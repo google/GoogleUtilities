@@ -14,7 +14,7 @@
 git clone \
   --depth 1 \
   --no-checkout \
-  git@github.com:firebase/firebase-ios-sdk.git \
+  https://github.com/firebase/firebase-ios-sdk.git \
 ;
 cd firebase-ios-sdk
 git checkout master -- scripts

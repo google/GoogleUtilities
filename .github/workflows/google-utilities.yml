@@ -17,7 +17,7 @@ jobs:
     - name: ls
       run: ls
     - name: Setup Scripts Directory
-      run: setup-scripts.sh
+      run: ./setup-scripts.sh
     - name: Setup Bundler
       run: scripts/setup_bundler.sh
     - name: Build and test
