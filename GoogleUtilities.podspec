@@ -8,19 +8,24 @@ Internal Google Utilities including Network, Reachability Environment, Logger an
 other Google CocoaPods. They're not intended for direct public usage.
                        DESC
 
-  s.homepage         = 'https://github.com/firebase/firebase-ios-sdk/tree/master/GoogleUtilities'
+  s.homepage         = 'https://github.com/google/GoogleUtilities'
   s.license          = { :type => 'Apache', :file => 'GoogleUtilities/LICENSE' }
   s.authors          = 'Google, Inc.'
 
   s.source           = {
-    :git => 'https://github.com/firebase/firebase-ios-sdk.git',
+    :git => 'https://github.com/google/GoogleUtilities.git',
     :tag => 'Utilities-' + s.version.to_s
   }
 
-  s.ios.deployment_target = '9.0'
-  s.osx.deployment_target = '10.12'
-  s.tvos.deployment_target = '10.0'
-  s.watchos.deployment_target = '6.0'
+  ios_deployment_target = '9.0'
+  osx_deployment_target = '10.12'
+  tvos_deployment_target = '10.0'
+  watchos_deployment_target = '6.0'
+
+  s.ios.deployment_target = ios_deployment_target
+  s.osx.deployment_target = osx_deployment_target
+  s.tvos.deployment_target = tvos_deployment_target
+  s.watchos.deployment_target = watchos_deployment_target
 
   s.cocoapods_version = '>= 1.4.0'
   s.prefix_header_file = false
@@ -118,7 +123,11 @@ other Google CocoaPods. They're not intended for direct public usage.
   s.test_spec 'unit' do |unit_tests|
     unit_tests.scheme = { :code_coverage => true }
     # All tests require arc except Tests/Network/third_party/GTMHTTPServer.m
-    unit_tests.platforms = {:ios => '8.0', :osx => '10.11', :tvos => '10.0'}
+    unit_tests.platforms = {
+      :ios => ios_deployment_target, 
+      :osx => osx_deployment_target, 
+      :tvos => tvos_deployment_target
+    }
     unit_tests.source_files = [
       'GoogleUtilities/Tests/Unit/**/*.[mh]',
       'SharedTestUtilities/URLSession/*.[mh]',
@@ -130,7 +139,11 @@ other Google CocoaPods. They're not intended for direct public usage.
 
   s.test_spec 'unit-swift' do |unit_tests_swift|
     unit_tests_swift.scheme = { :code_coverage => true }
-    unit_tests_swift.platforms = {:ios => '8.0', :osx => '10.11', :tvos => '10.0'}
+    unit_tests.platforms = {
+      :ios => ios_deployment_target, 
+      :osx => osx_deployment_target, 
+      :tvos => tvos_deployment_target
+    }
     unit_tests_swift.source_files = 'GoogleUtilities/Tests/SwiftUnit/**/*.swift',
                                     'GoogleUtilities/Tests/SwiftUnit/**/*.h'
     unit_tests_swift.requires_app_host = true

@@ -13,8 +13,7 @@ The utilities are not directly supported for non-Google library usage.
 
 ## Development
 
-To develop Firebase software in this repository, ensure that you have at least
-the following software:
+To develop in this repository, ensure that you have at least the following software:
 
   * Xcode 12.0 (or later)
   * CocoaPods 1.10.0 (or later)
@@ -66,8 +65,7 @@ Select a scheme and press Command-u to build a component and run its unit tests.
 
 ## Contributing
 
-See [Contributing](CONTRIBUTING.md) for more information on contributing to the Firebase
-iOS SDK.
+See [Contributing](CONTRIBUTING.md).
 
 ## License
 
