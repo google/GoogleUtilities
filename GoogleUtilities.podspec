@@ -9,7 +9,7 @@ other Google CocoaPods. They're not intended for direct public usage.
                        DESC
 
   s.homepage         = 'https://github.com/google/GoogleUtilities'
-  s.license          = { :type => 'Apache', :file => 'GoogleUtilities/LICENSE' }
+  s.license          = { :type => 'Apache', :file => 'LICENSE' }
   s.authors          = 'Google, Inc.'
 
   s.source           = {
