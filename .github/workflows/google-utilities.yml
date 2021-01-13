@@ -63,24 +63,24 @@ jobs:
     - name: Setup project and Build for Catalyst
       run: scripts/test_catalyst.sh GoogleUtilities test GoogleUtilities-Unit-unit
 
-#   utilities-cron-only:
-# #    if: github.event_name == 'schedule'
-#     runs-on: macos-latest
-#     strategy:
-#       matrix:
-#         target: [ios, tvos, macos]
-#         flags: [
-#           '--use-static-frameworks',
-#           '--use-libraries --skip-tests'
-#         ]
-#     needs: pod-lib-lint
-#     steps:
-#     - uses: actions/checkout@v2
-#     - name: Setup Scripts Directory
-#       run: setup-scripts.sh
-#     - name: Setup Bundler
-#       run: scripts/setup_bundler.sh
-#     - name: PodLibLint GoogleUtilities Cron
-#       run: |
-#         scripts/third_party/travis/retry.sh scripts/pod_lib_lint.rb \
-#           GoogleUtilities.podspec --platforms=${{ matrix.target }} ${{ matrix.flags }}
+  utilities-cron-only:
+#    if: github.event_name == 'schedule'
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target: [ios, tvos, macos]
+        flags: [
+          '--use-static-frameworks',
+          '--use-libraries --skip-tests'
+        ]
+    needs: pod-lib-lint
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Scripts Directory
+      run: setup-scripts.sh
+    - name: Setup Bundler
+      run: scripts/setup_bundler.sh
+    - name: PodLibLint GoogleUtilities Cron
+      run: |
+        scripts/third_party/travis/retry.sh scripts/pod_lib_lint.rb \
+          GoogleUtilities.podspec --platforms=${{ matrix.target }} ${{ matrix.flags }}
