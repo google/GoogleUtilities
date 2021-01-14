@@ -63,7 +63,6 @@ static NSString *const kGULGoogleAppDelegateProxyEnabledPlistKey =
 @property(nonatomic, strong) NSURL *url;
 @property(nonatomic, strong) NSDictionary<NSString *, id> *openURLOptions;
 @property(nonatomic, strong) NSString *openURLSourceApplication;
-@property(nonatomic, strong) id openURLAnnotation;
 
 @property(nonatomic, strong) NSUserActivity *userActivity;
 
@@ -88,13 +87,6 @@ static NSString *const kGULGoogleAppDelegateProxyEnabledPlistKey =
 // GULTestAppDelegate before GULAppDelegateSwizzlerTest. It works, but it might be a good idea to
 // figure a way to make this more deterministic.
 
-/** YES if GULTestAppDelegate responds to application:openURL:sourceApplication:annotation:, NO
- *  otherwise.
- */
-#if TARGET_OS_IOS || TARGET_OS_TV
-static BOOL gRespondsToOpenURLHandler_iOS8;
-#endif
-
 /** YES if GULTestAppDelegate responds to application:openURL:options:, NO otherwise. */
 static BOOL gRespondsToOpenURLHandler_iOS9;
 
@@ -112,12 +104,6 @@ static BOOL gRespondsToHandleBackgroundSession;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
-  // Before being proxied, it should be only be able to respond to
-  // application:openURL:sourceApplication:annotation:.
-#if TARGET_OS_IOS || TARGET_OS_TV
-  gRespondsToOpenURLHandler_iOS8 = [self
-      instancesRespondToSelector:@selector(application:openURL:sourceApplication:annotation:)];
-#endif
   gRespondsToOpenURLHandler_iOS9 =
       [self instancesRespondToSelector:@selector(application:openURL:options:)];
   gRespondsToHandleBackgroundSession =
@@ -149,19 +135,6 @@ static BOOL gRespondsToHandleBackgroundSession;
   _isOpenURLOptionsMethodCalled = YES;
   return NO;
 }
-
-#if TARGET_OS_IOS
-- (BOOL)application:(GULApplication *)application
-              openURL:(NSURL *)url
-    sourceApplication:(NSString *)sourceApplication
-           annotation:(id)annotation {
-  self.application = application;
-  self.url = url;
-  self.openURLSourceApplication = sourceApplication;
-  self.openURLAnnotation = annotation;
-  return NO;
-}
-#endif  // TARGET_OS_IOS
 
 - (BOOL)application:(GULApplication *)application
     continueUserActivity:(NSUserActivity *)userActivity
@@ -239,9 +212,6 @@ static BOOL gRespondsToHandleBackgroundSession;
 /** URL sent to application:openURL:options:. */
 @property(nonatomic, copy) NSURL *URLForIOS9;
 
-/** URL sent to application:openURL:sourceApplication:annotation:. */
-@property(nonatomic, copy) NSURL *URLForIOS8;
-
 /** The NSUserActivity sent to application:continueUserActivity:restorationHandler:. */
 @property(nonatomic, copy) NSUserActivity *userActivity;
 
@@ -255,16 +225,6 @@ static BOOL gRespondsToHandleBackgroundSession;
   _URLForIOS9 = [url copy];
   return YES;
 }
-
-#if TARGET_OS_IOS
-- (BOOL)application:(GULApplication *)application
-              openURL:(nonnull NSURL *)url
-    sourceApplication:(nullable NSString *)sourceApplication
-           annotation:(nonnull id)annotation {
-  _URLForIOS8 = [url copy];
-  return YES;
-}
-#endif  // TARGET_OS_IOS
 
 #if SDK_HAS_USERACTIVITY
 
@@ -332,12 +292,6 @@ static BOOL gRespondsToHandleBackgroundSession;
   // Class size must stay the same.
   XCTAssertEqual(sizeBefore, sizeAfter);
 
-  // After being proxied, it should be able to respond to the required method selector.
-#if TARGET_OS_IOS
-  XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:openURL:sourceApplication:annotation:)]);
-#endif  // TARGET_OS_IOS
-
   XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
                                                         continueUserActivity:restorationHandler:)]);
   XCTAssertTrue([realAppDelegate
@@ -389,12 +343,6 @@ static BOOL gRespondsToHandleBackgroundSession;
   // Class size must stay the same.
   XCTAssertEqual(sizeBefore, sizeAfter);
 
-  // After being proxied, it should be able to respond to the required method selector.
-#if TARGET_OS_IOS
-  XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:openURL:sourceApplication:annotation:)]);
-#endif  // TARGET_OS_IOS
-
   XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
                                                         continueUserActivity:restorationHandler:)]);
   // Remote notifications methods should be added only by
@@ -441,12 +389,6 @@ static BOOL gRespondsToHandleBackgroundSession;
 
   // Class size must stay the same.
   XCTAssertEqual(sizeBefore, sizeAfter);
-
-  // After being proxied, it should be able to respond to the required method selector.
-#if TARGET_OS_IOS
-  XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:openURL:sourceApplication:annotation:)]);
-#endif  // TARGET_OS_IOS
 
   XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
                                                         continueUserActivity:restorationHandler:)]);
@@ -500,12 +442,6 @@ static BOOL gRespondsToHandleBackgroundSession;
 
   // Class size must stay the same.
   XCTAssertEqual(sizeBefore, sizeAfter);
-
-  // After being proxied, it should be able to respond to the required method selector.
-#if TARGET_OS_IOS
-  XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:openURL:sourceApplication:annotation:)]);
-#endif  // TARGET_OS_IOS
 
   XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
                                                         continueUserActivity:restorationHandler:)]);
@@ -752,102 +688,6 @@ static BOOL gRespondsToHandleBackgroundSession;
   }
 }
 #endif  // TARGET_OS_IOS || TARGET_OS_TV
-
-#if TARGET_OS_IOS
-/** Tests that application:openURL:sourceApplication:annotation: is invoked on the interceptors if
- *  it exists.
- */
-- (void)testApplicationOpenURLSourceApplicationAnnotationIsInvokedOnInterceptors {
-  id interceptor = OCMProtocolMock(@protocol(GULApplicationDelegate));
-  OCMExpect([interceptor application:OCMOCK_ANY
-                             openURL:OCMOCK_ANY
-                   sourceApplication:OCMOCK_ANY
-                          annotation:OCMOCK_ANY])
-      .andReturn(NO);
-
-  id interceptor2 = OCMProtocolMock(@protocol(GULApplicationDelegate));
-  OCMExpect([interceptor2 application:OCMOCK_ANY
-                              openURL:OCMOCK_ANY
-                    sourceApplication:OCMOCK_ANY
-                           annotation:OCMOCK_ANY])
-      .andReturn(NO);
-
-  NSURL *testURL = [[NSURL alloc] initWithString:@"https://www.google.com"];
-
-  GULTestAppDelegate *testAppDelegate = [[GULTestAppDelegate alloc] init];
-  OCMStub([self.mockSharedApplication delegate]).andReturn(testAppDelegate);
-  [GULAppDelegateSwizzler proxyOriginalDelegate];
-
-  [GULAppDelegateSwizzler registerAppDelegateInterceptor:interceptor];
-  [GULAppDelegateSwizzler registerAppDelegateInterceptor:interceptor2];
-
-  NSString *sourceApplication = @"testApp";
-  NSString *annotation = @"testAnnotation";
-  [testAppDelegate application:[GULApplication sharedApplication]
-                       openURL:testURL
-             sourceApplication:sourceApplication
-                    annotation:annotation];
-
-  OCMVerifyAll(interceptor);
-  OCMVerifyAll(interceptor2);
-
-  // Check that original implementation was called with proper parameters
-  XCTAssertEqual(testAppDelegate.application, [GULApplication sharedApplication]);
-  XCTAssertEqual(testAppDelegate.url, testURL);
-  XCTAssertEqual(testAppDelegate.openURLSourceApplication, sourceApplication);
-  XCTAssertEqual(testAppDelegate.openURLAnnotation, annotation);
-}
-
-/** Tests that the result of application:openURL:sourceApplication:annotation: from all interceptors
- *  is ORed.
- */
-- (void)testApplicationOpenURLSourceApplicationAnnotationResultIsORed {
-  GULTestAppDelegate *testAppDelegate = [[GULTestAppDelegate alloc] init];
-  OCMStub([self.mockSharedApplication delegate]).andReturn(testAppDelegate);
-  NSURL *testURL = [[NSURL alloc] initWithString:@"https://www.google.com"];
-  [GULAppDelegateSwizzler proxyOriginalDelegate];
-
-  BOOL shouldOpen = [testAppDelegate application:[GULApplication sharedApplication]
-                                         openURL:testURL
-                               sourceApplication:@"test"
-                                      annotation:@"test"];
-  // Verify that without interceptors the result is NO.
-  XCTAssertFalse(shouldOpen);
-
-  id interceptor = OCMProtocolMock(@protocol(GULApplicationDelegate));
-  OCMExpect([interceptor application:OCMOCK_ANY
-                             openURL:OCMOCK_ANY
-                   sourceApplication:OCMOCK_ANY
-                          annotation:OCMOCK_ANY])
-      .andReturn(NO);
-  [GULAppDelegateSwizzler registerAppDelegateInterceptor:interceptor];
-  shouldOpen = [testAppDelegate application:[GULApplication sharedApplication]
-                                    openURL:testURL
-                          sourceApplication:@"test"
-                                 annotation:@"test"];
-  // The result is still NO if the only interceptor returns NO.
-  XCTAssertFalse(shouldOpen);
-
-  id interceptor2 = OCMProtocolMock(@protocol(GULApplicationDelegate));
-  OCMExpect([interceptor2 application:OCMOCK_ANY
-                              openURL:OCMOCK_ANY
-                    sourceApplication:OCMOCK_ANY
-                           annotation:OCMOCK_ANY])
-      .andReturn(YES);
-  OCMExpect([interceptor application:OCMOCK_ANY
-                             openURL:OCMOCK_ANY
-                   sourceApplication:OCMOCK_ANY
-                          annotation:OCMOCK_ANY])
-      .andReturn(NO);
-  [GULAppDelegateSwizzler registerAppDelegateInterceptor:interceptor2];
-  shouldOpen = [testAppDelegate application:[GULApplication sharedApplication]
-                                    openURL:testURL
-                          sourceApplication:@"test"
-                                 annotation:@"test"];
-  // The result is YES if one of the interceptors returns YES.
-  XCTAssertTrue(shouldOpen);
-}
-#endif  // TARGET_OS_IOS
 
 #if TARGET_OS_IOS || TARGET_OS_TV
 /** Tests that application:handleEventsForBackgroundURLSession:completionHandler: is invoked on the
