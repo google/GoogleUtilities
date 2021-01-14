@@ -30,7 +30,7 @@ jobs:
 #     steps:
 #     - uses: actions/checkout@v2
 #     - name: Setup Scripts Directory
-#       run: setup-scripts.sh
+#       run: ./setup-scripts.sh
 #     - name: Initialize xcodebuild
 #       run: xcodebuild -list
 #     - name: iOS Unit Tests
@@ -46,7 +46,7 @@ jobs:
 #     steps:
 #     - uses: actions/checkout@v2
 #     - name: Setup Scripts Directory
-#       run: setup-scripts.sh
+#       run: ./setup-scripts.sh
 #     - name: Initialize xcodebuild
 #       run: xcodebuild -list
 #     - name: Unit Tests
@@ -77,7 +77,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Setup Scripts Directory
-      run: setup-scripts.sh
+      run: ./setup-scripts.sh
     - name: Setup Bundler
       run: scripts/setup_bundler.sh
     - name: PodLibLint GoogleUtilities Cron
