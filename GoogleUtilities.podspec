@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = 'GoogleUtilities'
   s.version          = '7.2.0'
-  s.summary          = 'Google Utilities for iOS (plus community support for macOS and tvOS)'
+  s.summary          = 'Google Utilities for Apple platform SDKs'
 
   s.description      = <<-DESC
 Internal Google Utilities including Network, Reachability Environment, Logger and Swizzling for
@@ -14,7 +14,7 @@ other Google CocoaPods. They're not intended for direct public usage.
 
   s.source           = {
     :git => 'https://github.com/google/GoogleUtilities.git',
-    :tag => 'Utilities-' + s.version.to_s
+    :tag => 'CocoaPods-' + s.version.to_s
   }
 
   ios_deployment_target = '9.0'
