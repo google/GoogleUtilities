@@ -28,7 +28,11 @@ jobs:
       run: ./setup-scripts.sh
 
     - name: Setup check
-      run:  scripts/setup_check.sh
+      run: |
+        brew update
+        brew install clang-format@11
+        brew install mint
+        mint bootstrap
 
     - name: Check
       run: |
