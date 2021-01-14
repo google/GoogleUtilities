@@ -124,8 +124,8 @@ other Google CocoaPods. They're not intended for direct public usage.
     unit_tests.scheme = { :code_coverage => true }
     # All tests require arc except Tests/Network/third_party/GTMHTTPServer.m
     unit_tests.platforms = {
-      :ios => ios_deployment_target, 
-      :osx => osx_deployment_target, 
+      :ios => ios_deployment_target,
+      :osx => osx_deployment_target,
       :tvos => tvos_deployment_target
     }
     unit_tests.source_files = [
@@ -140,8 +140,8 @@ other Google CocoaPods. They're not intended for direct public usage.
   s.test_spec 'unit-swift' do |unit_tests_swift|
     unit_tests_swift.scheme = { :code_coverage => true }
     unit_tests_swift.platforms = {
-      :ios => ios_deployment_target, 
-      :osx => osx_deployment_target, 
+      :ios => ios_deployment_target,
+      :osx => osx_deployment_target,
       :tvos => tvos_deployment_target
     }
     unit_tests_swift.source_files = 'GoogleUtilities/Tests/SwiftUnit/**/*.swift',
