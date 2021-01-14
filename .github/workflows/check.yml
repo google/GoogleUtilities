@@ -24,6 +24,9 @@ jobs:
         key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
         restore-keys: ${{ runner.os }}-mint-
 
+    - name: Setup Scripts Directory
+      run: ./setup-scripts.sh
+
     - name: Setup check
       run:  scripts/setup_check.sh
 

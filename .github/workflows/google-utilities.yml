@@ -64,7 +64,7 @@ jobs:
       run: scripts/test_catalyst.sh GoogleUtilities test GoogleUtilities-Unit-unit
 
   utilities-cron-only:
-#    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule'
     runs-on: macos-latest
     strategy:
       matrix:
