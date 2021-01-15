@@ -22,4 +22,4 @@ jobs:
     - name: Initialize xcodebuild
       run: xcodebuild -list
     - name: iOS Unit Tests
-      run: scripts/third_party/travis/retry.sh scripts/build.sh Firebase-Package ${{ matrix.target }} spm
+      run: scripts/third_party/travis/retry.sh scripts/build.sh GoogleUtilities-Package ${{ matrix.target }} spm
