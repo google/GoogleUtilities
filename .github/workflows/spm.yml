@@ -17,6 +17,8 @@ jobs:
         target: [iOS, tvOS, macOS, catalyst]
     steps:
     - uses: actions/checkout@v2
+    - name: Setup Scripts Directory
+      run: ./setup-scripts.sh
     - name: Initialize xcodebuild
       run: xcodebuild -list
     - name: iOS Unit Tests

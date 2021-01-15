@@ -45,8 +45,7 @@ let package = Package(
       name: "GoogleUtilities_AppDelegateSwizzler",
       dependencies: ["GoogleUtilities_Environment",
                      "GoogleUtilities_Logger",
-                     "GoogleUtilities_Network"
-      ],
+                     "GoogleUtilities_Network"],
       path: "GoogleUtilities",
       exclude: [
         "CHANGELOG.md",
@@ -179,9 +178,9 @@ let package = Package(
       ],
       path: "SwiftPMTests/swift-test"
     ),
-     .testTarget(
-       name: "objc-import-test",
-       dependencies: [
+    .testTarget(
+      name: "objc-import-test",
+      dependencies: [
         "GoogleUtilities_AppDelegateSwizzler",
         "GoogleUtilities_Environment",
         "GoogleUtilities_ISASwizzler",
@@ -191,35 +190,35 @@ let package = Package(
         "GoogleUtilities_NSData",
         "GoogleUtilities_Reachability",
         "GoogleUtilities_UserDefaults",
-       ],
-       path: "SwiftPMTests/objc-import-test"
-     ),
+      ],
+      path: "SwiftPMTests/objc-import-test"
+    ),
     // TODO: - need to port Network/third_party/GTMHTTPServer.m to ARC.
-     .testTarget(
-       name: "UtilitiesUnit",
-       dependencies: [
-         "OCMock",
-         "GoogleUtilities_AppDelegateSwizzler",
-         "GoogleUtilities_Environment",
-         "GoogleUtilities_ISASwizzler",
-         "GoogleUtilities_Logger",
-         "GoogleUtilities_MethodSwizzler",
-         "GoogleUtilities_Network",
-         "GoogleUtilities_NSData",
-         "GoogleUtilities_Reachability",
-         "GoogleUtilities_UserDefaults",
+    .testTarget(
+      name: "UtilitiesUnit",
+      dependencies: [
+        "OCMock",
+        "GoogleUtilities_AppDelegateSwizzler",
+        "GoogleUtilities_Environment",
+        "GoogleUtilities_ISASwizzler",
+        "GoogleUtilities_Logger",
+        "GoogleUtilities_MethodSwizzler",
+        "GoogleUtilities_Network",
+        "GoogleUtilities_NSData",
+        "GoogleUtilities_Reachability",
+        "GoogleUtilities_UserDefaults",
         "SwizzlerTestHelpers",
-       ],
-       path: "GoogleUtilities/Tests/Unit",
-       exclude: [
-         "Network/third_party/LICENSE",
-         "Network/GULNetworkTest.m", // Requires GTMHTTPServer.m
-         "Network/third_party/GTMHTTPServer.m", // Requires disabling ARC
-       ],
-       cSettings: [
-         .headerSearchPath("../../.."),
-       ]
-     ),
+      ],
+      path: "GoogleUtilities/Tests/Unit",
+      exclude: [
+        "Network/third_party/LICENSE",
+        "Network/GULNetworkTest.m", // Requires GTMHTTPServer.m
+        "Network/third_party/GTMHTTPServer.m", // Requires disabling ARC
+      ],
+      cSettings: [
+        .headerSearchPath("../../.."),
+      ]
+    ),
   ],
   cLanguageStandard: .c99,
   cxxLanguageStandard: CXXLanguageStandard.gnucxx14
