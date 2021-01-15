@@ -25,33 +25,6 @@ jobs:
         scripts/third_party/travis/retry.sh scripts/pod_lib_lint.rb GoogleUtilities.podspec \
           --platforms=${{ matrix.target }}
 
-#   spm:
-#     runs-on: macOS-latest
-#     steps:
-#     - uses: actions/checkout@v2
-#     - name: Setup Scripts Directory
-#       run: ./setup-scripts.sh
-#     - name: Initialize xcodebuild
-#       run: xcodebuild -list
-#     - name: iOS Unit Tests
-#       # Only UserDefaults currently has a scheme.
-#       run: scripts/third_party/travis/retry.sh ./scripts/build.sh GoogleUtilities_UserDefaults iOS spmbuildonly
-
-#   spm-cron:
-# #    if: github.event_name == 'schedule'
-#     runs-on: macOS-latest
-#     strategy:
-#       matrix:
-#         target: [tvOS, macOS, catalyst]
-#     steps:
-#     - uses: actions/checkout@v2
-#     - name: Setup Scripts Directory
-#       run: ./setup-scripts.sh
-#     - name: Initialize xcodebuild
-#       run: xcodebuild -list
-#     - name: Unit Tests
-#       run: scripts/third_party/travis/retry.sh ./scripts/build.sh GoogleUtilities_UserDefaults ${{ matrix.target }} spmbuildonly
-
   catalyst:
     runs-on: macOS-latest
     steps:
@@ -63,8 +36,7 @@ jobs:
     - name: Setup project and Build for Catalyst
       run: scripts/test_catalyst.sh GoogleUtilities test GoogleUtilities-Unit-unit
 
-  utilities-cron-only:
-    if: github.event_name == 'schedule'
+  utilities-cocoapods-option-matrix:
     runs-on: macos-latest
     strategy:
       matrix:

@@ -130,8 +130,7 @@ other Google CocoaPods. They're not intended for direct public usage.
     }
     unit_tests.source_files = [
       'GoogleUtilities/Tests/Unit/**/*.[mh]',
-      'SharedTestUtilities/URLSession/*.[mh]',
-  ]
+    ]
     unit_tests.requires_arc = 'GoogleUtilities/Tests/Unit/*/*.[mh]'
     unit_tests.requires_app_host = true
     unit_tests.dependency 'OCMock'
