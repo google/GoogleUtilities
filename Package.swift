@@ -26,6 +26,38 @@ let package = Package(
       targets: ["GoogleUtilities_AppDelegateSwizzler"]
     ),
     .library(
+      name: "Environment",
+      targets: ["GoogleUtilities_Environment"]
+    ),
+    .library(
+      name: "Logger",
+      targets: ["GoogleUtilities_Logger"]
+    ),
+    .library(
+      name: "ISASwizzler",
+      targets: ["GoogleUtilities_ISASwizzler"]
+    ),
+    .library(
+      name: "MethodSwizzler",
+      targets: ["GoogleUtilities_MethodSwizzler"]
+    ),
+    .library(
+      name: "Network",
+      targets: ["GoogleUtilities_Network"]
+    ),
+    .library(
+      name: "NSData",
+      targets: ["GoogleUtilities_NSData"]
+    ),
+    .library(
+      name: "Reachability",
+      targets: ["GoogleUtilities_Reachability"]
+    ),
+    .library(
+      name: "SwizzlerTestHelpers",
+      targets: ["GoogleUtilities_SwizzlerTestHelpers"]
+    ),
+    .library(
       name: "UserDefaults",
       targets: ["GoogleUtilities_UserDefaults"]
     ),
@@ -38,6 +70,7 @@ let package = Package(
       .revision("7291762d3551c5c7e31c49cce40a0e391a52e889")
     ),
   ],
+  // TODO: Restructure directory structure to simplify the excludes here.
   targets: [
     .target(
       name: "GoogleUtilities_AppDelegateSwizzler",

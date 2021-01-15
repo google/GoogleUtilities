@@ -20,6 +20,7 @@
 
 #if !SWIFT_PACKAGE
 // TODO: Investigate why keychain tests fail on iOS with Swift Package Manager.
+// Keychain tests need a host app.
 
 #import <XCTest/XCTest.h>
 
