@@ -6,9 +6,6 @@ on:
     # Run every day at 11pm (PST) - cron uses UTC times
     - cron:  '0 7 * * *'
 
-# This workflow builds and tests the Swift Package Manager. Only iOS runs on PRs
-# because each platform takes 15-20 minutes after adding Firestore.
-
 jobs:
   swift-build-run:
     runs-on: macOS-latest
