@@ -17,8 +17,6 @@
 
 import PackageDescription
 
-let firebaseVersion = "7.2.0"
-
 let package = Package(
   name: "GoogleUtilities",
   platforms: [.iOS(.v10), .macOS(.v10_12), .tvOS(.v10), .watchOS(.v6)],
