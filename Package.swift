@@ -186,7 +186,7 @@ let package = Package(
       ]
     ),
     .target(
-      name: "SwizzlerTestHelpers",
+      name: "GoogleUtilities_SwizzlerTestHelpers",
       dependencies: ["GoogleUtilities_MethodSwizzler"],
       path: "GoogleUtilities/SwizzlerTestHelpers",
       publicHeadersPath: "Public",
