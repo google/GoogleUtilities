@@ -18,6 +18,10 @@
 #if !TARGET_OS_MACCATALYST
 // Skip keychain tests on Catalyst.
 
+#if !SWIFT_PACKAGE
+// TODO: Investigate why keychain tests fail on iOS with Swift Package Manager.
+// Keychain tests need a host app.
+
 #import <XCTest/XCTest.h>
 
 #import "FBLPromise+Testing.h"
@@ -204,4 +208,5 @@
 
 @end
 
+#endif  // SWIFT_PACKAGE
 #endif  // TARGET_OS_MACCATALYST
