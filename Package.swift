@@ -238,7 +238,7 @@ let package = Package(
         "GoogleUtilities_NSData",
         "GoogleUtilities_Reachability",
         "GoogleUtilities_UserDefaults",
-        "SwizzlerTestHelpers",
+        "GoogleUtilities_SwizzlerTestHelpers",
       ],
       path: "GoogleUtilities/Tests/Unit",
       exclude: [

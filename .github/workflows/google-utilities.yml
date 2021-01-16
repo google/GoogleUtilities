@@ -34,7 +34,9 @@ jobs:
     - name: Setup Bundler
       run: scripts/setup_bundler.sh
     - name: Setup project and Build for Catalyst
-      run: scripts/test_catalyst.sh GoogleUtilities test GoogleUtilities-Unit-unit
+      run: |
+        scripts/third_party/travis/retry.sh scripts/test_catalyst.sh GoogleUtilities test \
+          GoogleUtilities-Unit-unit
 
   utilities-cocoapods-option-matrix:
     runs-on: macos-latest
