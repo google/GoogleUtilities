@@ -11,6 +11,28 @@ development.
 
 The utilities are not directly supported for non-Google library usage.
 
+## Integration Testing
+These instructions apply to minor and patch version updates. Major versions need
+a customized adaptation.
+
+After the CI is green:
+  * Update the version in the podspec
+  * Add the CocoaPods tag
+    * `git tag CocoaPods-{version}`
+    * `git push origin CocoaPods-{version}`
+  * Push the podspec to SpecsStaging
+    * `pod repo push staging GoogleUtilities.podspec`
+  * Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`
+  * On google3, copybara and run a global TAP
+    * `third_party/firebase/ios/Releases/run_copy_bara.py --directory GoogleUtilities`
+
+## Publishing
+  * Add a version tag for Swift PM
+    * `git tag {version}`
+    * `git push origin {version}`
+  * `pod trunk push GoogleUtilities.podspec`
+  * Clean up SpecsStaging
+
 ## Development
 
 To develop in this repository, ensure that you have at least the following software:
