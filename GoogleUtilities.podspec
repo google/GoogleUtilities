@@ -97,6 +97,10 @@ other Google CocoaPods. They're not intended for direct public usage.
     adss.dependency 'GoogleUtilities/Environment'
   end
 
+  s.subspec 'MulticastAppDelegate' do |mad|
+    mad.source_files = 'GoogleUtilities/MulticastAppDelegate/**/*.swift'
+  end
+
   s.subspec 'ISASwizzler' do |iss|
     iss.source_files = 'GoogleUtilities/ISASwizzler/**/*.[mh]', 'GoogleUtilities/Common/*.h'
     iss.public_header_files = 'GoogleUtilities/ISASwizzler/Public/GoogleUtilities/*.h'
