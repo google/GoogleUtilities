@@ -1,0 +1,53 @@
+# OS X
+.DS_Store
+
+# Xcode
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+profile
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+
+# Swift Package Manager
+*/.build
+Package.resolved
+
+# Mint package manager
+Mint
+
+# IntelliJ
+.idea
+
+# Vim
+*.swo
+*.swp
+*~
+
+# Bundler
+/.bundle
+/vendor
+
+# Pods
+Pods/
+Podfile.lock
+*.xcworkspace
+
+# CocoaPods generate
+gen/
+
+#firebase-ios-sdk clone
+firebase-ios-sdk/
+
+#scripts link
+scripts
