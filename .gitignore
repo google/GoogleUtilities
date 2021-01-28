@@ -21,6 +21,33 @@ DerivedData
 
 # Swift Package Manager
 */.build
+Package.resolved
+
+# Mint package manager
+Mint
+
+# IntelliJ
+.idea
+
+# Vim
+*.swo
+*.swp
+*~
+
+# Bundler
+/.bundle
+/vendor
+
+# Pods
+Pods/
+Podfile.lock
+*.xcworkspace
 
 # CocoaPods generate
 gen/
+
+#firebase-ios-sdk clone
+firebase-ios-sdk/
+
+#scripts link
+scripts
