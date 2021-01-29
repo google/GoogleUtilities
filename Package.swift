@@ -22,43 +22,43 @@ let package = Package(
   platforms: [.iOS(.v10), .macOS(.v10_12), .tvOS(.v10), .watchOS(.v6)],
   products: [
     .library(
-      name: "AppDelegateSwizzler",
+      name: "GULAppDelegateSwizzler",
       targets: ["GoogleUtilities_AppDelegateSwizzler"]
     ),
     .library(
-      name: "Environment",
+      name: "GULEnvironment",
       targets: ["GoogleUtilities_Environment"]
     ),
     .library(
-      name: "Logger",
+      name: "GULLogger",
       targets: ["GoogleUtilities_Logger"]
     ),
     .library(
-      name: "ISASwizzler",
+      name: "GULISASwizzler",
       targets: ["GoogleUtilities_ISASwizzler"]
     ),
     .library(
-      name: "MethodSwizzler",
+      name: "GULMethodSwizzler",
       targets: ["GoogleUtilities_MethodSwizzler"]
     ),
     .library(
-      name: "Network",
+      name: "GULNetwork",
       targets: ["GoogleUtilities_Network"]
     ),
     .library(
-      name: "NSData",
+      name: "GULNSData",
       targets: ["GoogleUtilities_NSData"]
     ),
     .library(
-      name: "Reachability",
+      name: "GULReachability",
       targets: ["GoogleUtilities_Reachability"]
     ),
     .library(
-      name: "SwizzlerTestHelpers",
+      name: "GULSwizzlerTestHelpers",
       targets: ["GoogleUtilities_SwizzlerTestHelpers"]
     ),
     .library(
-      name: "UserDefaults",
+      name: "GULUserDefaults",
       targets: ["GoogleUtilities_UserDefaults"]
     ),
   ],
