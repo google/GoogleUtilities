@@ -79,9 +79,6 @@ let package = Package(
                      "GoogleUtilities_Network"],
       path: "GoogleUtilities",
       exclude: [
-        "CHANGELOG.md",
-        "CMakeLists.txt",
-        "LICENSE",
         "README.md",
         "AppDelegateSwizzler/README.md",
         "Environment/",

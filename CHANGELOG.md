@@ -1,4 +1,10 @@
-# 7.4.0
+# 7.2.2
+- Fix warnings introduced with Xcode 12.5. (#8)
+
+# 7.2.1
+- Fix GoogleUtilities namespacing (SPM only release). (#7)
+
+# 7.2.0
 - `NSURLSession` promise extension public API. (#7097)
 
 # 7.1.1
