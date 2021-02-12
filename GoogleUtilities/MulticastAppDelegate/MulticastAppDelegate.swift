@@ -27,7 +27,12 @@ open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate
   private var appDelegate: MulticastAppDelegateProtocol.Delegate?
   private var interceptors: [MulticastAppDelegateProtocol.Delegate] = []
   private var allInterceptors: [MulticastAppDelegateProtocol.Delegate] {
-    var allInterceptors: [MulticastAppDelegateProtocol.Delegate] = appDelegate != nil ? [appDelegate!] : []
+    guard let appDelegate = appDelegate else {
+      return interceptors
+    }
+
+    var allInterceptors = [appDelegate]
+    allInterceptors.append(contentsOf: interceptors)
     return allInterceptors
   }
 
@@ -46,7 +51,18 @@ open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate
     interceptors = interceptors.filter { $0 !== interceptor }
   }
 
+  // Forward all unknown messages to the original app delegate.
+  public override func responds(to aSelector: Selector!) -> Bool {
+    if type(of: self).instancesRespond(to: aSelector) {
+      return true
+    }
 
+    return appDelegate?.responds(to: aSelector) ?? false
+  }
+
+  open override func forwardingTarget(for aSelector: Selector!) -> Any? {
+    return appDelegate
+  }
 }
 
 extension MulticastAppDelegate: MulticastAppDelegateProtocol {
