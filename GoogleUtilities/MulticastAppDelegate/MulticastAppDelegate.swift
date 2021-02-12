@@ -24,7 +24,17 @@ public protocol MulticastAppDelegateProtocol: NSObjectProtocol {
 
 @objc
 open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate {
+  private var appDelegate: MulticastAppDelegateProtocol.Delegate?
   private var interceptors: [MulticastAppDelegateProtocol.Delegate] = []
+  private var allInterceptors: [MulticastAppDelegateProtocol.Delegate] {
+    var allInterceptors: [MulticastAppDelegateProtocol.Delegate] = appDelegate != nil ? [appDelegate!] : []
+    return allInterceptors
+  }
+
+  public init(appDelegate: MulticastAppDelegateProtocol.Delegate) {
+    super.init()
+    self.appDelegate = appDelegate
+  }
 
   @objc
   public func addInterceptor(_ interceptor: Delegate) {
@@ -35,6 +45,8 @@ open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate
   public func removeInterceptor(_ interceptor: Delegate) {
     interceptors = interceptors.filter { $0 !== interceptor }
   }
+
+
 }
 
 extension MulticastAppDelegate: MulticastAppDelegateProtocol {
