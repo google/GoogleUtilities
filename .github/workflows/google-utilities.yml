@@ -14,8 +14,6 @@ jobs:
         target: [ios, tvos, macos]
     steps:
     - uses: actions/checkout@v2
-    - name: ls
-      run: ls
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Setup Bundler
