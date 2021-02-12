@@ -23,7 +23,7 @@ public protocol MulticastAppDelegateProtocol: NSObjectProtocol {
 }
 
 @objc
-public class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate {
+open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate {
   private var interceptors: [MulticastAppDelegateProtocol.Delegate] = []
 
   @objc
@@ -38,6 +38,16 @@ public class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delega
 }
 
 extension MulticastAppDelegate: MulticastAppDelegateProtocol {
+
+  public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    var result = false
+
+    for interceptor in interceptors {
+      result = result || interceptor.application?(application, didFinishLaunchingWithOptions: launchOptions) ?? false
+    }
+
+    return result
+  }
 
   public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     var result = false
