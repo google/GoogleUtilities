@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
 
   s.source           = {
     :git => 'https://github.com/google/GoogleUtilities.git',
-    :tag => 'CocoaPods-' + s.version.to_s
+    :tag => 'MulticastAppDelegate-' + s.version.to_s
   }
 
   ios_deployment_target = '9.0'
