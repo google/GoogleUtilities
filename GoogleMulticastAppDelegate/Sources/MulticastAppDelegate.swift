@@ -24,7 +24,7 @@ public protocol MulticastAppDelegateProtocol: NSObjectProtocol {
 
 @objc
 open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate {
-  private var appDelegate: MulticastAppDelegateProtocol.Delegate?
+  public var appDelegate: MulticastAppDelegateProtocol.Delegate?
   private var interceptors: [MulticastAppDelegateProtocol.Delegate] = []
   private var allInterceptors: [MulticastAppDelegateProtocol.Delegate] {
     guard let appDelegate = appDelegate else {
@@ -34,6 +34,10 @@ open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate
     var allInterceptors = [appDelegate]
     allInterceptors.append(contentsOf: interceptors)
     return allInterceptors
+  }
+
+  public override init() {
+    super.init()
   }
 
   public init(appDelegate: MulticastAppDelegateProtocol.Delegate) {
@@ -70,7 +74,7 @@ extension MulticastAppDelegate: MulticastAppDelegateProtocol {
   public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     var result = false
 
-    for interceptor in interceptors {
+    for interceptor in allInterceptors {
       result = result || interceptor.application?(application, didFinishLaunchingWithOptions: launchOptions) ?? false
     }
 
@@ -80,7 +84,7 @@ extension MulticastAppDelegate: MulticastAppDelegateProtocol {
   public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     var result = false
 
-    for interceptor in interceptors {
+    for interceptor in allInterceptors {
       result = result || interceptor.application?(app, open: url, options: options) ?? false
     }
 
@@ -88,7 +92,7 @@ extension MulticastAppDelegate: MulticastAppDelegateProtocol {
   }
 
   public func application(_ application: UIApplication, didReceiveRemoteNotification notification: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-    for interceptor in interceptors {
+    for interceptor in allInterceptors {
       interceptor.application?(application, didReceiveRemoteNotification: notification, fetchCompletionHandler:completionHandler)
     }
   }
