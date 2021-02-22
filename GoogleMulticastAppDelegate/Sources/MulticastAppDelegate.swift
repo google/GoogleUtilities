@@ -93,6 +93,7 @@ extension MulticastAppDelegate: MulticastAppDelegateProtocol {
 
   public func application(_ application: UIApplication, didReceiveRemoteNotification notification: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
     for interceptor in allInterceptors {
+      // TODO: Make sure completionHandler is called once.
       interceptor.application?(application, didReceiveRemoteNotification: notification, fetchCompletionHandler:completionHandler)
     }
   }
