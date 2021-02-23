@@ -14,7 +14,10 @@
 
 import UIKit
 
-@objc
+private typealias Application = UIApplication
+private typealias ApplicationDelegate = UIApplicationDelegate
+
+@objc(GULMulticastAppDelegateProtocol)
 public protocol MulticastAppDelegateProtocol: NSObjectProtocol {
   typealias Delegate = UIApplicationDelegate
 
@@ -22,8 +25,8 @@ public protocol MulticastAppDelegateProtocol: NSObjectProtocol {
   func removeInterceptor(_ interceptor: Delegate)
 }
 
-@objc
-open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate {
+@objc(GULMulticastAppDelegate)
+open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol {
   public var appDelegate: MulticastAppDelegateProtocol.Delegate?
   private var interceptors: [MulticastAppDelegateProtocol.Delegate] = []
   private var allInterceptors: [MulticastAppDelegateProtocol.Delegate] {
@@ -64,12 +67,23 @@ open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol.Delegate
     return appDelegate?.responds(to: aSelector) ?? false
   }
 
-  open override func forwardingTarget(for aSelector: Selector!) -> Any? {
+  open override func forwardingTarget(for aSelector: Selector) -> Any? {
     return appDelegate
   }
 }
 
-extension MulticastAppDelegate: MulticastAppDelegateProtocol {
+extension MulticastAppDelegate {
+  @objc
+  public class func installedMulticastDelegate() -> MulticastAppDelegateProtocol? {
+    guard let multicastDelegate = Application.shared.delegate as? MulticastAppDelegateProtocol else {
+      return nil
+    }
+
+    return multicastDelegate
+  }
+}
+
+extension MulticastAppDelegate: MulticastAppDelegateProtocol.Delegate {
 
   public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     var result = false
@@ -89,6 +103,18 @@ extension MulticastAppDelegate: MulticastAppDelegateProtocol {
     }
 
     return result
+  }
+
+  public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    for interceptor in allInterceptors {
+      interceptor.application?(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+    }
+  }
+
+  public func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+    for interceptor in allInterceptors {
+      interceptor.application?(application, didFailToRegisterForRemoteNotificationsWithError: error)
+    }
   }
 
   public func application(_ application: UIApplication, didReceiveRemoteNotification notification: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
