@@ -19,19 +19,25 @@
 
 @interface GULHeartbeatDateStorageTest : XCTestCase
 @property(nonatomic) GULHeartbeatDateStorage *storage;
+#if TARGET_OS_TV
+@property(nonatomic) NSUserDefaults *defaults;
+#endif  // TARGET_OS_TV
 @end
 
 static NSString *const kTestFileName = @"GULStorageHeartbeatTest";
 
 @implementation GULHeartbeatDateStorageTest
 
-- (void)setUp {
 #if TARGET_OS_TV
-  NSArray *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+- (void)setUp {
+  NSString *suiteName = [self userDefaultsSuiteName];
+  self.defaults = [[NSUserDefaults alloc] initWithSuiteName:suiteName];
+  self.storage = [[GULHeartbeatDateStorage alloc] initWithDefaults:self.defaults key:@"test_root"];
+}
 #else
+- (void)setUp {
   NSArray *path =
       NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-#endif
   NSString *rootPath = [path firstObject];
   XCTAssertNotNil(rootPath);
   NSURL *rootURL = [NSURL fileURLWithPath:rootPath];
@@ -49,9 +55,15 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTest";
 
   [self assertInitializationDoesNotAccessFileSystem];
 }
+#endif  // TARGET_OS_TV
 
 - (void)tearDown {
+#if TARGET_OS_TV
+  [self.defaults removePersistentDomainForName:[self userDefaultsSuiteName]];
+  self.defaults = nil;
+#else
   [[NSFileManager defaultManager] removeItemAtURL:[self.storage fileURL] error:nil];
+#endif  // TARGET_OS_TV
   self.storage = nil;
 }
 
@@ -64,6 +76,16 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTest";
 
 #pragma mark - Private Helpers
 
+#if TARGET_OS_TV
+
+- (NSString *)userDefaultsSuiteName {
+  NSCharacterSet *lettersToTrim = [[NSCharacterSet letterCharacterSet] invertedSet];
+  NSString *nameWithSpaces = [self.name stringByTrimmingCharactersInSet:lettersToTrim];
+  return [nameWithSpaces stringByReplacingOccurrencesOfString:@" " withString:@"_"];
+}
+
+#else
+
 - (void)assertInitializationDoesNotAccessFileSystem {
   NSURL *fileURL = [self heartbeatFileURL];
   NSError *error;
@@ -74,17 +96,15 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTest";
 }
 
 - (NSURL *)heartbeatFileURL {
-#if TARGET_OS_TV
-  NSArray *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-#else
   NSArray *path =
       NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-#endif
   NSString *rootPath = [path firstObject];
   NSArray<NSString *> *components = @[ rootPath, @"Google/FIRApp", kTestFileName ];
   NSString *fileString = [NSString pathWithComponents:components];
   NSURL *fileURL = [NSURL fileURLWithPath:fileString];
   return fileURL;
 }
+
+#endif  // TARGET_OS_TV
 
 @end

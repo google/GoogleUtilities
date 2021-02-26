@@ -23,8 +23,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-@property(nonatomic, readonly) NSURL *fileURL;
+@property(nonatomic, readonly) NSURL *fileURL API_UNAVAILABLE(tvos);
 
+/**
+ * Default initializer for tvOS. tvOS can only write to the cache directory and
+ * there are no guarantees that the directory will persist. User defaults will
+ * be retained, so that should be used instead.
+ * @param defaults User defaults instance to store the heartbeat information.
+ * @param key The key to be used with the user defaults instance.
+ */
+- (instancetype)initWithDefaults:(NSUserDefaults *)defaults
+                             key:(NSString *)key API_AVAILABLE(tvos(10.0))
+                                     API_UNAVAILABLE(ios, macCatalyst, macos);
+
+/**
+ * Default initializer for non-tvOS platforms.
+ * @param fileName The name of the file to store the date information.
+ * exist, it will be created if needed.
+ */
+- (instancetype)initWithFileName:(NSString *)fileName API_UNAVAILABLE(tvos);
 /**
  * Default initializer.
  * @param fileName The name of the file to store the date information.

@@ -18,13 +18,43 @@
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
 @interface GULHeartbeatDateStorage ()
+#if TARGET_OS_TV
+/** The storage to store the date of the last sent heartbeat. */
+@property(nonatomic, readonly) NSUserDefaults *userDefaults;
+
+/** The key for user defaults to store heartbeat information. */
+@property(nonatomic, readonly) NSString *key;
+#else
 /** The storage to store the date of the last sent heartbeat. */
 @property(nonatomic, readonly) NSFileCoordinator *fileCoordinator;
+
 /** The name of the file that stores heartbeat information. */
 @property(nonatomic, readonly) NSString *fileName;
+#endif
 @end
 
 @implementation GULHeartbeatDateStorage
+
+#if TARGET_OS_TV
+- (instancetype)initWithDefaults:(NSUserDefaults *)defaults key:(NSString *)key {
+  self = [super init];
+  if (self) {
+    _userDefaults = defaults;
+    _key = key;
+  }
+  return self;
+}
+
+- (nullable NSMutableDictionary *)heartbeatDictionaryFromDefaults {
+  NSDictionary *heartbeatDict = [self.userDefaults objectForKey:self.key];
+  if (heartbeatDict != nil) {
+    return [heartbeatDict mutableCopy];
+  } else {
+    return [NSMutableDictionary dictionary];
+  }
+}
+
+#else   // Non tvOS platforms.
 
 @synthesize fileURL = _fileURL;
 
@@ -57,13 +87,8 @@
  * @return the URL path of the directory for heartbeat storage data.
  */
 + (NSURL *)directoryPathURL {
-#if TARGET_OS_TV
-  NSArray<NSString *> *paths =
-      NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-#else
   NSArray<NSString *> *paths =
       NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-#endif
   NSArray<NSString *> *components = @[ paths.lastObject, @"Google/FIRApp" ];
   NSString *directoryString = [NSString pathWithComponents:components];
   NSURL *directoryURL = [NSURL fileURLWithPath:directoryString];
@@ -113,7 +138,28 @@
   return dict;
 }
 
+- (BOOL)writeDictionary:(NSMutableDictionary *)dictionary
+          forWritingURL:(NSURL *)writingFileURL
+                  error:(NSError **)outError {
+  NSData *data = [GULSecureCoding archivedDataWithRootObject:dictionary error:outError];
+  if (*outError != nil) {
+    return false;
+  } else {
+    return [data writeToURL:writingFileURL atomically:YES];
+  }
+}
+#endif  // TARGET_OS_TV
+
 - (nullable NSDate *)heartbeatDateForTag:(NSString *)tag {
+#if TARGET_OS_TV
+  NSDate *date = nil;
+  @synchronized(self.userDefaults) {
+    NSMutableDictionary *dict = [self heartbeatDictionaryFromDefaults];
+    date = dict[tag];
+  }
+
+  return date;
+#else
   __block NSMutableDictionary *dict;
   NSError *error;
   [self.fileCoordinator coordinateReadingItemAtURL:self.fileURL
@@ -123,9 +169,18 @@
                                           dict = [self heartbeatDictionaryWithFileURL:readingURL];
                                         }];
   return dict[tag];
+#endif  // TARGET_OS_TV
 }
 
 - (BOOL)setHearbeatDate:(NSDate *)date forTag:(NSString *)tag {
+#if TARGET_OS_TV
+  @synchronized(self.userDefaults) {
+    NSMutableDictionary *dict = [self heartbeatDictionaryFromDefaults];
+    dict[tag] = date;
+    [self.userDefaults setObject:dict forKey:self.key];
+  }
+  return true;
+#else
   NSError *error;
   __block BOOL isSuccess = false;
   [self.fileCoordinator coordinateReadingItemAtURL:self.fileURL
@@ -143,17 +198,7 @@
                                                                       error:&error];
                                         }];
   return isSuccess;
-}
-
-- (BOOL)writeDictionary:(NSMutableDictionary *)dictionary
-          forWritingURL:(NSURL *)writingFileURL
-                  error:(NSError **)outError {
-  NSData *data = [GULSecureCoding archivedDataWithRootObject:dictionary error:outError];
-  if (*outError != nil) {
-    return false;
-  } else {
-    return [data writeToURL:writingFileURL atomically:YES];
-  }
+#endif  // TARGET_OS_TV
 }
 
 @end
