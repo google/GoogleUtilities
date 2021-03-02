@@ -80,7 +80,7 @@
   }
 
   GULObjectSwizzler *existingSwizzler =
-      [[self class] getAssociatedObject:object key:kSwizzlerAssociatedObjectKey];
+      [[self class] getAssociatedObject:object key:kGULSwizzlerAssociatedObjectKey];
   if ([existingSwizzler isKindOfClass:[GULObjectSwizzler class]]) {
     // The object has been swizzled already, no need to swizzle again.
     return existingSwizzler;
@@ -130,7 +130,7 @@
   __strong id swizzledObject = _swizzledObject;
 
   GULObjectSwizzler *existingSwizzler =
-      [[self class] getAssociatedObject:swizzledObject key:kSwizzlerAssociatedObjectKey];
+      [[self class] getAssociatedObject:swizzledObject key:kGULSwizzlerAssociatedObjectKey];
   if (existingSwizzler != nil) {
     NSAssert(existingSwizzler == self, @"The swizzled object has a different swizzler.");
     // The object has been swizzled already.
@@ -139,7 +139,7 @@
 
   if (swizzledObject) {
     [GULObjectSwizzler setAssociatedObject:swizzledObject
-                                       key:kSwizzlerAssociatedObjectKey
+                                       key:kGULSwizzlerAssociatedObjectKey
                                      value:self
                                association:GUL_ASSOCIATION_RETAIN];
 
