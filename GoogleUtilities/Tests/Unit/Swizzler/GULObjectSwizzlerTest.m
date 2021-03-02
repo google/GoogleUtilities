@@ -15,7 +15,7 @@
 #import <XCTest/XCTest.h>
 #import <objc/runtime.h>
 
-#import "GoogleUtilities/ISASwizzler/Public/GoogleUtilities/GULObjectSwizzler.h"
+#import "GoogleUtilities/ISASwizzler/GULObjectSwizzler+Internal.h"
 #import "GoogleUtilities/ISASwizzler/Public/GoogleUtilities/GULSwizzledObject.h"
 #import "GoogleUtilities/SwizzlerTestHelpers/GULProxy.h"
 
@@ -390,7 +390,7 @@
 
     // Release GULObjectSwizzler
     [GULObjectSwizzler setAssociatedObject:object
-                                       key:kSwizzlerAssociatedObjectKey
+                                       key:kGULSwizzlerAssociatedObjectKey
                                      value:nil
                                association:GUL_ASSOCIATION_RETAIN];
 
@@ -434,7 +434,7 @@
 
     // Release GULObjectSwizzler
     [GULObjectSwizzler setAssociatedObject:object
-                                       key:kSwizzlerAssociatedObjectKey
+                                       key:kGULSwizzlerAssociatedObjectKey
                                      value:nil
                                association:GUL_ASSOCIATION_RETAIN];
 
