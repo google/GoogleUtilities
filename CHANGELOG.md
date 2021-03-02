@@ -1,3 +1,5 @@
+# 7.3.0
+- Fix conflicting internal constant name and move it out of the public header. (#7635)
 # 7.2.2
 - Fix warnings introduced with Xcode 12.5. (#8)
 
