@@ -62,7 +62,7 @@ jobs:
         cd firebase-ios-sdk/scripts/code_coverage_report/generate_code_coverage_report/
         swift build
     - name: Generate report
-      if: github.event_name == 'pull_request' && ${{ env.METRICS_SERVICE_SECRET }}
+      if: github.event.pull_request.merged != true && ${{ env.METRICS_SERVICE_SECRET }}
       env:
         pr_branch: ${{ github.event.pull_request.head.ref }}
       run: |
