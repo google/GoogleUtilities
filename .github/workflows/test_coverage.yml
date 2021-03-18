@@ -26,6 +26,7 @@ jobs:
     - name: PodLibLint DataTransport
       run: |
         scripts/code_coverage_report/pod_test_code_coverage_report.sh --sdk=GoogleUtilities --platform=${{ matrix.target }} --test_spec="unit"
+        scripts/code_coverage_report/pod_test_code_coverage_report.sh --sdk=GoogleUtilities --platform=${{ matrix.target }} --test_spec="unit-swift"
     - uses: actions/upload-artifact@v2
       with:
         name: codecoverage
