@@ -25,8 +25,8 @@ jobs:
       run: ./scripts/setup_bundler.sh
     - name: PodLibLint DataTransport
       run: |
-        scripts/code_coverage_report/pod_test_code_coverage_report.sh --sdk=GoogleUtilities --platform=${{ matrix.target }} --test_spec="unit"
-        scripts/code_coverage_report/pod_test_code_coverage_report.sh --sdk=GoogleUtilities --platform=${{ matrix.target }} --test_spec="unit-swift"
+        scripts/code_coverage_report/pod_test_code_coverage_report.sh --sdk=GoogleUtilities --platform=${{ matrix.target }} --test_spec="unit" --output_path="/Users/runner/GoogleUtilities-ios-unit.xcresult"
+        scripts/code_coverage_report/pod_test_code_coverage_report.sh --sdk=GoogleUtilities --platform=${{ matrix.target }} --test_spec="unit-swift" --output_path="/Users/runner/GoogleUtilities-ios-unit-swift.xcresult"
     - uses: actions/upload-artifact@v2
       with:
         name: codecoverage

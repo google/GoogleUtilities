@@ -139,7 +139,7 @@ other Google CocoaPods. They're not intended for direct public usage.
     unit_tests.dependency 'OCMock'
   end
 
-  s.test_spec 'unit-swift' do |unit_tests_swift|
+  s.test_spec 'unit_swift' do |unit_tests_swift|
     unit_tests_swift.scheme = { :code_coverage => true }
     unit_tests_swift.platforms = {
       :ios => ios_deployment_target,
