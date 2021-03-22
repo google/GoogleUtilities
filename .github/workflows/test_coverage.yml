@@ -28,6 +28,7 @@ jobs:
         scripts/code_coverage_report/pod_test_code_coverage_report.sh --sdk=GoogleUtilities --platform=${{ matrix.target }} --test_spec="unit" --output_path="/Users/runner/GoogleUtilities-ios-unit.xcresult"
         scripts/code_coverage_report/pod_test_code_coverage_report.sh --sdk=GoogleUtilities --platform=${{ matrix.target }} --test_spec="unit-swift" --output_path="/Users/runner/GoogleUtilities-ios-unit-swift.xcresult"
         xcrun xcresulttool merge /Users/runner/GoogleUtilities-ios-unit.xcresult /Users/runner/GoogleUtilities-ios-unit-swift.xcresult --output-path /Users/runner/GoogleUtilities-ios.xcresult
+        find /Users/ -type d -regex ".*/.*App\.xcworkspace" -execdir cp -R '{}' "${OUTPUT_PATH}" \;
     - uses: actions/upload-artifact@v2
       with:
         name: codecoverage
