@@ -2,5 +2,4 @@ blank_issues_enabled: false
 contact_links:
   - name: Google Utilities
     url: https://github.com/firebase/firebase-ios-sdk/issues/new/choose
-    about: Google Utilities is not supported for direct usage. Please file the issue with the
-    product library that depends on Google Utilities instead of in this repository.
+    about: Google Utilities is not supported for direct usage. Please file with the product library that depends on Google Utilities.
