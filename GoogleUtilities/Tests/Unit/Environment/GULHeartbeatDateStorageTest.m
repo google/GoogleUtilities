@@ -81,7 +81,7 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTest";
       NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
 #endif
   NSString *rootPath = [path firstObject];
-  NSArray<NSString *> *components = @[rootPath, kGULHeartbeatStorageDirectory, kTestFileName];
+  NSArray<NSString *> *components = @[ rootPath, kGULHeartbeatStorageDirectory, kTestFileName ];
   NSString *fileString = [NSString pathWithComponents:components];
   NSURL *fileURL = [NSURL fileURLWithPath:fileString];
   return fileURL;
