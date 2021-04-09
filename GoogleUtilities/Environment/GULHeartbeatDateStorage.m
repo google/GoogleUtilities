@@ -139,7 +139,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
                             [[self heartbeatDictionaryWithFileURL:readingURL] mutableCopy];
                         heartbeatDictionary[tag] = date;
                         NSError *error;
-                        isSuccess = [self writeDictionary:heartbeatDictionary
+                        isSuccess = [self writeDictionary:heartbeatDictionary.copy
                                             forWritingURL:writingURL
                                                     error:&error];
                       }];
