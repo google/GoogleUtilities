@@ -47,7 +47,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
 - (NSURL *)fileURL {
   if (!_fileURL) {
     NSURL *directoryURL = [self directoryPathURL];
-    [self checkAndCreateDirectory:directoryURL fileCoordinator:_fileCoordinator];
+    [self checkAndCreateDirectory:directoryURL];
     _fileURL = [directoryURL URLByAppendingPathComponent:_fileName];
   }
   return _fileURL;
@@ -72,12 +72,10 @@ NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
 /** Check for the existence of the directory specified by the URL, and create it if it does not
  * exist.
  * @param directoryPathURL The path to the directory that needs to exist.
- * @param fileCoordinator The `NSFileCoordinator` object that coordinates writes to the directory.
  */
-- (void)checkAndCreateDirectory:(NSURL *)directoryPathURL
-                fileCoordinator:(NSFileCoordinator *)fileCoordinator {
+- (void)checkAndCreateDirectory:(NSURL *)directoryPathURL {
   NSError *fileCoordinatorError = nil;
-  [fileCoordinator
+  [self.fileCoordinator
       coordinateWritingItemAtURL:directoryPathURL
                          options:0
                            error:&fileCoordinatorError
@@ -94,7 +92,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
 }
 
 - (nullable NSDictionary *)heartbeatDictionaryWithFileURL:(NSURL *)readingFileURL {
-  NSDictionary *heartbeatDictionary = [NSDictionary new];
+  NSDictionary *heartbeatDictionary;
 
   NSError *error;
   NSData *objectData = [NSData dataWithContentsOfURL:readingFileURL options:0 error:&error];
@@ -104,9 +102,10 @@ NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
     heartbeatDictionary = [GULSecureCoding unarchivedObjectOfClasses:objectClasses
                                                             fromData:objectData
                                                                error:&error];
-    if (heartbeatDictionary.count == 0 || error != nil) {
-      heartbeatDictionary = [NSDictionary new];
-    }
+  }
+
+  if (heartbeatDictionary.count == 0 || error != nil) {
+    heartbeatDictionary = [NSDictionary dictionary];
   }
 
   return heartbeatDictionary;
@@ -150,8 +149,8 @@ NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
           forWritingURL:(NSURL *)writingFileURL
                   error:(NSError **)outError {
   NSData *data = [GULSecureCoding archivedDataWithRootObject:dictionary error:outError];
-  if (*outError != nil) {
-    return false;
+  if (data.length == 0 || *outError != nil) {
+    return NO;
   }
 
   return [data writeToURL:writingFileURL atomically:YES];
