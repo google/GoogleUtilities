@@ -149,7 +149,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
           forWritingURL:(NSURL *)writingFileURL
                   error:(NSError **)outError {
   NSData *data = [GULSecureCoding archivedDataWithRootObject:dictionary error:outError];
-  if (data.length == 0 || *outError != nil) {
+  if (data.length == 0) {
     return NO;
   }
 
