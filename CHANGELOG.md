@@ -1,8 +1,12 @@
+# 7.3.2
+- Change heartbeat directory name and refactor file. (#19)
+
 # 7.3.1
 - Add explicit dependency on Security framework to Environment subspec. (#12)
 
 # 7.3.0
 - Fix conflicting internal constant name and move it out of the public header. (#7635)
+
 # 7.2.2
 - Fix warnings introduced with Xcode 12.5. (#8)
 
