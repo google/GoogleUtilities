@@ -33,7 +33,7 @@ After the CI is green:
   ```
   If the command fails with `Unable to find the 'staging' repo.`, add the staging repo with:
   ```console
-  pod repo add staging https://github.com/firebase/SpecsStaging.git
+  pod repo add staging git@github.com:firebase/SpecsStaging.git
   ```
 * Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`.
 * On google3, copybara and run a global TAP
