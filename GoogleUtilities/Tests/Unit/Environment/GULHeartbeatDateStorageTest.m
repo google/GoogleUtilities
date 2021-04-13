@@ -15,25 +15,44 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "GoogleUtilities/Environment/Public/GoogleUtilities/GULHeartbeatDateStorageUserDefaults.h"
+#import "GoogleUtilities/Environment/Public/GoogleUtilities/GULHeartbeatDateStorage.h"
 
-@interface GULHeartbeatDateStorageUserDefaultsTest : XCTestCase
-@property(nonatomic) GULHeartbeatDateStorageUserDefaults *storage;
-@property(nonatomic) NSUserDefaults *defaults;
+@interface GULHeartbeatDateStorageTest : XCTestCase
+@property(nonatomic) GULHeartbeatDateStorage *storage;
 @end
 
-@implementation GULHeartbeatDateStorageUserDefaultsTest
+static NSString *const kTestFileName = @"GULStorageHeartbeatTest";
+
+@implementation GULHeartbeatDateStorageTest
 
 - (void)setUp {
-  NSString *suiteName = [self userDefaultsSuiteName];
-  self.defaults = [[NSUserDefaults alloc] initWithSuiteName:suiteName];
-  self.storage = [[GULHeartbeatDateStorageUserDefaults alloc] initWithDefaults:self.defaults
-                                                                           key:@"test_root"];
+#if TARGET_OS_TV
+  NSArray *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+#else
+  NSArray *path =
+      NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+#endif
+  NSString *rootPath = [path firstObject];
+  XCTAssertNotNil(rootPath);
+  NSURL *rootURL = [NSURL fileURLWithPath:rootPath];
+
+  NSError *error;
+  if (![rootURL checkResourceIsReachableAndReturnError:&error]) {
+    XCTAssert([[NSFileManager defaultManager] createDirectoryAtURL:rootURL
+                                       withIntermediateDirectories:YES
+                                                        attributes:nil
+                                                             error:&error],
+              @"Error: %@", error);
+  }
+
+  self.storage = [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
+
+  [self assertInitializationDoesNotAccessFileSystem];
 }
 
 - (void)tearDown {
-  [self.defaults removePersistentDomainForName:[self userDefaultsSuiteName]];
-  self.defaults = nil;
+  [[NSFileManager defaultManager] removeItemAtURL:[self.storage fileURL] error:nil];
+  self.storage = nil;
 }
 
 - (void)testHeartbeatDateForTag {
@@ -49,10 +68,27 @@
 
 #pragma mark - Private Helpers
 
-- (NSString *)userDefaultsSuiteName {
-  NSCharacterSet *lettersToTrim = [[NSCharacterSet letterCharacterSet] invertedSet];
-  NSString *nameWithSpaces = [self.name stringByTrimmingCharactersInSet:lettersToTrim];
-  return [nameWithSpaces stringByReplacingOccurrencesOfString:@" " withString:@"_"];
+- (void)assertInitializationDoesNotAccessFileSystem {
+  NSURL *fileURL = [self heartbeatFileURL];
+  NSError *error;
+  BOOL fileIsReachable = [fileURL checkResourceIsReachableAndReturnError:&error];
+  XCTAssertFalse(fileIsReachable,
+                 @"GULHeartbeatDateStorage initialization should not access the file system.");
+  XCTAssertNotNil(error, @"Error: %@", error);
+}
+
+- (NSURL *)heartbeatFileURL {
+#if TARGET_OS_TV
+  NSArray *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+#else
+  NSArray *path =
+      NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+#endif
+  NSString *rootPath = [path firstObject];
+  NSArray<NSString *> *components = @[ rootPath, kGULHeartbeatStorageDirectory, kTestFileName ];
+  NSString *fileString = [NSString pathWithComponents:components];
+  NSURL *fileURL = [NSURL fileURLWithPath:fileString];
+  return fileURL;
 }
 
 @end
