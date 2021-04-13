@@ -16,19 +16,30 @@ These instructions apply to minor and patch version updates. Major versions need
 a customized adaptation.
 
 After the CI is green:
-  * Update the version in the podspec to match the latest entry in the [CHANGELOG.md](CHANGELOG.md)
-  * Add the CocoaPods tag
-    * Checkout the `main` branch.
-    * `git tag CocoaPods-{version}`
-    * `git push origin CocoaPods-{version}`
-  * Push the podspec to SpecsStaging
-    * `pod repo push --skip-tests staging GoogleUtilities.podspec`
-
-    If the command fails with `Unable to find the 'staging' repo.`, add the staging repo with:
-    * `pod repo add staging https://github.com/firebase/SpecsStaging.git`
-  * Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`
-  * On google3, copybara and run a global TAP
-    * `third_party/firebase/ios/Releases/run_copy_bara.py --directory GoogleUtilities`
+* Update the version in the podspec to match the latest entry in the [CHANGELOG.md](CHANGELOG.md)
+* Checkout the `main` branch and ensure it is up to date.
+  ```console
+  git checkout main
+  git pull
+  ```
+* Add the CocoaPods tag (`{version}` will be the latest version in the [podspec](GoogleUtilities.podspec#L3))
+  ```console
+  git tag CocoaPods-{version}
+  git push origin CocoaPods-{version}
+  ```
+* Push the podspec to SpecsStaging
+  ```console
+  pod repo push --skip-tests staging GoogleUtilities.podspec
+  ```
+  If the command fails with `Unable to find the 'staging' repo.`, add the staging repo with:
+  ```console
+  pod repo add staging https://github.com/firebase/SpecsStaging.git
+  ```
+* Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`.
+* On google3, copybara and run a global TAP
+  ```console
+  third_party/firebase/ios/Releases/run_copy_bara.py --directory GoogleUtilities
+  ```
 
 ## Publishing
   * Add a version tag for Swift PM
