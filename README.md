@@ -38,7 +38,7 @@ After the CI is green:
 * Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`.
 * On google3, copybara and run a global TAP
   ```console
-  third_party/firebase/ios/Releases/run_copy_bara.py --directory GoogleUtilities
+  third_party/firebase/ios/Releases/run_copy_bara.py --directory GoogleUtilities  --branch main
   ```
 
 ## Publishing
