@@ -21,7 +21,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /// Stores either a date or a dictionary to a specified file.
-@interface GULHeartbeatDateStorageUserDefaults : NSObject<GULHeartbeatDateStorable>
+@interface GULHeartbeatDateStorageUserDefaults : NSObject <GULHeartbeatDateStorable>
 
 /**
  * Default initializer. tvOS can only write to the cache directory and
@@ -30,8 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param defaults User defaults instance to store the heartbeat information.
  * @param key The key to be used with the user defaults instance.
  */
-- (instancetype)initWithDefaults:(NSUserDefaults *)defaults
-                             key:(NSString *)key;
+- (instancetype)initWithDefaults:(NSUserDefaults *)defaults key:(NSString *)key;
 
 - (instancetype)init NS_UNAVAILABLE;
 

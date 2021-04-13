@@ -35,7 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)setHearbeatDate:(NSDate *)date forTag:(NSString *)tag;
 
-
 @end
 
 NS_ASSUME_NONNULL_END

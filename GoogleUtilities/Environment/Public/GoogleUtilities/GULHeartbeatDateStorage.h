@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString *const kGULHeartbeatStorageDirectory;
 
 /// Stores either a date or a dictionary to a specified file.
-@interface GULHeartbeatDateStorage : NSObject<GULHeartbeatDateStorable>
+@interface GULHeartbeatDateStorage : NSObject <GULHeartbeatDateStorable>
 
 - (instancetype)init NS_UNAVAILABLE;
 
