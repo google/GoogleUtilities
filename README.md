@@ -16,12 +16,16 @@ These instructions apply to minor and patch version updates. Major versions need
 a customized adaptation.
 
 After the CI is green:
-  * Update the version in the podspec
+  * Update the version in the podspec to match the latest entry in the [CHANGELOG.md](CHANGELOG.md)
   * Add the CocoaPods tag
+    * Checkout the `main` branch.
     * `git tag CocoaPods-{version}`
     * `git push origin CocoaPods-{version}`
   * Push the podspec to SpecsStaging
-    * `pod repo push staging GoogleUtilities.podspec`
+    * `pod repo push --skip-tests staging GoogleUtilities.podspec`
+
+    If the command fails with `Unable to find the 'staging' repo.`, add the staging repo with:
+    * `pod repo add staging https://github.com/firebase/SpecsStaging.git`
   * Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`
   * On google3, copybara and run a global TAP
     * `third_party/firebase/ios/Releases/run_copy_bara.py --directory GoogleUtilities`
@@ -76,7 +80,7 @@ before creating a PR.
 GitHub Actions will verify that any code changes are done in a style compliant
 way. Install `clang-format` and `mint`:
 
-```
+```console
 brew install clang-format@11
 brew install mint
 ```
