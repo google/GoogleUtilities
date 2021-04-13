@@ -18,7 +18,7 @@ a customized adaptation.
 After the CI is green:
   * Update the version in the podspec to match the latest entry in the [CHANGELOG.md](CHANGELOG.md)
   * Add the CocoaPods tag
-    * Checkout the `main` branch.
+    * Checkout the `main` branch and ensure it is up to date.
     * `git tag CocoaPods-{version}`
     * `git push origin CocoaPods-{version}`
   * Push the podspec to SpecsStaging
