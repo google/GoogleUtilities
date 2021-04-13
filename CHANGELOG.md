@@ -1,6 +1,6 @@
 # 7.4.0
 - Change heartbeat directory name and refactor file. (#19)
-- Introduce user defaults based heartbeat storage. (#9)
+- Introduce user defaults based heartbeat storage. (#23)
 
 # 7.3.1
 - Add explicit dependency on Security framework to Environment subspec. (#12)
