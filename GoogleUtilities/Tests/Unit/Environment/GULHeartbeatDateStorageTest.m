@@ -62,6 +62,10 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTest";
                  [[self.storage heartbeatDateForTag:@"fire-iid"] timeIntervalSinceReferenceDate]);
 }
 
+- (void)testConformsToHeartbeatStorableProtocol {
+  XCTAssertTrue([self.storage conformsToProtocol:@protocol(GULHeartbeatDateStorable)]);
+}
+
 #pragma mark - Private Helpers
 
 - (void)assertInitializationDoesNotAccessFileSystem {

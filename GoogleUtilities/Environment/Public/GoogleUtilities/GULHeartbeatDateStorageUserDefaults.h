@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// The name of the directory where the heartbeat data is stored.
-extern NSString *const kGULHeartbeatStorageDirectory;
-
 /// Stores either a date or a dictionary to a specified file.
-@interface GULHeartbeatDateStorage : NSObject <GULHeartbeatDateStorable>
-
-- (instancetype)init NS_UNAVAILABLE;
-
-@property(nonatomic, readonly) NSURL *fileURL;
+@interface GULHeartbeatDateStorageUserDefaults : NSObject <GULHeartbeatDateStorable>
 
 /**
- * Default initializer.
- * @param fileName The name of the file to store the date information.
- * exist, it will be created if needed.
+ * Default initializer. tvOS can only write to the cache directory and
+ * there are no guarantees that the directory will persist. User defaults will
+ * be retained, so that should be used instead.
+ * @param defaults User defaults instance to store the heartbeat information.
+ * @param key The key to be used with the user defaults instance.
  */
-- (instancetype)initWithFileName:(NSString *)fileName;
+- (instancetype)initWithDefaults:(NSUserDefaults *)defaults key:(NSString *)key;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  * Reads the date from the specified file for the given tag.
