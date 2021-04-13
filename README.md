@@ -23,7 +23,7 @@ After the CI is green:
     * `git push origin CocoaPods-{version}`
   * Push the podspec to SpecsStaging
     * `pod repo push --skip-tests staging GoogleUtilities.podspec`
-    
+
     If the command fails with `Unable to find the 'staging' repo.`, add the staging repo with:
     * `pod repo add staging https://github.com/firebase/SpecsStaging.git`
   * Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`
