@@ -562,7 +562,7 @@ static BOOL gRespondsToHandleBackgroundSession;
   XCTAssertEqualObjects(descriptionAfter, descriptionString);
 }
 
-/** Tests that methods that are not overriden by the App Delegate Proxy still work as expected. */
+/** Tests that methods that are not overridden by the App Delegate Proxy still work as expected. */
 - (void)testNotOverriddenMethods {
   GULTestAppDelegate *realAppDelegate = [[GULTestAppDelegate alloc] init];
   OCMStub([self.mockSharedApplication delegate]).andReturn(realAppDelegate);
@@ -587,7 +587,7 @@ static BOOL gRespondsToHandleBackgroundSession;
  *  handles it correctly.
  */
 - (void)testAppDelegateInstance {
-  // The test logic involves using KVC on the UIApplication.delegate propery. This does not really
+  // The test logic involves using KVC on the UIApplication.delegate property. This does not really
   // work well with OCMPartialMock([GULApplication sharedApplication]) and triggers issue
   // https://github.com/erikdoe/ocmock/issues/346.
   // Let's stop mocking the shared application for this particular test.
@@ -776,12 +776,12 @@ static BOOL gRespondsToHandleBackgroundSession;
   [GULAppDelegateSwizzler proxyOriginalDelegate];
   NSUserActivity *testUserActivity = [[NSUserActivity alloc] initWithActivityType:@"test"];
 
-  BOOL shouldContinueUserActvitiy = [testAppDelegate application:[GULApplication sharedApplication]
+  BOOL shouldContinueUserActivity = [testAppDelegate application:[GULApplication sharedApplication]
                                             continueUserActivity:testUserActivity
                                               restorationHandler:^(NSArray *restorableObjects){
                                               }];
   // Verify that it is NO when there are no interceptors.
-  XCTAssertFalse(shouldContinueUserActvitiy);
+  XCTAssertFalse(shouldContinueUserActivity);
 
   id interceptor = OCMProtocolMock(@protocol(GULApplicationDelegate));
   OCMExpect([interceptor application:OCMOCK_ANY
@@ -789,12 +789,12 @@ static BOOL gRespondsToHandleBackgroundSession;
                   restorationHandler:OCMOCK_ANY])
       .andReturn(NO);
   [GULAppDelegateSwizzler registerAppDelegateInterceptor:interceptor];
-  shouldContinueUserActvitiy = [testAppDelegate application:[GULApplication sharedApplication]
+  shouldContinueUserActivity = [testAppDelegate application:[GULApplication sharedApplication]
                                        continueUserActivity:testUserActivity
                                          restorationHandler:^(NSArray *restorableObjects){
                                          }];
   // Verify that it is NO when the only interceptor returns a NO.
-  XCTAssertFalse(shouldContinueUserActvitiy);
+  XCTAssertFalse(shouldContinueUserActivity);
 
   id interceptor2 = OCMProtocolMock(@protocol(GULApplicationDelegate));
   OCMExpect([interceptor2 application:OCMOCK_ANY
@@ -807,13 +807,13 @@ static BOOL gRespondsToHandleBackgroundSession;
                 continueUserActivity:OCMOCK_ANY
                   restorationHandler:OCMOCK_ANY])
       .andReturn(NO);
-  shouldContinueUserActvitiy = [testAppDelegate application:[GULApplication sharedApplication]
+  shouldContinueUserActivity = [testAppDelegate application:[GULApplication sharedApplication]
                                        continueUserActivity:testUserActivity
                                          restorationHandler:^(NSArray *restorableObjects){
                                          }];
 
   // The result is YES if one of the interceptors returns YES.
-  XCTAssertTrue(shouldContinueUserActvitiy);
+  XCTAssertTrue(shouldContinueUserActivity);
 }
 
 - (void)testApplicationDidRegisterForRemoteNotificationsIsInvokedOnInterceptors {

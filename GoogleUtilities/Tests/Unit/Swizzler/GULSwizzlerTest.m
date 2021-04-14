@@ -410,7 +410,7 @@
                                                     selector:testSelector2
                                              isClassSelector:NO];
   XCTAssertNotEqual(origImp2, NULL, @"Original IMP is NULL after swizzle.");
-  XCTAssertNotEqual(origImp, origImp2, @"Implementations are the same when they should't be.");
+  XCTAssertNotEqual(origImp, origImp2, @"Implementations are the same when they shouldn't be.");
 
   [GULSwizzler unswizzleClass:testClass selector:testSelector isClassSelector:NO];
   [GULSwizzler unswizzleClass:testClass2 selector:testSelector2 isClassSelector:NO];
