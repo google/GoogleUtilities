@@ -149,7 +149,7 @@
   XCTAssert([[GULSwizzlingCache sharedInstance] cachedIMPForClass:swizzledClass
                                                      withSelector:swizzledSelector] != NULL);
   XCTAssertEqual([GULSwizzlingCache originalIMPOfCurrentIMP:newIMP], originalIMP,
-                 @"New to original IMP cache was not correctly poplated.");
+                 @"New to original IMP cache was not correctly populated.");
 
   [[GULSwizzlingCache sharedInstance] clearCacheForSwizzledIMP:newIMP
                                                       selector:swizzledSelector

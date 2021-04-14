@@ -126,7 +126,7 @@
 
   SEL swizzledSelector = @selector(description);
 
-  // Observe that swizzling the superclass IMP propogates to its subclasses when we haven't yet
+  // Observe that swizzling the superclass IMP propagates to its subclasses when we haven't yet
   // swizzled and unsiwzzled the subclasses.
   [GULSwizzler swizzleClass:[PollutedTestObject class]
                    selector:swizzledSelector

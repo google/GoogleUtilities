@@ -62,7 +62,7 @@
 #import <CFNetwork/CFNetwork.h>
 #endif  // GTM_IPHONE_SDK
 
-// Global contants needed for errors from start
+// Global constants needed for errors from start
 
 #undef _EXTERN
 #undef _INITIALIZE_AS
@@ -87,7 +87,7 @@ enum {
 
 // ----------------------------------------------------------------------------
 
-// See comment at top of file for the intened use of this class.
+// See comment at top of file for the intended use of this class.
 @interface GTMHTTPServer : NSObject {
  @private
   id delegate_;  // WEAK

@@ -16,7 +16,7 @@
 
 #import <Foundation/Foundation.h>
 
-/** This class handles the caching and retreival of IMPs as we swizzle and unswizzle them. It uses
+/** This class handles the caching and retrieval of IMPs as we swizzle and unswizzle them. It uses
  *  two C++ STL unordered_maps as the underlying data store. This class is NOT thread safe.
  */
 @interface GULSwizzlingCache : NSObject
