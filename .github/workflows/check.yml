@@ -30,7 +30,7 @@ jobs:
     - name: Setup check
       run: |
         brew update
-        brew install clang-format@11
+        brew install clang-format@12
         brew install mint
         mint bootstrap
 
