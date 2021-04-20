@@ -17,7 +17,7 @@
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULHeartbeatDateStorage.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
-NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
+NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 
 @interface GULHeartbeatDateStorage ()
 /** The storage to store the date of the last sent heartbeat. */
@@ -63,7 +63,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"GoogleHeartbeatStorage";
 #else
   paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
 #endif  // TARGET_OS_TV
-  NSString *rootPath = [paths firstObject];
+  NSString *rootPath = [paths lastObject];
   NSURL *rootURL = [NSURL fileURLWithPath:rootPath];
   NSURL *directoryURL = [rootURL URLByAppendingPathComponent:kGULHeartbeatStorageDirectory];
   return directoryURL;
