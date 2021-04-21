@@ -19,7 +19,7 @@ import PackageDescription
 
 let package = Package(
   name: "GoogleUtilities",
-  platforms: [.iOS(.v10), .macOS(.v10_12), .tvOS(.v10), .watchOS(.v6)],
+  platforms: [.iOS(.v9), .macOS(.v10_12), .tvOS(.v10), .watchOS(.v6)],
   products: [
     .library(
       name: "GULAppDelegateSwizzler",
