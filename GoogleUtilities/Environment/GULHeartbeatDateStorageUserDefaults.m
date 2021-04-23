@@ -37,7 +37,7 @@
   return self;
 }
 
-- (nullable NSMutableDictionary *)heartbeatDictionaryFromDefaults {
+- (NSMutableDictionary *)heartbeatDictionaryFromDefaults {
   NSDictionary *heartbeatDict = [self.userDefaults objectForKey:self.key];
   if (heartbeatDict != nil) {
     return [heartbeatDict mutableCopy];
