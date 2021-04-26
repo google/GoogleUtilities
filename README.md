@@ -55,7 +55,7 @@ After the CI is green:
     ```
     </details>
 * Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`.
-* On google3, create a workspace. Then copybara and run a global TAP.
+* On google3, run copybara and a global TAP by running the following command:
   ```console
   third_party/firebase/ios/Releases/run_copy_bara.py --directory GoogleUtilities --branch main
   ```
