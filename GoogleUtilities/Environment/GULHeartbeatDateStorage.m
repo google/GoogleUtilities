@@ -91,26 +91,6 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
                       }];
 }
 
-- (nullable NSDictionary *)heartbeatDictionaryWithFileURL:(NSURL *)readingFileURL {
-  NSDictionary *heartbeatDictionary;
-
-  NSError *error;
-  NSData *objectData = [NSData dataWithContentsOfURL:readingFileURL options:0 error:&error];
-
-  if (objectData.length > 0 && error == nil) {
-    NSSet<Class> *objectClasses = [NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]];
-    heartbeatDictionary = [GULSecureCoding unarchivedObjectOfClasses:objectClasses
-                                                            fromData:objectData
-                                                               error:&error];
-  }
-
-  if (heartbeatDictionary.count == 0 || error != nil) {
-    heartbeatDictionary = [NSDictionary dictionary];
-  }
-
-  return heartbeatDictionary;
-}
-
 - (nullable NSDate *)heartbeatDateForTag:(NSString *)tag {
   __block NSDictionary *heartbeatDictionary;
   NSError *error;
@@ -143,6 +123,26 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
                                                     error:&error];
                       }];
   return isSuccess;
+}
+
+- (NSDictionary *)heartbeatDictionaryWithFileURL:(NSURL *)readingFileURL {
+  NSDictionary *heartbeatDictionary;
+
+  NSError *error;
+  NSData *objectData = [NSData dataWithContentsOfURL:readingFileURL options:0 error:&error];
+
+  if (objectData.length > 0 && error == nil) {
+    NSSet<Class> *objectClasses = [NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]];
+    heartbeatDictionary = [GULSecureCoding unarchivedObjectOfClasses:objectClasses
+                                                            fromData:objectData
+                                                               error:&error];
+  }
+
+  if (heartbeatDictionary.count == 0 || error != nil) {
+    heartbeatDictionary = [NSDictionary dictionary];
+  }
+
+  return heartbeatDictionary;
 }
 
 - (BOOL)writeDictionary:(NSDictionary *)dictionary

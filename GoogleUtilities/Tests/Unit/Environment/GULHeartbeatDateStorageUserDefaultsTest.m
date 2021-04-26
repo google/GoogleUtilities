@@ -34,20 +34,51 @@
 - (void)tearDown {
   [self.defaults removePersistentDomainForName:[self userDefaultsSuiteName]];
   self.defaults = nil;
+
+  self.storage = nil;
 }
 
+#pragma mark - Public API Tests
+
 - (void)testHeartbeatDateForTag {
-  NSDate *now = [NSDate date];
-  [self.storage setHearbeatDate:now forTag:@"fire-iid"];
-  XCTAssertEqual([now timeIntervalSinceReferenceDate],
-                 [[self.storage heartbeatDateForTag:@"fire-iid"] timeIntervalSinceReferenceDate]);
+  // 1. Tag and save some heartbeat info.
+  NSDate *storedDate = [NSDate date];
+  NSString *tag = @"fire-iid";
+  [self.storage setHearbeatDate:storedDate forTag:tag];
+
+  // 2. Retrieve the stored heartbeat info and assert the retrieved info is accurate.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:tag];
+  XCTAssertEqualObjects(retrievedDate, storedDate);
+}
+
+- (void)testHeartbeatDateForTagWhenReturnedDateIsNil {
+  NSString *nonexistentTag = @"missing-tag";
+  NSDate *nilDate = [self.storage heartbeatDateForTag:nonexistentTag];
+  XCTAssertNil(nilDate);
+}
+
+- (void)testSetHeartbeatDateForTag {
+  NSDate *date = [NSDate date];
+  NSString *tag = @"tag";
+
+  // 1. Retrieve heartbeat info that is not stored and assert the retrieved info is nil.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:tag];
+  XCTAssertNil(retrievedDate);
+
+  // 2. Save the heartbeat info and assert the save was successful.
+  BOOL successfulSave = [self.storage setHearbeatDate:date forTag:tag];
+  XCTAssert(successfulSave);
+
+  // 3. Retrieve heartbeat info that is now stored and assert the retrieved info is accurate.
+  retrievedDate = [self.storage heartbeatDateForTag:tag];
+  XCTAssertEqualObjects(retrievedDate, date);
 }
 
 - (void)testConformsToHeartbeatStorableProtocol {
   XCTAssertTrue([self.storage conformsToProtocol:@protocol(GULHeartbeatDateStorable)]);
 }
 
-#pragma mark - Private Helpers
+#pragma mark - Testing Utilities
 
 - (NSString *)userDefaultsSuiteName {
   NSCharacterSet *lettersToTrim = [[NSCharacterSet letterCharacterSet] invertedSet];

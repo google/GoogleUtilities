@@ -16,78 +16,250 @@
 
 #import <XCTest/XCTest.h>
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULHeartbeatDateStorage.h"
+#import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
 @interface GULHeartbeatDateStorageTest : XCTestCase
 @property(nonatomic) GULHeartbeatDateStorage *storage;
 @end
 
-static NSString *const kTestFileName = @"GULStorageHeartbeatTest";
+static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
-@implementation GULHeartbeatDateStorageTest
+@implementation GULHeartbeatDateStorageTest {
+  BOOL _rootDirectoryCreated;
+}
 
-- (void)setUp {
-#if TARGET_OS_TV
-  NSArray *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-#else
-  NSArray *path =
-      NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-#endif
-  NSString *rootPath = [path firstObject];
-  XCTAssertNotNil(rootPath);
-  NSURL *rootURL = [NSURL fileURLWithPath:rootPath];
+- (BOOL)setUpWithError:(NSError *__autoreleasing _Nullable *)error {
+  [super setUpWithError:error];
 
-  NSError *error;
-  if (![rootURL checkResourceIsReachableAndReturnError:&error]) {
-    XCTAssert([[NSFileManager defaultManager] createDirectoryAtURL:rootURL
-                                       withIntermediateDirectories:YES
-                                                        attributes:nil
-                                                             error:&error],
-              @"Error: %@", error);
+  NSError *directoryError;
+  if (!_rootDirectoryCreated) {
+    _rootDirectoryCreated = [self createRootDirectoryWithError:&directoryError];
   }
 
-  self.storage = [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
+  BOOL success = _rootDirectoryCreated;
+  if (!success && error) {
+    *error = [NSError errorWithDomain:@"com.GULHeartbeatDateStorageTest.ErrorDomain"
+                                 code:1
+                             userInfo:@{NSUnderlyingErrorKey : directoryError}];
+  }
 
+  return success;
+}
+
+- (void)setUp {
+  [super setUp];
+
+  self.storage = [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
   [self assertInitializationDoesNotAccessFileSystem];
 }
 
 - (void)tearDown {
-  [[NSFileManager defaultManager] removeItemAtURL:[self.storage fileURL] error:nil];
+  [super tearDown];
+
+  // Removes the Heartbeat Storage Directory if it exists.
+  NSURL *directoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  [[NSFileManager defaultManager] removeItemAtURL:directoryURL error:nil];
+
   self.storage = nil;
 }
 
+#pragma mark - Public API Tests
+
 - (void)testHeartbeatDateForTag {
-  NSDate *now = [NSDate date];
-  [self.storage setHearbeatDate:now forTag:@"fire-iid"];
-  XCTAssertEqual([now timeIntervalSinceReferenceDate],
-                 [[self.storage heartbeatDateForTag:@"fire-iid"] timeIntervalSinceReferenceDate]);
+  // 1. Tags and saves heartbeat info, which creates the storage directory & file as side effects.
+  NSDate *date = [NSDate date];
+  NSString *tag = @"tag";
+  BOOL successfulSave = [self.storage setHearbeatDate:date forTag:tag];
+  XCTAssert(successfulSave);
+
+  // 2. Retrieve saved heartbeat info.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:tag];
+
+  // 3. Assert that requested heartbeat info matches what was stored.
+  //    This implies the storage directory & file were created, written to, and read from.
+  XCTAssertEqualObjects(retrievedDate, date);
+}
+
+/// Heartbeat info is requested when the storage directory already exists (i.e. it was created in a
+/// previous app launch).
+- (void)testHeartbeatDateForTagWhenHeartbeatStorageDirectoryExists {
+  // 1. Manually create the heartbeat directory.
+  NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  NSError *error;
+  BOOL directoryCreated = [self explicitlyCreateDirectoryForURL:heartbeatStorageDirectoryURL
+                                                      withError:&error];
+  XCTAssert(directoryCreated);
+
+  // 2. Populate the storage file with heartbeat info.
+  // 2.1 Create a dictionary with heartbeat info.
+  NSDate *storedDate = [NSDate dateWithTimeIntervalSince1970:0];
+  NSString *storedTag = @"stored-tag";
+  NSDictionary *storedHeartbeatDictionary = @{storedTag : storedDate};
+  // 2.2 Encode the dictionary.
+  NSError *archiveError;
+  NSData *data = [GULSecureCoding archivedDataWithRootObject:storedHeartbeatDictionary
+                                                       error:&archiveError];
+  XCTAssertNotNil(data);
+  XCTAssertNil(archiveError);
+
+  // 2.3 Write the encoded dictionary to file.
+  NSURL *heartbeatStorageFileURL = [self fileURLForDirectory:heartbeatStorageDirectoryURL];
+  [data writeToURL:heartbeatStorageFileURL atomically:YES];
+  XCTAssertNotNil(data);
+
+  // 3. Retrieve the stored heartbeat info and validate that it matches the info that was stored.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:storedTag];
+
+  XCTAssertEqualObjects(retrievedDate, storedDate);
+}
+
+- (void)testHeartbeatDateForTagWhenReturnedDateIsNil {
+  NSString *nonexistentTag = @"missing-tag";
+  NSDate *nilDate = [self.storage heartbeatDateForTag:nonexistentTag];
+  XCTAssertNil(nilDate);
+}
+
+- (void)testSetHeartbeatDateForTagWhenExpectingFailure {
+  // The `setHearbeatDate: forTag:` API is expected to return NO if it is unable to write the
+  // heartbeat info to file. To verify the API successfully fails, an invalid string is used to
+  // create an invalid instance of `GULHeartbeatDateStorage` by supplying an invalid filename.
+  // This replicates a file system error that prohibits `setHearbeatDate: forTag:` from successfully
+  // storing the heartbeat info.
+  NSString *invalidFileName = @"";
+  GULHeartbeatDateStorage *invalidStorage =
+      [[GULHeartbeatDateStorage alloc] initWithFileName:invalidFileName];
+
+  BOOL success = [invalidStorage setHearbeatDate:NSDate.date forTag:@"tag"];
+  XCTAssertFalse(success);
+}
+
+- (void)testSetHeartbeatDateForTag {
+  NSDate *date = [NSDate date];
+  NSString *tag = @"tag";
+
+  // 1. Retrieve heartbeat info that is not stored and assert the retrieved info is nil.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:tag];
+  XCTAssertNil(retrievedDate);
+
+  // 2. Save the heartbeat info and assert the save was successful.
+  BOOL successfulSave = [self.storage setHearbeatDate:date forTag:tag];
+  XCTAssert(successfulSave);
+
+  // 3. Retrieve heartbeat info that is now stored and assert the retrieved info is accurate.
+  retrievedDate = [self.storage heartbeatDateForTag:tag];
+  XCTAssertEqualObjects(retrievedDate, date);
+}
+
+- (void)testHeartbeatDateForTagWhenHeartbeatFileReturnsInvalidData {
+  // 1. Manually create the heartbeat directory.
+  NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  NSError *error;
+  BOOL directoryCreated = [self explicitlyCreateDirectoryForURL:heartbeatStorageDirectoryURL
+                                                      withError:&error];
+  XCTAssert(directoryCreated);
+
+  // 2. Populate the storage file with invalid data.
+  NSData *corruptedData = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
+  XCTAssertNotNil(corruptedData);
+  NSURL *heartbeatStorageFileURL = [self fileURLForDirectory:heartbeatStorageDirectoryURL];
+  [corruptedData writeToURL:heartbeatStorageFileURL atomically:YES];
+
+  // 3. Retrieve saved heartbeat info and assert that it is nil.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:@"tag"];
+  XCTAssertNil(retrievedDate);
+}
+
+- (void)testSetHeartbeatDateForTagWhenHeartbeatFileReturnsInvalidData {
+  // 1. Manually create the heartbeat directory.
+  NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  NSError *error;
+  BOOL directoryCreated = [self explicitlyCreateDirectoryForURL:heartbeatStorageDirectoryURL
+                                                      withError:&error];
+  XCTAssert(directoryCreated);
+
+  // 2. Populate the storage file with invalid data.
+  NSData *corruptedData = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
+  XCTAssertNotNil(corruptedData);
+  NSURL *heartbeatStorageFileURL = [self fileURLForDirectory:heartbeatStorageDirectoryURL];
+  [corruptedData writeToURL:heartbeatStorageFileURL atomically:YES];
+
+  // 3. Tag and save heartbeat info. This should overwrite the invalid data with a
+  //    correctly encoded heartbeat dictionary.
+  NSDate *date = [NSDate date];
+  NSString *tag = @"tag";
+  BOOL successfulSave = [self.storage setHearbeatDate:date forTag:tag];
+  XCTAssert(successfulSave);
+
+  // 4. Retrieve saved heartbeat info.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:tag];
+
+  // 5. Assert that requested heartbeat info matches what was stored.
+  //    This implies the storage directory & file were created, written to, and read from.
+  XCTAssertEqualObjects(retrievedDate, date);
 }
 
 - (void)testConformsToHeartbeatStorableProtocol {
   XCTAssertTrue([self.storage conformsToProtocol:@protocol(GULHeartbeatDateStorable)]);
 }
 
-#pragma mark - Private Helpers
+#pragma mark - Testing Utilities
 
-- (void)assertInitializationDoesNotAccessFileSystem {
-  NSURL *fileURL = [self heartbeatFileURL];
-  NSError *error;
-  BOOL fileIsReachable = [fileURL checkResourceIsReachableAndReturnError:&error];
-  XCTAssertFalse(fileIsReachable,
-                 @"GULHeartbeatDateStorage initialization should not access the file system.");
-  XCTAssertNotNil(error, @"Error: %@", error);
+- (BOOL)createRootDirectoryWithError:(NSError *__autoreleasing _Nullable *)outError {
+  NSArray<NSString *> *paths;
+#if TARGET_OS_TV
+  paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+#else
+  paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+#endif  // TARGET_OS_TV
+  NSString *rootPath = [paths lastObject];
+  NSURL *rootURL = [NSURL fileURLWithPath:rootPath];
+
+  BOOL rootDirectoryExists = [rootURL checkResourceIsReachableAndReturnError:nil];
+  if (!rootDirectoryExists) {
+    rootDirectoryExists = [[NSFileManager defaultManager] createDirectoryAtURL:rootURL
+                                                   withIntermediateDirectories:YES
+                                                                    attributes:nil
+                                                                         error:outError];
+  }
+  return rootDirectoryExists;
 }
 
-- (NSURL *)heartbeatFileURL {
+- (BOOL)explicitlyCreateDirectoryForURL:(NSURL *)directoryPathURL withError:(NSError **)outError {
+  BOOL success = false;
+  if (![directoryPathURL checkResourceIsReachableAndReturnError:outError]) {
+    success = [[NSFileManager defaultManager] createDirectoryAtURL:directoryPathURL
+                                       withIntermediateDirectories:YES
+                                                        attributes:nil
+                                                             error:outError];
+  }
+  return success;
+}
+
+- (void)assertInitializationDoesNotAccessFileSystem {
+  NSString *directoryURL = [[self pathURLForDirectory:kGULHeartbeatStorageDirectory] path];
+  BOOL isDir;
+  BOOL directoryIsReachable =
+      [[NSFileManager defaultManager] fileExistsAtPath:directoryURL isDirectory:&isDir] && isDir;
+  XCTAssertFalse(directoryIsReachable,
+                 @"The Heartbeat Storage Directory already exists. "
+                 @"GULHeartbeatDateStorage initialization should not access the file system.");
+}
+
+- (NSURL *)pathURLForDirectory:(NSString *)directory {
+  NSArray<NSString *> *paths;
 #if TARGET_OS_TV
-  NSArray *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+  paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
 #else
-  NSArray *path =
-      NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-#endif
-  NSString *rootPath = [path firstObject];
-  NSArray<NSString *> *components = @[ rootPath, kGULHeartbeatStorageDirectory, kTestFileName ];
-  NSString *fileString = [NSString pathWithComponents:components];
-  NSURL *fileURL = [NSURL fileURLWithPath:fileString];
+  paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+#endif  // TARGET_OS_TV
+  NSString *rootPath = [paths lastObject];
+  NSURL *rootURL = [NSURL fileURLWithPath:rootPath];
+  NSURL *directoryURL = [rootURL URLByAppendingPathComponent:directory];
+  return directoryURL;
+}
+
+- (NSURL *)fileURLForDirectory:(NSURL *)directoryURL {
+  NSURL *fileURL = [directoryURL URLByAppendingPathComponent:kTestFileName];
   return fileURL;
 }
 
