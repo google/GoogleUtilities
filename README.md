@@ -17,7 +17,7 @@ a customized adaptation.
 
 After the CI is green:
 * Update the version in the podspec to match the latest entry in the [CHANGELOG.md](CHANGELOG.md)
-* Checkout the `main` branch and ensure it is up to date.
+* Checkout the `main` branch and ensure it is up to date
   ```console
   git checkout main
   git pull
@@ -55,17 +55,56 @@ After the CI is green:
     ```
     </details>
 * Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`.
-* On google3, create a workspace. Then copybara and run a global TAP.
+* On google3, run copybara using the command below. Then, start a global TAP on the generated CL. Deflake as needed.
   ```console
   third_party/firebase/ios/Releases/run_copy_bara.py --directory GoogleUtilities --branch main
   ```
 
 ## Publishing
+The release process is as follows:
+1. [Tag and release for Swift PM](#swift-package-manager)
+2. [Publish to CocoaPods](#cocoapods)
+3. [Perform post release cleanup](#post-release-cleanup)
+
+### Swift Package Manager
+  By creating and [pushing a tag](https://github.com/google/GoogleUtilities/tags)
+  for Swift PM, the newly tagged version will be immediately released for public use.
+  Given this, please verify the intended time of release for Swift PM.
   * Add a version tag for Swift PM
-    * `git tag {version}`
-    * `git push origin {version}`
-  * `pod trunk push GoogleUtilities.podspec`
-  * Clean up SpecsStaging
+  ```console
+  git tag {version}
+  git push origin {version}
+  ```
+  *Note: Ensure that any inflight PRs that depend on the new `GoogleUtilities` version are updated to point to the
+  newly tagged version rather than a checksum.*
+
+### CocoaPods
+* Publish the newly versioned pod to CocoaPods
+
+  It's recommended to point to the `GoogleUtilities.podspec` in `staging` to make sure the correct spec is being published.
+  ```console
+  pod trunk push ~/.cocoapods/repos/staging/GoogleUtilities/7.4.0/GoogleUtilities.podspec
+  ```
+  *Note: In some cases, it may be acceptable to `pod trunk push` with the `--skip-tests` flag. Please double check with
+  the maintainers before doing so.*
+
+  The pod push was successful if the above command logs: `🚀  GoogleUtilities ({version}) successfully published`.
+  In addition, a new commit that publishes the new version (co-authored by [CocoaPodsAtGoogle](https://github.com/CocoaPodsAtGoogle))
+  should appear in the [CocoaPods specs repo](https://github.com/CocoaPods/Specs). Last, the latest version should be displayed
+  on [GoogleUtilities's CocoaPods page](https://cocoapods.org/pods/GoogleUtilities).
+
+  *Don't forget to perform the [post release cleanup](#post-release-cleanup)!*
+
+### Post Release Cleanup
+* Clean up [SpecsStaging](https://github.com/firebase/SpecsStaging):
+  ```console
+  cd ~/path/to/SpecsStaging/
+  git checkout master
+  git pull
+  git rm -rf GoogleUtilities/
+  git commit -m "Post GoogleUtilities {version} release cleanup"
+  git push
+  ```
 
 ## Development
 
