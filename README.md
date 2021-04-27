@@ -80,21 +80,21 @@ The release process is as follows:
 
 ### CocoaPods
 * Publish the newly versioned pod to CocoaPods
-  
+
   It's recommended to point to the `GoogleUtilities.podspec` in `staging` to make sure the correct spec is being published.
   ```console
   pod trunk push ~/.cocoapods/repos/staging/GoogleUtilities/7.4.0/GoogleUtilities.podspec
   ```
   *Note: In some cases, it may be acceptable to `pod trunk push` with the `--skip-tests` flag. Please double check with
   the maintainers before doing so.*
-  
+
   The pod push was successful if the above command logs: `🚀  GoogleUtilities ({version}) successfully published`.
   In addition, a new commit that publishes the new version (co-authored by [CocoaPodsAtGoogle](https://github.com/CocoaPodsAtGoogle))
   should appear in the [CocoaPods specs repo](https://github.com/CocoaPods/Specs). Last, the latest version should be displayed
   on [GoogleUtilities's CocoaPods page](https://cocoapods.org/pods/GoogleUtilities).
-  
+
   *Don't forget to perform the [post release cleanup](#post-release-cleanup)!*
-  
+
 ### Post Release Cleanup
 * Clean up [SpecsStaging](https://github.com/firebase/SpecsStaging):
   ```console
