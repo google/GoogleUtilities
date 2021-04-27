@@ -62,9 +62,9 @@ After the CI is green:
 
 ## Publishing
 The release process is as follows:
-1. [Tag and release for Swift PM](#Swift-Package-Manager)
-2. [Publish to CocoaPods](#CocoaPods)
-3. [Perform post release cleanup](#Post-Release-Cleanup)
+1. [Tag and release for Swift PM](#swift-package-manager)
+2. [Publish to CocoaPods](#cocoaPods)
+3. [Perform post release cleanup](#post-release-cleanup)
 
 ### Swift Package Manager
   By creating and [pushing a tag](https://github.com/google/GoogleUtilities/tags)
@@ -93,7 +93,7 @@ The release process is as follows:
   should appear in the [CocoaPods specs repo](https://github.com/CocoaPods/Specs). Last, the latest version should be displayed
   on [GoogleUtilities's CocoaPods page](https://cocoapods.org/pods/GoogleUtilities).
   
-  *Don't forget to perform the [post release cleanup](#Post-Release-Cleanup)!*
+  *Don't forget to perform the [post release cleanup](#post-release-cleanup)!*
   
 ### Post Release Cleanup
 * Clean up [SpecsStaging](https://github.com/firebase/SpecsStaging):
