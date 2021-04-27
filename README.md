@@ -76,7 +76,7 @@ The release process is as follows:
   git push origin {version}
   ```
   *Note: Ensure that any inflight PRs that depend on the new `GoogleUtilities` version are updated to point to the
-  newly tagged version rather than the latest checksum.*
+  newly tagged version rather than a checksum.*
 
 ### CocoaPods
 * Publish the newly versioned pod to CocoaPods
