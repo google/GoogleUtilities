@@ -63,7 +63,7 @@ After the CI is green:
 ## Publishing
 The release process is as follows:
 1. [Tag and release for Swift PM](#swift-package-manager)
-2. [Publish to CocoaPods](#cocoaPods)
+2. [Publish to CocoaPods](#cocoapods)
 3. [Perform post release cleanup](#post-release-cleanup)
 
 ### Swift Package Manager
