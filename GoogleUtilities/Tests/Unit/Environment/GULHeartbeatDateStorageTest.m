@@ -238,14 +238,16 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
   // 6. Assert that stored heartbeat dictionary has been archived as a mutable dictionary.
   NSError *error;
-  NSData *objectData = [NSData dataWithContentsOfURL:heartbeatStorageFileURL options:0 error:&error];
+  NSData *objectData = [NSData dataWithContentsOfURL:heartbeatStorageFileURL
+                                             options:0
+                                               error:&error];
   XCTAssertNotNil(objectData);
   XCTAssert(objectData.length > 0);
   XCTAssertNil(error);
 
   NSSet<Class> *objectClasses = [NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]];
   NSDictionary *unarchivedDictionary = [GULSecureCoding unarchivedObjectOfClasses:objectClasses
-                                                                        fromData:objectData
+                                                                         fromData:objectData
                                                                             error:&error];
   XCTAssertNotNil(unarchivedDictionary);
   XCTAssertNil(error);
@@ -316,22 +318,6 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (NSURL *)fileURLForDirectory:(NSURL *)directoryURL {
   NSURL *fileURL = [directoryURL URLByAppendingPathComponent:kTestFileName];
   return fileURL;
-}
-
-
-- (void)testRepro8047 {
-  NSString *tag = @"tag";
-
-  // Store heartbeat on 7.4
-  NSDate *distantPast = [NSDate distantPast];
-  BOOL successfulSave = [self.storage setHearbeatDate:distantPast forTag:tag];
-  XCTAssert(successfulSave);
-
-  // Downgrade from 7.4
-
-  // Set heartbeat from pre-7.4 and expect crash
-  NSDate *now = [NSDate date];
-  [self.storage old_setHearbeatDate:now forTag:tag]; // Expect Crash
 }
 
 @end
