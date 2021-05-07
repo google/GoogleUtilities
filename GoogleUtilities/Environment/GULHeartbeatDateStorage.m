@@ -156,4 +156,42 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
   return [data writeToURL:writingFileURL atomically:YES];
 }
 
+- (BOOL)old_setHearbeatDate:(NSDate *)date forTag:(NSString *)tag {
+  NSError *error;
+  __block BOOL isSuccess = false;
+  [self.fileCoordinator coordinateReadingItemAtURL:self.fileURL
+                         options:0
+                writingItemAtURL:self.fileURL
+                         options:0
+                           error:&error
+                      byAccessor:^(NSURL *readingURL, NSURL *writingURL) {
+                                          NSMutableDictionary *dictionary =
+                                              [self old_heartbeatDictionaryWithFileURL:readingURL];
+                                          dictionary[tag] = date;
+                        NSError *error;
+                                          isSuccess = [self writeDictionary:dictionary
+                                            forWritingURL:writingURL
+                                                    error:&error];
+                      }];
+  return isSuccess;
+}
+
+- (nullable NSMutableDictionary *)old_heartbeatDictionaryWithFileURL:(NSURL *)readingFileURL {
+  NSError *error;
+  NSMutableDictionary *dict;
+  NSData *objectData = [NSData dataWithContentsOfURL:readingFileURL options:0 error:&error];
+  if (objectData == nil || error != nil) {
+    dict = [NSMutableDictionary dictionary];
+  } else {
+    dict = [GULSecureCoding
+        unarchivedObjectOfClasses:[NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]]
+                         fromData:objectData
+                            error:&error];
+    if (dict == nil || error != nil) {
+      dict = [NSMutableDictionary dictionary];
+    }
+  }
+  return dict;
+}
+
 @end

@@ -65,6 +65,22 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
 #pragma mark - Public API Tests
 
+// MARK: This test fails.
+- (void)testRepro8047 {
+  NSString *tag = @"tag";
+
+  // Store heartbeat on 7.4
+  NSDate *distantPast = [NSDate distantPast];
+  BOOL successfulSave = [self.storage setHearbeatDate:distantPast forTag:tag];
+  XCTAssert(successfulSave);
+
+  // Downgrade from 7.4
+
+  // Set heartbeat from pre-7.4 and expect crash
+  NSDate *now = [NSDate now];
+  [self.storage old_setHearbeatDate:now forTag:tag]; // Expect Crash
+}
+
 // MARK: This test passes.
 - (void)testArchiveMutableDictThenUnarchiveImmutableDict {
   // Archive Mutable Dict
