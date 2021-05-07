@@ -149,8 +149,8 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
           forWritingURL:(NSURL *)writingFileURL
                   error:(NSError **)outError {
   // Archive a mutable copy `dictionary` for writing to disk. This is done for
-  // backward compatibility. See Google Utilities issue #36 for more context.
-  // TODO: Remove in a future version of See Google Utilities (perhaps for Firebase 9).
+  // backwards compatibility. See Google Utilities issue #36 for more context.
+  // TODO: Remove usage of mutable copy in a future version of Google Utilities.
   NSData *data = [GULSecureCoding archivedDataWithRootObject:[dictionary mutableCopy]
                                                        error:outError];
   if (data.length == 0) {
