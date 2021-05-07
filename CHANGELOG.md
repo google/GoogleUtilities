@@ -1,4 +1,4 @@
-# 7.4.1 
+# 7.4.1
 - Improve heartbeat date storage's version compatability. (#37)
 
 # 7.4.0
