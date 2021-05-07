@@ -49,10 +49,6 @@ extern NSString *const kGULHeartbeatStorageDirectory;
  */
 - (BOOL)setHearbeatDate:(NSDate *)date forTag:(NSString *)tag;
 
-
-- (BOOL)old_setHearbeatDate:(NSDate *)date forTag:(NSString *)tag;
-
-
 @end
 
 NS_ASSUME_NONNULL_END

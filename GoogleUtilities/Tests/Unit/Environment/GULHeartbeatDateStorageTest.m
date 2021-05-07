@@ -65,72 +65,6 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
 #pragma mark - Public API Tests
 
-// MARK: This test fails.
-- (void)testRepro8047 {
-  NSString *tag = @"tag";
-
-  // Store heartbeat on 7.4
-  NSDate *distantPast = [NSDate distantPast];
-  BOOL successfulSave = [self.storage setHearbeatDate:distantPast forTag:tag];
-  XCTAssert(successfulSave);
-
-  // Downgrade from 7.4
-
-  // Set heartbeat from pre-7.4 and expect crash
-  NSDate *now = [NSDate now];
-  [self.storage old_setHearbeatDate:now forTag:tag]; // Expect Crash
-}
-
-// MARK: This test passes.
-- (void)testArchiveMutableDictThenUnarchiveImmutableDict {
-  // Archive Mutable Dict
-  NSDictionary *dict = @{@"tag": @(100)};
-  NSMutableDictionary *mutableDict = [NSMutableDictionary dictionaryWithDictionary:dict];
-  NSError *outError;
-  NSData *mutableDictData = [GULSecureCoding archivedDataWithRootObject:mutableDict
-                                                                  error:&outError];
-  XCTAssertNotNil(mutableDictData);
-  XCTAssertNil(outError);
-
-  // Unarchive Immutable Dict
-  NSSet<Class> *objectClasses = [NSSet setWithArray:@[ NSDictionary.class ]]; // NSDictionary.class!
-  NSDictionary *heartbeatDictionary = [GULSecureCoding unarchivedObjectOfClasses:objectClasses
-                                                                        fromData:mutableDictData
-                                                                           error:&outError];
-  XCTAssertNotNil(heartbeatDictionary);
-  XCTAssertNil(outError);
-}
-
-// MARK: This test passes.
-- (void)testRepro8047Attempt {
-  // 1. Manually create the heartbeat directory.
-  NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
-  NSError *error;
-  BOOL directoryCreated = [self explicitlyCreateDirectoryForURL:heartbeatStorageDirectoryURL
-                                                      withError:&error];
-  XCTAssert(directoryCreated);
-
-  // 2. Populate the storage file with `NSMutableDictionary` data.
-  NSMutableDictionary *hbDict = [NSMutableDictionary
-                                 dictionaryWithDictionary:@{@"tag" : NSDate.distantPast}];
-  NSError *outError;
-  NSData *mutableDictData = [GULSecureCoding archivedDataWithRootObject:hbDict
-                                                                  error:&outError];
-  XCTAssertNotNil(mutableDictData);
-  NSURL *heartbeatStorageFileURL = [self fileURLForDirectory:heartbeatStorageDirectoryURL];
-  [mutableDictData writeToURL:heartbeatStorageFileURL atomically:YES];
-
-  // 3. Call HeartbeatStorage APIs that read archived `NSMutableDictionary` as an `NSDictionary`.
-  NSDate *date = [NSDate date];
-  NSString *tag = @"tag";
-  BOOL successfulSave = [self.storage setHearbeatDate:date forTag:tag];
-  XCTAssert(successfulSave);
-  NSDate *retrievedDate = [self.storage heartbeatDateForTag:tag];
-
-  // Assert that requested heartbeat info matches what was stored.
-  XCTAssertEqualObjects(retrievedDate, date);
-}
-
 - (void)testHeartbeatDateForTag {
   // 1. Tags and saves heartbeat info, which creates the storage directory & file as side effects.
   NSDate *date = [NSDate date];
@@ -158,7 +92,7 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
   // 2. Populate the storage file with heartbeat info.
   // 2.1 Create a dictionary with heartbeat info.
-  NSDate *storedDate = [NSDate dateWithTimeIntervalSince1970:0];
+  NSDate *storedDate = [NSDate distantPast];
   NSString *storedTag = @"stored-tag";
   NSDictionary *storedHeartbeatDictionary = @{storedTag : storedDate};
   // 2.2 Encode the dictionary.
@@ -258,6 +192,45 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
   // 4. Retrieve saved heartbeat info.
   NSDate *retrievedDate = [self.storage heartbeatDateForTag:tag];
+
+  // 5. Assert that requested heartbeat info matches what was stored.
+  //    This implies the storage directory & file were created, written to, and read from.
+  XCTAssertEqualObjects(retrievedDate, date);
+}
+
+// Ensures that `setHearbeatDate:forTag:` API successfully functions when
+// stored heartbeat dictionary is immutable. See GoogleUtilities issue #36 for context.
+- (void)testSetHeartbeatDateForTagWhenStoredHeartbeatDictionaryIsImmutable {
+  // 1. Manually create the heartbeat directory.
+  NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  NSError *error;
+  BOOL directoryCreated = [self explicitlyCreateDirectoryForURL:heartbeatStorageDirectoryURL
+                                                      withError:&error];
+  XCTAssert(directoryCreated);
+
+  // 2. Populate the storage file with heartbeat info.
+  // 2.1 Create an *immutable* dictionary with heartbeat info.
+  NSDate *storedDate = [NSDate distantPast];
+  NSString *storedTag = @"stored-tag";
+  NSDictionary *storedHeartbeatDictionary = @{storedTag : storedDate};
+  // 2.2 Encode the dictionary.
+  NSError *archiveError;
+  NSData *data = [GULSecureCoding archivedDataWithRootObject:storedHeartbeatDictionary
+                                                       error:&archiveError];
+  XCTAssertNotNil(data);
+  XCTAssertNil(archiveError);
+  // 2.3 Write the encoded dictionary to file.
+  NSURL *heartbeatStorageFileURL = [self fileURLForDirectory:heartbeatStorageDirectoryURL];
+  [data writeToURL:heartbeatStorageFileURL atomically:YES];
+  XCTAssertNotNil(data);
+
+  // 3. Tag and save new heartbeat date for `storedTag`.
+  NSDate *date = [NSDate date];
+  BOOL successfulSave = [self.storage setHearbeatDate:date forTag:storedTag];
+  XCTAssert(successfulSave);
+
+  // 4. Retrieve saved heartbeat info.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:storedTag];
 
   // 5. Assert that requested heartbeat info matches what was stored.
   //    This implies the storage directory & file were created, written to, and read from.
