@@ -94,7 +94,7 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
   // 2.1 Create a dictionary with heartbeat info.
   NSDate *storedDate = [NSDate distantPast];
   NSString *storedTag = @"stored-tag";
-  NSMutableDictionary *storedHeartbeatDictionary = [@{storedTag : storedDate} mutableCopy];
+  NSDictionary *storedHeartbeatDictionary = @{storedTag : storedDate};
   // 2.2 Encode the dictionary.
   NSError *archiveError;
   NSData *data = [GULSecureCoding archivedDataWithRootObject:storedHeartbeatDictionary
