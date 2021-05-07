@@ -203,9 +203,9 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (void)testSetHeartbeatDateForTagWhenStoredHeartbeatDictionaryIsImmutable {
   // 1. Manually create the heartbeat directory.
   NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
-  NSError *error;
+  NSError *directoryError;
   BOOL directoryCreated = [self explicitlyCreateDirectoryForURL:heartbeatStorageDirectoryURL
-                                                      withError:&error];
+                                                      withError:&directoryError];
   XCTAssert(directoryCreated);
 
   // 2. Populate the storage file with heartbeat info.
@@ -235,6 +235,22 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
   // 5. Assert that requested heartbeat info matches what was stored.
   //    This implies the storage directory & file were created, written to, and read from.
   XCTAssertEqualObjects(retrievedDate, date);
+
+  // 6. Assert that stored heartbeat dictionary has been archived as a mutable dictionary.
+  NSError *error;
+  NSData *objectData = [NSData dataWithContentsOfURL:heartbeatStorageFileURL options:0 error:&error];
+  XCTAssertNotNil(objectData);
+  XCTAssert(objectData.length > 0);
+  XCTAssertNil(error);
+
+  NSSet<Class> *objectClasses = [NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]];
+  NSDictionary *unarchivedDictionary = [GULSecureCoding unarchivedObjectOfClasses:objectClasses
+                                                                        fromData:objectData
+                                                                            error:&error];
+  XCTAssertNotNil(unarchivedDictionary);
+  XCTAssertNil(error);
+  // Unarchived as a mutable dictionary.
+  XCTAssertTrue([unarchivedDictionary isKindOfClass:[NSMutableDictionary class]]);
 }
 
 - (void)testConformsToHeartbeatStorableProtocol {
@@ -300,6 +316,22 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (NSURL *)fileURLForDirectory:(NSURL *)directoryURL {
   NSURL *fileURL = [directoryURL URLByAppendingPathComponent:kTestFileName];
   return fileURL;
+}
+
+
+- (void)testRepro8047 {
+  NSString *tag = @"tag";
+
+  // Store heartbeat on 7.4
+  NSDate *distantPast = [NSDate distantPast];
+  BOOL successfulSave = [self.storage setHearbeatDate:distantPast forTag:tag];
+  XCTAssert(successfulSave);
+
+  // Downgrade from 7.4
+
+  // Set heartbeat from pre-7.4 and expect crash
+  NSDate *now = [NSDate date];
+  [self.storage old_setHearbeatDate:now forTag:tag]; // Expect Crash
 }
 
 @end

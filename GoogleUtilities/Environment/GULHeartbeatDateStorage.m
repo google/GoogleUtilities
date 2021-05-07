@@ -92,7 +92,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 }
 
 - (nullable NSDate *)heartbeatDateForTag:(NSString *)tag {
-  __block NSMutableDictionary *heartbeatDictionary;
+  __block NSDictionary *heartbeatDictionary;
   NSError *error;
   [self.fileCoordinator coordinateReadingItemAtURL:self.fileURL
                                            options:0
@@ -107,24 +107,25 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 - (BOOL)setHearbeatDate:(NSDate *)date forTag:(NSString *)tag {
   NSError *error;
   __block BOOL isSuccess = false;
-  [self.fileCoordinator coordinateReadingItemAtURL:self.fileURL
-                                           options:0
-                                  writingItemAtURL:self.fileURL
-                                           options:0
-                                             error:&error
-                                        byAccessor:^(NSURL *readingURL, NSURL *writingURL) {
-                                          NSMutableDictionary *heartbeatDictionary =
-                                              [self heartbeatDictionaryWithFileURL:readingURL];
-                                          heartbeatDictionary[tag] = date;
-                                          NSError *error;
-                                          isSuccess = [self writeDictionary:heartbeatDictionary
-                                                              forWritingURL:writingURL
-                                                                      error:&error];
-                                        }];
+  [self.fileCoordinator
+      coordinateReadingItemAtURL:self.fileURL
+                         options:0
+                writingItemAtURL:self.fileURL
+                         options:0
+                           error:&error
+                      byAccessor:^(NSURL *readingURL, NSURL *writingURL) {
+                        NSMutableDictionary *heartbeatDictionary =
+                            [[self heartbeatDictionaryWithFileURL:readingURL] mutableCopy];
+                        heartbeatDictionary[tag] = date;
+                        NSError *error;
+                        isSuccess = [self writeDictionary:[heartbeatDictionary copy]
+                                            forWritingURL:writingURL
+                                                    error:&error];
+                      }];
   return isSuccess;
 }
 
-- (NSMutableDictionary *)heartbeatDictionaryWithFileURL:(NSURL *)readingFileURL {
+- (NSDictionary *)heartbeatDictionaryWithFileURL:(NSURL *)readingFileURL {
   NSDictionary *heartbeatDictionary;
 
   NSError *error;
@@ -141,13 +142,17 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
     heartbeatDictionary = [NSDictionary dictionary];
   }
 
-  return [heartbeatDictionary mutableCopy];
+  return heartbeatDictionary;
 }
 
-- (BOOL)writeDictionary:(NSMutableDictionary *)dictionary
+- (BOOL)writeDictionary:(NSDictionary *)dictionary
           forWritingURL:(NSURL *)writingFileURL
                   error:(NSError **)outError {
-  NSData *data = [GULSecureCoding archivedDataWithRootObject:dictionary error:outError];
+  // Archive a mutable copy `dictionary` for writing to disk. This is done for
+  // backward compatibility. See Google Utilities issue #36 for more context.
+  // TODO: Remove in a future version of See Google Utilities (perhaps for Firebase 9).
+  NSData *data = [GULSecureCoding archivedDataWithRootObject:[dictionary mutableCopy]
+                                                       error:outError];
   if (data.length == 0) {
     return NO;
   }
