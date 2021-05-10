@@ -306,6 +306,13 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
 #pragma mark - Version Compatibility (#36)
 
+// Attempts to replicate a developer's version migration from a bad state (7.3.1->7.4.0) back to
+// a good state (7.4.0->7.4.1->7.3.1). The developer ends at 7.3.1 in a working state.
+// Overall version transtions: 7.3.1->7.4.0->7.4.1->7.3.1.
+- (void)testCompatibilityFrom7_3_1_to7_4_0_to7_4_1_to7_3_1 {
+
+}
+
 - (void)testCompatibility_pre7_4_0 {
   NSString *tag = @"tag";
 
