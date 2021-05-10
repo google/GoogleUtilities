@@ -102,7 +102,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
                                               [self heartbeatDictionaryWithFileURL:readingURL];
                                         }];
   NSDate *heartbeatDate = heartbeatDictionary[tag];
-  if (![heartbeatDate isKindOfClass:NSDate.class]) {
+  if (![heartbeatDate isKindOfClass:[NSDate class]]) {
     return nil;
   }
   return heartbeatDate;
