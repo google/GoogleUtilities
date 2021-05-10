@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import "GULHeartbeatDateStorageV7.4.0.h"
+#import "GoogleUtilities/Tests/Unit/Environment/Sources/GULHeartbeatDateStorageV7.4.0.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
 NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";

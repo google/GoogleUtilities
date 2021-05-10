@@ -19,8 +19,8 @@
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
 // Import specific version implementations for compatibility testing.
-#import "Sources/GULHeartbeatDateStorageV7.3.1.h"
-#import "Sources/GULHeartbeatDateStorageV7.4.0.h"
+#import "GoogleUtilities/Tests/Unit/Environment/Sources/GULHeartbeatDateStorageV7.3.1.h"
+#import "GoogleUtilities/Tests/Unit/Environment/Sources/GULHeartbeatDateStorageV7.4.0.h"
 
 @interface GULHeartbeatDateStorageTest : XCTestCase
 @property(nonatomic) GULHeartbeatDateStorage *storage;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#import "GULHeartbeatDateStorageV7.3.1.h"
+#import "GoogleUtilities/Tests/Unit/Environment/Sources/GULHeartbeatDateStorageV7.3.1.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
 @interface GULHeartbeatDateStorage7_3_1 ()
