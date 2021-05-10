@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
+// MARK: This file is strictly for version compatibility testing.
+
 #import <Foundation/Foundation.h>
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULHeartbeatDateStorable.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-//extern NSString *const kGULHeartbeatStorageDirectory; // Avoids duplicate linker error.
+extern NSString *const kGULHeartbeatStorageDirectory7_4_0;  // Avoids duplicate linker error.
 
 /// Stores either a date or a dictionary to a specified file.
 @interface GULHeartbeatDateStorage7_4_0 : NSObject <GULHeartbeatDateStorable>

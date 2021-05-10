@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// MARK: This file is strictly for version compatibility testing.
+
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN

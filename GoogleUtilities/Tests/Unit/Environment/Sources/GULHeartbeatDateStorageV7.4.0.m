@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+// MARK: This file is strictly for version compatibility testing.
+
 #import "GoogleUtilities/Tests/Unit/Environment/Sources/GULHeartbeatDateStorageV7.4.0.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
 // Add static to avoid linker error.
-static NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
+NSString *const kGULHeartbeatStorageDirectory7_4_0 = @"Google/FIRApp";
 
 @interface GULHeartbeatDateStorage7_4_0 ()
 /** The storage to store the date of the last sent heartbeat. */
@@ -66,7 +68,7 @@ static NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 #endif  // TARGET_OS_TV
   NSString *rootPath = [paths lastObject];
   NSURL *rootURL = [NSURL fileURLWithPath:rootPath];
-  NSURL *directoryURL = [rootURL URLByAppendingPathComponent:kGULHeartbeatStorageDirectory];
+  NSURL *directoryURL = [rootURL URLByAppendingPathComponent:kGULHeartbeatStorageDirectory7_4_0];
   return directoryURL;
 }
 

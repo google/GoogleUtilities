@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// MARK: This file is strictly for version compatibility testing.
+
 #import "GoogleUtilities/Tests/Unit/Environment/Sources/GULHeartbeatDateStorageV7.3.1.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
