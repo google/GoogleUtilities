@@ -20,8 +20,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// The name of the directory where the heartbeat data is stored.
-extern NSString *const kGULHeartbeatStorageDirectory;
+
+//extern NSString *const kGULHeartbeatStorageDirectory; // Avoids duplicate linker error.
 
 /// Stores either a date or a dictionary to a specified file.
 @interface GULHeartbeatDateStorage7_4_0 : NSObject <GULHeartbeatDateStorable>

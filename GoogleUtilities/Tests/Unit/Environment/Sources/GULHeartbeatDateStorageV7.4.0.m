@@ -17,7 +17,8 @@
 #import "GoogleUtilities/Tests/Unit/Environment/Sources/GULHeartbeatDateStorageV7.4.0.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
-NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
+// Add static to avoid linker error.
+static NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 
 @interface GULHeartbeatDateStorage7_4_0 ()
 /** The storage to store the date of the last sent heartbeat. */
