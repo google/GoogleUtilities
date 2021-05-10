@@ -169,6 +169,65 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
   XCTAssertNil(retrievedDate);
 }
 
+- (void)testHeartbeatDateForTagWhenHeartbeatFileContainsUnexpectedContent {
+  // 1. Manually create the heartbeat directory.
+  NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  NSError *error;
+  BOOL directoryCreated = [self explicitlyCreateDirectoryForURL:heartbeatStorageDirectoryURL
+                                                      withError:&error];
+  XCTAssert(directoryCreated);
+
+  // 2. Populate the storage file with unexpected content.
+  NSArray *array = @[ [NSDate distantPast], [NSDate date], [NSDate distantFuture] ];
+  NSError *archiveError;
+  NSData *data = [GULSecureCoding archivedDataWithRootObject:array error:&archiveError];
+  XCTAssertNotNil(data);
+  XCTAssert(data.length > 0);
+  XCTAssertNil(archiveError);
+  NSURL *heartbeatStorageFileURL = [self fileURLForDirectory:heartbeatStorageDirectoryURL];
+  [data writeToURL:heartbeatStorageFileURL atomically:YES];
+
+  // 3. Retrieve saved heartbeat info and assert that it is nil.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:@"tag"];
+  XCTAssertNil(retrievedDate);
+}
+
+- (void)testSetHeartbeatDateForTagWhenHeartbeatFileContainsUnexpectedContent {
+  // 1. Manually create the heartbeat directory.
+  NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  NSError *error;
+  BOOL directoryCreated = [self explicitlyCreateDirectoryForURL:heartbeatStorageDirectoryURL
+                                                      withError:&error];
+  XCTAssert(directoryCreated);
+
+  // 2. Populate the storage file with unexpected content.
+  NSArray *array = @[ [NSDate distantPast], [NSDate date], [NSDate distantFuture] ];
+  NSError *archiveError;
+  NSData *data = [GULSecureCoding archivedDataWithRootObject:array error:&archiveError];
+  XCTAssertNotNil(data);
+  XCTAssert(data.length > 0);
+  XCTAssertNil(archiveError);
+
+  NSURL *heartbeatStorageFileURL = [self fileURLForDirectory:heartbeatStorageDirectoryURL];
+  [data writeToURL:heartbeatStorageFileURL atomically:YES];
+
+  // 3. Create heartbeat info.
+  NSDate *date = [NSDate date];
+  NSString *tag = @"tag";
+
+  // 4. Retrieve heartbeat info that is not stored and assert the retrieved info is nil.
+  NSDate *retrievedDate = [self.storage heartbeatDateForTag:tag];
+  XCTAssertNil(retrievedDate);
+
+  // 5. Save the heartbeat info and assert the save was successful.
+  BOOL successfulSave = [self.storage setHearbeatDate:date forTag:tag];
+  XCTAssert(successfulSave);
+
+  // 6. Retrieve heartbeat info that is now stored and assert the retrieved info is accurate.
+  retrievedDate = [self.storage heartbeatDateForTag:tag];
+  XCTAssertEqualObjects(retrievedDate, date);
+}
+
 - (void)testSetHeartbeatDateForTagWhenHeartbeatFileReturnsInvalidData {
   // 1. Manually create the heartbeat directory.
   NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
