@@ -151,13 +151,11 @@
           forWritingURL:(NSURL *)writingFileURL
                   error:(NSError **)outError {
   NSData *data = [GULSecureCoding archivedDataWithRootObject:dictionary error:outError];
-  // The following logic has been commented out to avoid mysterious `__NSStackBlock__` errors
-  // during testing.
-  //  if (*outError != nil) {
-  //    return false;
-  //  } else {
-  return [data writeToURL:writingFileURL atomically:YES];
-  //  }
+  if (*outError != nil) {
+    return false;
+  } else {
+    return [data writeToURL:writingFileURL atomically:YES];
+  }
 }
 
 @end
