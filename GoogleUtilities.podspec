@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'GoogleUtilities'
-  s.version          = '7.4.0'
+  s.version          = '7.4.1'
   s.summary          = 'Google Utilities for Apple platform SDKs'
 
   s.description      = <<-DESC
@@ -125,7 +125,7 @@ other Google CocoaPods. They're not intended for direct public usage.
 
   s.test_spec 'unit' do |unit_tests|
     unit_tests.scheme = { :code_coverage => true }
-    # All tests require arc except Tests/Network/third_party/GTMHTTPServer.m
+
     unit_tests.platforms = {
       :ios => ios_deployment_target,
       :osx => osx_deployment_target,
@@ -134,7 +134,12 @@ other Google CocoaPods. They're not intended for direct public usage.
     unit_tests.source_files = [
       'GoogleUtilities/Tests/Unit/**/*.[mh]',
     ]
-    unit_tests.requires_arc = 'GoogleUtilities/Tests/Unit/*/*.[mh]'
+
+    # All tests require arc except Tests/Network/third_party/GTMHTTPServer.m
+    unit_tests.requires_arc = [
+      'GoogleUtilities/Tests/Unit/*/*.[mh]',
+      'GoogleUtilities/Tests/Unit/Environment/**/*.[mh]'
+    ]
     unit_tests.requires_app_host = true
     unit_tests.dependency 'OCMock'
   end

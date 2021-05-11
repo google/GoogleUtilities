@@ -1,3 +1,6 @@
+# 7.4.1
+- Improve heartbeat date storage's version compatability. (#37)
+
 # 7.4.0
 - Change heartbeat directory name and refactor file. (#19)
 - Introduce user defaults based heartbeat storage. (#23)
