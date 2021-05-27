@@ -69,11 +69,11 @@ jobs:
         common_commit=$(git merge-base remotes/origin/${pr_branch} remotes/origin/main)
         GITHUB_SHA=$(cat $GITHUB_EVENT_PATH | jq -r .pull_request.head.sha)
         if [ -d "${{steps.download.outputs.download-path}}" ]; then
-        firebase-ios-sdk/scripts/code_coverage_report/generate_code_coverage_report/.build/debug/CoverageReportGenerator --presubmit "google/GoogleUtilities" --commit "${GITHUB_SHA}" --token $(gcloud auth print-identity-token) --xcresult-dir "${{steps.download.outputs.download-path}}/codecoverage" --log-link "https://github.com/google/GoogleUtilities/actions/runs/${GITHUB_RUN_ID}" --pull-request-num ${{github.event.pull_request.number}} --base-commit "$common_commit"
+        firebase-ios-sdk/scripts/code_coverage_report/generate_code_coverage_report/.build/debug/CoverageReportGenerator --presubmit "google/GoogleUtilities" --head-commit "${GITHUB_SHA}" --token $(gcloud auth print-identity-token) --xcresult-dir "${{steps.download.outputs.download-path}}/codecoverage" --log-link "https://github.com/google/GoogleUtilities/actions/runs/${GITHUB_RUN_ID}" --pull-request-num ${{github.event.pull_request.number}} --base-commit "$common_commit"
         fi
     - name: Update New Coverage Data
       if: github.event.pull_request.merged == true && env.METRICS_SERVICE_SECRET
       run: |
         if [ -d "${{steps.download.outputs.download-path}}" ]; then
-        firebase-ios-sdk/scripts/code_coverage_report/generate_code_coverage_report/.build/debug/CoverageReportGenerator --merge "google/GoogleUtilities" --commit "${GITHUB_SHA}" --token $(gcloud auth print-identity-token) --xcresult-dir "${{steps.download.outputs.download-path}}/codecoverage" --log-link "https://github.com/google/GoogleUtilities/actions/runs/${GITHUB_RUN_ID}" --branch "${GITHUB_REF##*/}"
+        firebase-ios-sdk/scripts/code_coverage_report/generate_code_coverage_report/.build/debug/CoverageReportGenerator --merge "google/GoogleUtilities" --head-commit "${GITHUB_SHA}" --token $(gcloud auth print-identity-token) --xcresult-dir "${{steps.download.outputs.download-path}}/codecoverage" --log-link "https://github.com/google/GoogleUtilities/actions/runs/${GITHUB_RUN_ID}" --source-branch "${GITHUB_REF##*/}"
         fi
