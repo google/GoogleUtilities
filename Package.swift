@@ -79,7 +79,6 @@ let package = Package(
                      "GoogleUtilities_Network"],
       path: "GoogleUtilities",
       exclude: [
-        "README.md",
         "AppDelegateSwizzler/README.md",
         "Environment/",
         "Network/",
@@ -94,8 +93,7 @@ let package = Package(
       ],
       sources: [
         "AppDelegateSwizzler/",
-        "SceneDelegateSwizzler/",
-        "Common/*.h",
+        "Common/",
       ],
       publicHeadersPath: "AppDelegateSwizzler/Public",
       cSettings: [
