@@ -83,7 +83,7 @@ The release process is as follows:
 
   It's recommended to point to the `GoogleUtilities.podspec` in `staging` to make sure the correct spec is being published.
   ```console
-  pod trunk push ~/.cocoapods/repos/staging/GoogleUtilities/7.4.0/GoogleUtilities.podspec
+  pod trunk push ~/.cocoapods/repos/staging/GoogleUtilities/{version}/GoogleUtilities.podspec
   ```
   *Note: In some cases, it may be acceptable to `pod trunk push` with the `--skip-tests` flag. Please double check with
   the maintainers before doing so.*
