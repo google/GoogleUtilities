@@ -424,7 +424,8 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
   NSURL *heartbeatStorageDirectoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
   NSURL *heartbeatStorageFileURL = [self fileURLForDirectory:heartbeatStorageDirectoryURL];
   NSData *objectData = [NSData dataWithContentsOfURL:heartbeatStorageFileURL options:0 error:nil];
-  __auto_type objectClasses = [NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]];
+  __auto_type objectClasses =
+      [NSSet setWithArray:@[ NSDictionary.class, NSDate.class, NSString.class ]];
   NSMutableDictionary *heartbeatDict = [GULSecureCoding unarchivedObjectOfClasses:objectClasses
                                                                          fromData:objectData
                                                                             error:nil];

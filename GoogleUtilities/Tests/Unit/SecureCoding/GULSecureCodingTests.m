@@ -60,7 +60,8 @@
   XCTAssertNotNil(archiveData);
 
   NSDictionary *unarchivedObject = [GULSecureCoding
-      unarchivedObjectOfClasses:[NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]]
+      unarchivedObjectOfClasses:
+          [NSSet setWithArray:@[ NSDictionary.class, NSDate.class, NSString.class, NSNumber.class ]]
                        fromData:archiveData
                           error:&error];
   XCTAssertNil(error);
