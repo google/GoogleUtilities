@@ -1,4 +1,4 @@
-# Unreleased
+# 7.4.2
 - Include all object classes when using archiver. (#42)
 
 # 7.4.1

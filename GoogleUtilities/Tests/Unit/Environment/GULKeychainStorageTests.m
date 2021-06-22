@@ -87,6 +87,8 @@
 
   // 3. Read existing object which is not present in in-memory cache.
   [self.cache removeAllObjects];
+  // TODO: Evaluate if GULKeychainStorage needs an API that takes set of classes. (#42)
+  // The following method causes an NSKeyedUnarchiver-related runtime warning log.
   [self assertSuccessReadObject:@{@"key" : @"value"}
                          forKey:@"test-key1"
                           class:[NSDictionary class]
