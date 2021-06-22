@@ -1,3 +1,6 @@
+# Unreleased
+- Include all object classes when using archiver. (#42)
+
 # 7.4.1
 - Improve heartbeat date storage's version compatability. (#37)
 
