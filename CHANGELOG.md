@@ -1,8 +1,8 @@
 # 7.4.3
 - Include all object classes when using archiver. (#42)
 
-# 7.4.2
-- This was a SwiftPM-only release.
+# 7.4.2 (Swift PM)
+- Fix warnings in Xcode 13 beta 1. (#41)
 
 # 7.4.1
 - Improve heartbeat date storage's version compatability. (#37)
