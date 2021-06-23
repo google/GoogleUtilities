@@ -20,7 +20,7 @@ After the CI is green:
   [tagged releases](https://github.com/google/GoogleUtilities/tags).
   Ensure that the next release version keeps Swift PM and CocoaPods respective versions in in sync.
 * Verify that the releasing version has the latest entry in the [CHANGELOG.md](CHANGELOG.md),
-  updating it if necessary. 
+  updating it if necessary.
 * Update the version in the podspec to match the latest entry in the [CHANGELOG.md](CHANGELOG.md)
 * Checkout the `main` branch and ensure it is up to date
   ```console
