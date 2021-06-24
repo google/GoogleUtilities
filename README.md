@@ -17,7 +17,7 @@ a customized adaptation.
 
 After the CI is green:
 * Determine the next version for release by checking the
-  [tagged releases](https://github.com/google/GoogleDataTransport/tags).
+  [tagged releases](https://github.com/google/GoogleUtilities/tags).
   Ensure that the next release version keeps the Swift PM and CocoaPods versions in sync.
 * Verify that the releasing version is the latest entry in the [CHANGELOG.md](CHANGELOG.md),
   updating it if necessary.
@@ -99,11 +99,11 @@ The release process is as follows:
   should appear in the [CocoaPods specs repo](https://github.com/CocoaPods/Specs). Last, the latest version should be displayed
   on [GoogleUtilities's CocoaPods page](https://cocoapods.org/pods/GoogleUtilities).
 
-### [Create GitHub Release](https://github.com/google/GoogleDataTransport/releases/new/)
-  Update the [release template](https://github.com/google/GoogleDataTransport/releases/new/)'s **Tag version** and **Release title**
+### [Create GitHub Release](https://github.com/google/GoogleUtilities/releases/new/)
+  Update the [release template](https://github.com/google/GoogleUtilities/releases/new/)'s **Tag version** and **Release title**
   fields with the latest version. In addition, reference the [Release Notes](./CHANGELOG.md) in the release's description.
 
-  See [this release](https://github.com/google/GoogleDataTransport/releases/edit/9.0.1) for an example.
+  See [this release](https://github.com/google/GoogleUtilities/releases/edit/9.0.1) for an example.
 
   *Don't forget to perform the [post release cleanup](#post-release-cleanup)!*
 
