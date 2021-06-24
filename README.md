@@ -98,7 +98,7 @@ The release process is as follows:
   In addition, a new commit that publishes the new version (co-authored by [CocoaPodsAtGoogle](https://github.com/CocoaPodsAtGoogle))
   should appear in the [CocoaPods specs repo](https://github.com/CocoaPods/Specs). Last, the latest version should be displayed
   on [GoogleUtilities's CocoaPods page](https://cocoapods.org/pods/GoogleUtilities).
-  
+
 ### [Create GitHub Release](https://github.com/google/GoogleDataTransport/releases/new/)
   Update the [release template](https://github.com/google/GoogleDataTransport/releases/new/)'s **Tag version** and **Release title**
   fields with the latest version. In addition, reference the [Release Notes](./CHANGELOG.md) in the release's description.
@@ -109,7 +109,7 @@ The release process is as follows:
 
 ### Post Release Cleanup
   <details>
-  <summary>Clean up <b>SpecsStaging</b></summary> 
+  <summary>Clean up <b>SpecsStaging</b></summary>
 
   ```console
   pwd=$(pwd)
@@ -119,9 +119,9 @@ The release process is as follows:
   git rm -rf GoogleUtilities/
   git commit -m "Post publish cleanup"
   git push origin master
-  rm -rf /tmp/release-cleanup 
+  rm -rf /tmp/release-cleanup
   cd $pwd
-  ```  
+  ```
   </details>
 
 ## Development
