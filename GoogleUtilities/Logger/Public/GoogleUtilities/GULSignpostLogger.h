@@ -19,7 +19,7 @@ typedef os_signpost_id_t gul_os_signpost_id_t;
 
 // See `os_signpost_interval_begin`.
 #define gul_os_signpost_interval_begin(log, interval_id, name, ...) \
-  os_signpost_interval_begin(log, interval_id, name, ##__VA_ARGS__)
+ _gul_os_signpost_interval_begin(log, interval_id, name, ##__VA_ARGS__)
 
 // See `os_signpost_interval_end`.
 #define gul_os_signpost_interval_end(log, interval_id, name, ...) \
@@ -31,7 +31,7 @@ typedef os_signpost_id_t gul_os_signpost_id_t;
 
 // See `_gul_default_signpost_log`.
 #define gul_default_signpost_log() \
-  _gul_default_signpost_log
+  _gul_default_signpost_log()
 
 #else // __has_include(<os/signpost.h>)
 
@@ -42,7 +42,7 @@ typedef void gul_os_signpost_id_t;
 
 #define gul_os_signpost_id_generate(log)
 
-#define gul_os_signpost_interval_begin(log, interval_id, name, ...)
+//#define gul_os_signpost_interval_begin(log, interval_id, name, ...)
 
 #define gul_os_signpost_interval_end(log, interval_id, name, ...)
 
@@ -55,3 +55,5 @@ typedef void gul_os_signpost_id_t;
 /// Returns a default instance of `gul_os_log_t` to be used for signpost logging when available.
 /// @return A default instance of `gul_os_log_t`.
 gul_os_log_t _gul_default_signpost_log(void);
+
+void _gul_os_signpost_interval_begin(gul_os_log_t log, gul_os_signpost_id_t interval_id, const char *name, ...);
