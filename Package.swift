@@ -63,7 +63,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(name: "Promises", url: "https://github.com/google/promises.git", "1.2.8" ..< "1.3.0"),
+    .package(name: "Promises", url: "https://github.com/google/promises.git", "1.2.8" ..< "3.0.0"),
     .package(
       name: "OCMock",
       url: "https://github.com/firebase/ocmock.git",
