@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'GoogleUtilities'
-  s.version          = '7.4.3'
+  s.version          = '7.4.4'
   s.summary          = 'Google Utilities for Apple platform SDKs'
 
   s.description      = <<-DESC
@@ -38,7 +38,7 @@ other Google CocoaPods. They're not intended for direct public usage.
   s.subspec 'Environment' do |es|
     es.source_files = 'GoogleUtilities/Environment/**/*.[mh]'
     es.public_header_files = 'GoogleUtilities/Environment/Public/GoogleUtilities/*.h'
-    es.dependency 'PromisesObjC', '~> 1.2'
+    es.dependency 'PromisesObjC', '>= 1.2', '<= 2.0'
     es.frameworks = [
       'Security'
     ]
