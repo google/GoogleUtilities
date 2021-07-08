@@ -1,3 +1,6 @@
+# 7.4.4
+- Bump promises dependency #46
+
 # 7.4.3
 - Include all object classes when using archiver. (#42)
 
