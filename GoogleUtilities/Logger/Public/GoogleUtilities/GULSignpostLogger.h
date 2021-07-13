@@ -13,36 +13,50 @@
 typedef os_log_t gul_os_log_t;
 typedef os_signpost_id_t gul_os_signpost_id_t;
 
-// See `os_signpost_id_generate`.
-#define gul_os_signpost_id_generate(log) \
-  os_signpost_id_generate(log)
-
 // See `os_signpost_interval_begin`.
 #define gul_os_signpost_interval_begin(log, interval_id, name, ...) \
- _gul_os_signpost_interval_begin(log, interval_id, name, ##__VA_ARGS__)
+    __extension__({ \
+        if (@available(iOS 12.0, *)) { \
+          os_signpost_interval_begin(log, interval_id, name, "" __VA_ARGS__); \
+        } \
+    })
 
 // See `os_signpost_interval_end`.
 #define gul_os_signpost_interval_end(log, interval_id, name, ...) \
-  os_signpost_interval_end(log, interval_id, name, ##__VA_ARGS__)
+    __extension__({ \
+        if (@available(iOS 12.0, *)) { \
+          os_signpost_interval_end(log, interval_id, name, "" __VA_ARGS__); \
+        } \
+    })
 
 // See `os_signpost_interval_end`.
 #define gul_os_signpost_interval_emit(log, event_id, name, ...) \
-  os_signpost_interval_emit(log, event_id, name, ##__VA_ARGS__)
+    __extension__({ \
+        if (@available(iOS 12.0, *)) { \
+          os_signpost_interval_end(log, event_id, name, "" __VA_ARGS__); \
+        } \
+    })
 
 // See `_gul_default_signpost_log`.
 #define gul_default_signpost_log() \
   _gul_default_signpost_log()
+
+
+#define _gul_os_signpost_interval_begin(log, interval_id, name, ...) \
+    __extension__({ \
+        if (@available(iOS 12.0, *)) { \
+          os_signpost_interval_begin(log, interval_id, name, "" __VA_ARGS__); \
+        } \
+    })
 
 #else // __has_include(<os/signpost.h>)
 
 // Placeholders for the signpost API methods and types when it's not available.
 
 typedef void gul_os_log_t;
-typedef void gul_os_signpost_id_t;
+typedef uint64_t gul_os_signpost_id_t;
 
-#define gul_os_signpost_id_generate(log)
-
-//#define gul_os_signpost_interval_begin(log, interval_id, name, ...)
+#define gul_os_signpost_interval_begin(log, interval_id, name, ...)
 
 #define gul_os_signpost_interval_end(log, interval_id, name, ...)
 
@@ -56,4 +70,5 @@ typedef void gul_os_signpost_id_t;
 /// @return A default instance of `gul_os_log_t`.
 gul_os_log_t _gul_default_signpost_log(void);
 
-void _gul_os_signpost_interval_begin(gul_os_log_t log, gul_os_signpost_id_t interval_id, const char *name, ...);
+// See `os_signpost_id_generate`.
+gul_os_signpost_id_t gul_os_signpost_id_generate(gul_os_log_t log);

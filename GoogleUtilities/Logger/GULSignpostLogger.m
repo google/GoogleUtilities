@@ -18,10 +18,14 @@ gul_os_log_t _gul_default_signpost_log(void) {
   return _default_signpost_log;
 }
 
-void _gul_os_signpost_interval_begin(gul_os_log_t log, gul_os_signpost_id_t interval_id, const char *name, ...) {
+gul_os_signpost_id_t gul_os_signpost_id_generate(gul_os_log_t log) {
+#if __has_include(<os/signpost.h>)
   if (@available(iOS 12.0, *)) {
-    os_signpost_interval_begin(log, interval_id, name, "" __VA_ARGS__);
+    return os_signpost_id_generate(log);
   } else {
-    // Fallback on earlier versions
+    return 0;
   }
+#else // __has_include(<os/signpost.h>)
+  return 0;
+#endif // __has_include(<os/signpost.h>)
 }
