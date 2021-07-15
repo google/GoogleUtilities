@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-#import "GoogleUtilities/Environment/Public/GoogleUtilities/GULHeartbeatDateStorage.h"
+// MARK: This file is strictly for version compatibility testing.
+
+#import "GoogleUtilities/Tests/Unit/Environment/Sources/GULHeartbeatDateStorageV7.4.0.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
-NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
+// Add static to avoid linker error.
+NSString *const kGULHeartbeatStorageDirectory7_4_0 = @"Google/FIRApp";
 
-@interface GULHeartbeatDateStorage ()
+@interface GULHeartbeatDateStorage7_4_0 ()
 /** The storage to store the date of the last sent heartbeat. */
 @property(nonatomic, readonly) NSFileCoordinator *fileCoordinator;
 /** The name of the file that stores heartbeat information. */
 @property(nonatomic, readonly) NSString *fileName;
 @end
 
-@implementation GULHeartbeatDateStorage
+@implementation GULHeartbeatDateStorage7_4_0
 
 @synthesize fileURL = _fileURL;
 
@@ -65,7 +68,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 #endif  // TARGET_OS_TV
   NSString *rootPath = [paths lastObject];
   NSURL *rootURL = [NSURL fileURLWithPath:rootPath];
-  NSURL *directoryURL = [rootURL URLByAppendingPathComponent:kGULHeartbeatStorageDirectory];
+  NSURL *directoryURL = [rootURL URLByAppendingPathComponent:kGULHeartbeatStorageDirectory7_4_0];
   return directoryURL;
 }
 
@@ -101,11 +104,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
                                           heartbeatDictionary =
                                               [self heartbeatDictionaryWithFileURL:readingURL];
                                         }];
-  NSDate *heartbeatDate = heartbeatDictionary[tag];
-  if (![heartbeatDate isKindOfClass:[NSDate class]]) {
-    return nil;
-  }
-  return heartbeatDate;
+  return heartbeatDictionary[tag];
 }
 
 - (BOOL)setHearbeatDate:(NSDate *)date forTag:(NSString *)tag {
@@ -122,7 +121,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
                             [[self heartbeatDictionaryWithFileURL:readingURL] mutableCopy];
                         heartbeatDictionary[tag] = date;
                         NSError *error;
-                        isSuccess = [self writeDictionary:[heartbeatDictionary copy]
+                        isSuccess = [self writeDictionary:heartbeatDictionary.copy
                                             forWritingURL:writingURL
                                                     error:&error];
                       }];
@@ -130,14 +129,13 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 }
 
 - (NSDictionary *)heartbeatDictionaryWithFileURL:(NSURL *)readingFileURL {
-  NSDictionary *heartbeatDictionary;
+  NSDictionary *heartbeatDictionary = nil;
 
   NSError *error;
   NSData *objectData = [NSData dataWithContentsOfURL:readingFileURL options:0 error:&error];
 
   if (objectData.length > 0 && error == nil) {
-    NSSet<Class> *objectClasses =
-        [NSSet setWithArray:@[ NSDictionary.class, NSDate.class, NSString.class ]];
+    NSSet<Class> *objectClasses = [NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]];
     heartbeatDictionary = [GULSecureCoding unarchivedObjectOfClasses:objectClasses
                                                             fromData:objectData
                                                                error:&error];
@@ -153,11 +151,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 - (BOOL)writeDictionary:(NSDictionary *)dictionary
           forWritingURL:(NSURL *)writingFileURL
                   error:(NSError **)outError {
-  // Archive a mutable copy `dictionary` for writing to disk. This is done for
-  // backwards compatibility. See Google Utilities issue #36 for more context.
-  // TODO: Remove usage of mutable copy in a future version of Google Utilities.
-  NSData *data = [GULSecureCoding archivedDataWithRootObject:[dictionary mutableCopy]
-                                                       error:outError];
+  NSData *data = [GULSecureCoding archivedDataWithRootObject:dictionary error:outError];
   if (data.length == 0) {
     return NO;
   }

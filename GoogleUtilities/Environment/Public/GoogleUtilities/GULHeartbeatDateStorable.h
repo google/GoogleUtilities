@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,12 @@
 
 #import <Foundation/Foundation.h>
 
-#import "GULHeartbeatDateStorable.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
-/// The name of the directory where the heartbeat data is stored.
-extern NSString *const kGULHeartbeatStorageDirectory;
-
-/// Stores either a date or a dictionary to a specified file.
-@interface GULHeartbeatDateStorage : NSObject <GULHeartbeatDateStorable>
-
-- (instancetype)init NS_UNAVAILABLE;
-
-@property(nonatomic, readonly) NSURL *fileURL;
-
 /**
- * Default initializer.
- * @param fileName The name of the file to store the date information.
- * exist, it will be created if needed.
+ * Describes an object that can store and fetch heartbeat dates for given tags.
  */
-- (instancetype)initWithFileName:(NSString *)fileName;
+@protocol GULHeartbeatDateStorable <NSObject>
 
 /**
  * Reads the date from the specified file for the given tag.
