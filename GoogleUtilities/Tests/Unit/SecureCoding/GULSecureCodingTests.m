@@ -37,7 +37,7 @@
 @implementation GULSecureCodingTests
 
 - (void)testArchiveUnarchiveSingleClass {
-  NSDictionary *objectToArchive = @{@"key1" : @"value1", @"key2" : @(2)};
+  NSDictionary *objectToArchive = @{};
 
   NSError *error;
   NSData *archiveData = [GULSecureCoding archivedDataWithRootObject:objectToArchive error:&error];
@@ -60,7 +60,8 @@
   XCTAssertNotNil(archiveData);
 
   NSDictionary *unarchivedObject = [GULSecureCoding
-      unarchivedObjectOfClasses:[NSSet setWithArray:@[ NSDictionary.class, NSDate.class ]]
+      unarchivedObjectOfClasses:
+          [NSSet setWithArray:@[ NSDictionary.class, NSDate.class, NSString.class, NSNumber.class ]]
                        fromData:archiveData
                           error:&error];
   XCTAssertNil(error);

@@ -19,7 +19,7 @@ import PackageDescription
 
 let package = Package(
   name: "GoogleUtilities",
-  platforms: [.iOS(.v10), .macOS(.v10_12), .tvOS(.v10), .watchOS(.v6)],
+  platforms: [.iOS(.v9), .macOS(.v10_12), .tvOS(.v10), .watchOS(.v6)],
   products: [
     .library(
       name: "GULAppDelegateSwizzler",
@@ -63,7 +63,7 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(name: "Promises", url: "https://github.com/google/promises.git", "1.2.8" ..< "1.3.0"),
+    .package(name: "Promises", url: "https://github.com/google/promises.git", "1.2.8" ..< "3.0.0"),
     .package(
       name: "OCMock",
       url: "https://github.com/firebase/ocmock.git",
@@ -79,7 +79,6 @@ let package = Package(
                      "GoogleUtilities_Network"],
       path: "GoogleUtilities",
       exclude: [
-        "README.md",
         "AppDelegateSwizzler/README.md",
         "Environment/",
         "Network/",
@@ -94,8 +93,7 @@ let package = Package(
       ],
       sources: [
         "AppDelegateSwizzler/",
-        "SceneDelegateSwizzler/",
-        "Common/*.h",
+        "Common/",
       ],
       publicHeadersPath: "AppDelegateSwizzler/Public",
       cSettings: [

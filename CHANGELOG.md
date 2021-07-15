@@ -1,3 +1,26 @@
+# 7.5.0
+- Bump Promises dependency. (#8334)
+
+# 7.4.3
+- Include all object classes when using archiver. (#42)
+
+# 7.4.2 (Swift PM)
+- Fix warnings in Xcode 13 beta 1. (#41)
+
+# 7.4.1
+- Improve heartbeat date storage's version compatability. (#37)
+
+# 7.4.0
+- Change heartbeat directory name and refactor file. (#19)
+- Introduce user defaults based heartbeat storage. (#23)
+- Support iOS 9 with Swift Package Manager.
+
+# 7.3.1
+- Add explicit dependency on Security framework to Environment subspec. (#12)
+
+# 7.3.0
+- Fix conflicting internal constant name and move it out of the public header. (#7635)
+
 # 7.2.2
 - Fix warnings introduced with Xcode 12.5. (#8)
 
@@ -85,7 +108,7 @@
 # 6.0.0
 - GULAppDelegateSwizzler - proxy APNS methods separately. (#2835)
 - Cocoapods 1.7.0 multiproject support. (#2751)
-- Bump minimium iOS version to iOS 8. (#2876)
+- Bump minimum iOS version to iOS 8. (#2876)
 
 # 5.7.0
 - Restore to 5.5.0 tag after increased App Store warnings. (#2807)
