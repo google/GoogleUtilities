@@ -85,16 +85,7 @@ extension MulticastAppDelegate {
 
 extension MulticastAppDelegate: MulticastAppDelegateProtocol.Delegate {
 
-  public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    var result = false
-
-    for interceptor in allInterceptors {
-      result = result || interceptor.application?(application, didFinishLaunchingWithOptions: launchOptions) ?? false
-    }
-
-    return result
-  }
-
+  // MARK: - Open URL
   public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     var result = false
 
@@ -105,6 +96,7 @@ extension MulticastAppDelegate: MulticastAppDelegateProtocol.Delegate {
     return result
   }
 
+  // MARK: - APNS methods
   public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
     for interceptor in allInterceptors {
       interceptor.application?(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
