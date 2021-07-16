@@ -61,6 +61,10 @@ let package = Package(
       name: "GULUserDefaults",
       targets: ["GoogleUtilities_UserDefaults"]
     ),
+    .library(
+      name: "GULMulticastAppDelegate",
+      targets: ["GoogleUtilities_MulticastAppDelegate"]
+    ),
   ],
   dependencies: [
     .package(name: "Promises", url: "https://github.com/google/promises.git", "1.2.8" ..< "3.0.0"),
@@ -189,6 +193,14 @@ let package = Package(
         .headerSearchPath("../../"),
       ]
     ),
+
+    // MARK: - Multicast App Delegate targets
+    .target(
+      name: "GoogleUtilities_MulticastAppDelegate",
+      path: "GoogleMulticastAppDelegate/Sources"
+    ),
+
+    // MARK: - Tests
     .testTarget(
       name: "swift-test",
       dependencies: [
