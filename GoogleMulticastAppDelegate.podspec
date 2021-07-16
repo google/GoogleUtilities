@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   # TODO: Is `GoogleMulticastAppDelegate` name fine?
   s.name             = 'GoogleMulticastAppDelegate'
-  s.version          = '7.2.2'
+  s.version          = '7.5.0'
   s.summary          = 'GoogleMulticastAppDelegate'
 
   s.description      = <<-DESC
