@@ -39,7 +39,7 @@ open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol {
     return allInterceptors
   }
 
-  public override init() {
+  override public init() {
     super.init()
   }
 
@@ -59,7 +59,7 @@ open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol {
   }
 
   // Forward all unknown messages to the original app delegate.
-  public override func responds(to aSelector: Selector!) -> Bool {
+  override public func responds(to aSelector: Selector!) -> Bool {
     if type(of: self).instancesRespond(to: aSelector) {
       return true
     }
@@ -67,26 +67,46 @@ open class MulticastAppDelegate: NSObject, MulticastAppDelegateProtocol {
     return appDelegate?.responds(to: aSelector) ?? false
   }
 
-  open override func forwardingTarget(for aSelector: Selector) -> Any? {
+  override open func forwardingTarget(for aSelector: Selector) -> Any? {
     return appDelegate
   }
 }
 
+// MARK: - Multicast App Delegate detection
+
 extension MulticastAppDelegate {
+  /// Returns an instance of app delegate if it conforms to `MulticastAppDelegateProtocol`
   @objc
   public class func installedMulticastDelegate() -> MulticastAppDelegateProtocol? {
-    guard let multicastDelegate = Application.shared.delegate as? MulticastAppDelegateProtocol else {
+    guard let appDelegate = Application.shared.delegate else {
       return nil
     }
 
-    return multicastDelegate
+    if let multicastDelegate = appDelegate as? MulticastAppDelegateProtocol {
+      return multicastDelegate
+    }
+
+    // SwiftUI `UIApplicationDelegateAdaptor` doesn't allow easily check if the actual app delegate confirms to a protocol. But any method call is eventually forwarded to the original app delegate instance, so it can be used as a type-safe workaround.
+    if appDelegate.responds(to: #selector(gulMulticastDelegate)) {
+      return appDelegate.perform(#selector(gulMulticastDelegate))
+        .takeRetainedValue() as? MulticastAppDelegateProtocol
+    }
+
+    return nil
+  }
+
+  /// The method is used to test if calls to `Application.shared.delegate` are forwarded to a `MulticastAppDelegate` subclass.
+  @objc
+  public func gulMulticastDelegate() -> MulticastAppDelegateProtocol {
+    return self
   }
 }
 
 extension MulticastAppDelegate: MulticastAppDelegateProtocol.Delegate {
-
   // MARK: - Open URL
-  public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+
+  public func application(_ app: UIApplication, open url: URL,
+                          options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
     var result = false
 
     for interceptor in allInterceptors {
@@ -97,23 +117,37 @@ extension MulticastAppDelegate: MulticastAppDelegateProtocol.Delegate {
   }
 
   // MARK: - APNS methods
-  public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+
+  public func application(_ application: UIApplication,
+                          didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
     for interceptor in allInterceptors {
-      interceptor.application?(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+      interceptor.application?(
+        application,
+        didRegisterForRemoteNotificationsWithDeviceToken: deviceToken
+      )
     }
   }
 
-  public func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+  public func application(_ application: UIApplication,
+                          didFailToRegisterForRemoteNotificationsWithError error: Error) {
     for interceptor in allInterceptors {
       interceptor.application?(application, didFailToRegisterForRemoteNotificationsWithError: error)
     }
   }
 
-  public func application(_ application: UIApplication, didReceiveRemoteNotification notification: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+  public func application(_ application: UIApplication,
+                          didReceiveRemoteNotification notification: [AnyHashable: Any],
+                          fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult)
+                            -> Void) {
     for interceptor in allInterceptors {
       // TODO: Make sure completionHandler is called once.
-      interceptor.application?(application, didReceiveRemoteNotification: notification, fetchCompletionHandler:completionHandler)
+      interceptor.application?(
+        application,
+        didReceiveRemoteNotification: notification,
+        fetchCompletionHandler: completionHandler
+      )
     }
   }
-
 }
+
+extension MulticastAppDelegate {}
