@@ -44,7 +44,9 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 }
 
 - (instancetype)initWithFileName:(NSString *)fileName {
-  return [self initWithFileName:fileName queue:dispatch_queue_create("GULHeartbeatDateStorage", DISPATCH_QUEUE_SERIAL)];
+  return [self
+      initWithFileName:fileName
+                 queue:dispatch_queue_create("GULHeartbeatDateStorage", DISPATCH_QUEUE_SERIAL)];
 }
 
 /** Lazy getter for fileURL.
@@ -95,8 +97,7 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
   NSError *error;
 
   dispatch_sync(self.queue, ^{
-    NSDictionary *heartbeatDictionary =
-        [self heartbeatDictionaryWithFileURL:self.fileURL];
+    NSDictionary *heartbeatDictionary = [self heartbeatDictionaryWithFileURL:self.fileURL];
     heartbeatDate = heartbeatDictionary[tag];
     if (![heartbeatDate isKindOfClass:[NSDate class]]) {
       heartbeatDate = nil;
