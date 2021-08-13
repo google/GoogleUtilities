@@ -20,8 +20,10 @@
 NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 
 @interface GULHeartbeatDateStorage ()
-/** The storage to store the date of the last sent heartbeat. */
-@property(nonatomic, readonly) NSFileCoordinator *fileCoordinator;
+
+/** Dispatch queue to access the file. */
+@property(nonatomic, readonly) dispatch_queue_t queue;
+
 /** The name of the file that stores heartbeat information. */
 @property(nonatomic, readonly) NSString *fileName;
 @end
@@ -30,15 +32,19 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 
 @synthesize fileURL = _fileURL;
 
-- (instancetype)initWithFileName:(NSString *)fileName {
+- (instancetype)initWithFileName:(NSString *)fileName queue:(dispatch_queue_t)queue {
   if (fileName == nil) return nil;
 
   self = [super init];
   if (self) {
-    _fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+    _queue = queue;
     _fileName = fileName;
   }
   return self;
+}
+
+- (instancetype)initWithFileName:(NSString *)fileName {
+  return [self initWithFileName:fileName queue:dispatch_queue_create("GULHeartbeatDateStorage", DISPATCH_QUEUE_SERIAL)];
 }
 
 /** Lazy getter for fileURL.
@@ -74,58 +80,44 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
  * @param directoryPathURL The path to the directory that needs to exist.
  */
 - (void)checkAndCreateDirectory:(NSURL *)directoryPathURL {
-  NSError *fileCoordinatorError = nil;
-  [self.fileCoordinator
-      coordinateWritingItemAtURL:directoryPathURL
-                         options:0
-                           error:&fileCoordinatorError
-                      byAccessor:^(NSURL *writingDirectoryURL) {
-                        NSError *error;
-                        if (![writingDirectoryURL checkResourceIsReachableAndReturnError:&error]) {
-                          NSError *error;
-                          [[NSFileManager defaultManager] createDirectoryAtURL:writingDirectoryURL
-                                                   withIntermediateDirectories:YES
-                                                                    attributes:nil
-                                                                         error:&error];
-                        }
-                      }];
+  NSError *error;
+  if (![directoryPathURL checkResourceIsReachableAndReturnError:&error]) {
+    NSError *error;
+    [[NSFileManager defaultManager] createDirectoryAtURL:directoryPathURL
+                             withIntermediateDirectories:YES
+                                              attributes:nil
+                                                   error:&error];
+  }
 }
 
 - (nullable NSDate *)heartbeatDateForTag:(NSString *)tag {
-  __block NSDictionary *heartbeatDictionary;
+  __block NSDate *heartbeatDate;
   NSError *error;
-  [self.fileCoordinator coordinateReadingItemAtURL:self.fileURL
-                                           options:0
-                                             error:&error
-                                        byAccessor:^(NSURL *readingURL) {
-                                          heartbeatDictionary =
-                                              [self heartbeatDictionaryWithFileURL:readingURL];
-                                        }];
-  NSDate *heartbeatDate = heartbeatDictionary[tag];
-  if (![heartbeatDate isKindOfClass:[NSDate class]]) {
-    return nil;
-  }
+
+  dispatch_sync(self.queue, ^{
+    NSDictionary *heartbeatDictionary =
+        [self heartbeatDictionaryWithFileURL:self.fileURL];
+    heartbeatDate = heartbeatDictionary[tag];
+    if (![heartbeatDate isKindOfClass:[NSDate class]]) {
+      heartbeatDate = nil;
+    }
+  });
+
   return heartbeatDate;
 }
 
 - (BOOL)setHearbeatDate:(NSDate *)date forTag:(NSString *)tag {
   NSError *error;
   __block BOOL isSuccess = false;
-  [self.fileCoordinator
-      coordinateReadingItemAtURL:self.fileURL
-                         options:0
-                writingItemAtURL:self.fileURL
-                         options:0
-                           error:&error
-                      byAccessor:^(NSURL *readingURL, NSURL *writingURL) {
-                        NSMutableDictionary *heartbeatDictionary =
-                            [[self heartbeatDictionaryWithFileURL:readingURL] mutableCopy];
-                        heartbeatDictionary[tag] = date;
-                        NSError *error;
-                        isSuccess = [self writeDictionary:[heartbeatDictionary copy]
-                                            forWritingURL:writingURL
-                                                    error:&error];
-                      }];
+  dispatch_sync(self.queue, ^{
+    NSMutableDictionary *heartbeatDictionary =
+        [[self heartbeatDictionaryWithFileURL:self.fileURL] mutableCopy];
+    heartbeatDictionary[tag] = date;
+    NSError *error;
+    isSuccess = [self writeDictionary:[heartbeatDictionary copy]
+                        forWritingURL:self.fileURL
+                                error:&error];
+  });
   return isSuccess;
 }
 
