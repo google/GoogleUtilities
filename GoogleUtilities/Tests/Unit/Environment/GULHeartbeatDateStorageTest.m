@@ -304,6 +304,35 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
   XCTAssertTrue([self.storage conformsToProtocol:@protocol(GULHeartbeatDateStorable)]);
 }
 
+#pragma mark - Concurrency tests
+
+- (void)testConcurrentReadWriteToTheSameFileFromDifferentInstances {
+  dispatch_queue_t concurrentQueue = dispatch_queue_create("testConcurrentReadWriteToTheSameFileFromDifferentInstances", DISPATCH_QUEUE_CONCURRENT);
+
+  NSString *fileName = self.name;
+  NSString *tag = self.name;
+
+  GULHeartbeatDateStorage *storage1 = [[GULHeartbeatDateStorage alloc] initWithFileName:fileName];
+  GULHeartbeatDateStorage *storage2 = [[GULHeartbeatDateStorage alloc] initWithFileName:fileName];
+
+  NSUInteger attemptsCount = 50;
+  for (NSUInteger i = 0; i < attemptsCount; i++) {
+    dispatch_async(concurrentQueue, ^{
+      NSDate *date = [NSDate date];
+      [storage1 setHearbeatDate:date forTag:tag];
+      XCTAssertEqual([storage1 heartbeatDateForTag:tag], date);
+    });
+  }
+
+  for (NSUInteger i = 0; i < attemptsCount; i++) {
+    dispatch_async(concurrentQueue, ^{
+      NSDate *date = [NSDate date];
+      [storage2 setHearbeatDate:date forTag:tag];
+      XCTAssertEqual([storage2 heartbeatDateForTag:tag], date);
+    });
+  }
+}
+
 #pragma mark - Version Compatibility (#36)
 
 - (void)testCompatibility_pre7_4_0 {
