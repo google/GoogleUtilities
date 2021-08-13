@@ -306,31 +306,55 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
 #pragma mark - Concurrency tests
 
-- (void)testConcurrentReadWriteToTheSameFileFromDifferentInstances {
+- (void)testConcurrentReadWriteWithSingleInstance {
   dispatch_queue_t concurrentQueue = dispatch_queue_create("testConcurrentReadWriteToTheSameFileFromDifferentInstances", DISPATCH_QUEUE_CONCURRENT);
 
-  NSString *fileName = self.name;
+  NSString *tag = self.name;
+  NSUInteger attemptsCount = 50;
+
+  XCTestExpectation *expectation = [self expectationWithDescription:self.name];
+  expectation.expectedFulfillmentCount = attemptsCount;
+
+  for (NSUInteger i = 0; i < attemptsCount; i++) {
+    dispatch_async(concurrentQueue, ^{
+      [self assertWriteAndReadNoFileCorruption:self.storage];
+      [expectation fulfill];
+    });
+  }
+
+  [self waitForExpectations:@[ expectation ] timeout:1];
+}
+
+- (void)testConcurrentReadWritesToTheSameFileFromDifferentInstances {
+  dispatch_queue_t concurrentQueue = dispatch_queue_create("testConcurrentReadWriteToTheSameFileFromDifferentInstances", DISPATCH_QUEUE_CONCURRENT);
+
   NSString *tag = self.name;
 
-  GULHeartbeatDateStorage *storage1 = [[GULHeartbeatDateStorage alloc] initWithFileName:fileName];
-  GULHeartbeatDateStorage *storage2 = [[GULHeartbeatDateStorage alloc] initWithFileName:fileName];
+  GULHeartbeatDateStorage *storage1 = [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
+  GULHeartbeatDateStorage *storage2 = [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
 
   NSUInteger attemptsCount = 50;
-  for (NSUInteger i = 0; i < attemptsCount; i++) {
-    dispatch_async(concurrentQueue, ^{
-      NSDate *date = [NSDate date];
-      [storage1 setHearbeatDate:date forTag:tag];
-      XCTAssertEqual([storage1 heartbeatDateForTag:tag], date);
-    });
-  }
+
+  XCTestExpectation *expectation1 = [self expectationWithDescription:[NSString stringWithFormat:@"%@-1", self.name]];
+  expectation1.expectedFulfillmentCount = attemptsCount;
 
   for (NSUInteger i = 0; i < attemptsCount; i++) {
     dispatch_async(concurrentQueue, ^{
-      NSDate *date = [NSDate date];
-      [storage2 setHearbeatDate:date forTag:tag];
-      XCTAssertEqual([storage2 heartbeatDateForTag:tag], date);
+      [self assertWriteAndReadNoFileCorruption:storage1];
+      [expectation1 fulfill];
     });
   }
+
+  XCTestExpectation *expectation2 = [self expectationWithDescription:[NSString stringWithFormat:@"%@-2", self.name]];
+  expectation2.expectedFulfillmentCount = attemptsCount;
+  for (NSUInteger i = 0; i < attemptsCount; i++) {
+    dispatch_async(concurrentQueue, ^{
+      [self assertWriteAndReadNoFileCorruption:storage2];
+      [expectation2 fulfill];
+    });
+  }
+
+  [self waitForExpectations:@[ expectation1, expectation2 ] timeout:1];
 }
 
 #pragma mark - Version Compatibility (#36)
@@ -462,6 +486,16 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
     XCTAssertFalse([heartbeatDict isKindOfClass:[NSMutableDictionary class]]);
   }
   XCTAssertTrue([heartbeatDict isKindOfClass:class]);
+}
+
+- (void)assertWriteAndReadNoFileCorruption:(GULHeartbeatDateStorage *)storage {
+  NSString *tag = self.name;
+  NSDate *date = [NSDate date];
+  [storage setHearbeatDate:date forTag:tag];
+
+  // Assert that the file was not corrupted by concurrent access.
+  // NOTE: With the current synchronization model we cannot expect the read date to be equal the date just set because another date may be set from another thread before read is performed. Prevent the read/modify/write data race is currently the storage clients responsibility.
+  XCTAssertNotNil([storage heartbeatDateForTag:tag]);
 }
 
 @end
