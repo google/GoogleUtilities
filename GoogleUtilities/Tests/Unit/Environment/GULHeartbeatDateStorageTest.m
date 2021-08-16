@@ -313,17 +313,15 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
   NSUInteger attemptsCount = 50;
 
-  XCTestExpectation *expectation = [self expectationWithDescription:self.name];
-  expectation.expectedFulfillmentCount = attemptsCount;
-
   for (NSUInteger i = 0; i < attemptsCount; i++) {
     dispatch_async(concurrentQueue, ^{
       [self assertWriteAndReadNoFileCorruption:self.storage];
-      [expectation fulfill];
     });
   }
 
-  [self waitForExpectations:@[ expectation ] timeout:1];
+  // Wait until all storage operations completed.
+  dispatch_barrier_sync(concurrentQueue, ^{
+  });
 }
 
 - (void)testConcurrentReadWritesToTheSameFileFromDifferentInstances {
@@ -337,28 +335,21 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
   NSUInteger attemptsCount = 50;
 
-  XCTestExpectation *expectation1 =
-      [self expectationWithDescription:[NSString stringWithFormat:@"%@-1", self.name]];
-  expectation1.expectedFulfillmentCount = attemptsCount;
-
   for (NSUInteger i = 0; i < attemptsCount; i++) {
     dispatch_async(concurrentQueue, ^{
       [self assertWriteAndReadNoFileCorruption:storage1];
-      [expectation1 fulfill];
     });
   }
 
-  XCTestExpectation *expectation2 =
-      [self expectationWithDescription:[NSString stringWithFormat:@"%@-2", self.name]];
-  expectation2.expectedFulfillmentCount = attemptsCount;
   for (NSUInteger i = 0; i < attemptsCount; i++) {
     dispatch_async(concurrentQueue, ^{
       [self assertWriteAndReadNoFileCorruption:storage2];
-      [expectation2 fulfill];
     });
   }
 
-  [self waitForExpectations:@[ expectation1, expectation2 ] timeout:1];
+  // Wait until all storage operations completed.
+  dispatch_barrier_sync(concurrentQueue, ^{
+  });
 }
 
 #pragma mark - Version Compatibility (#36)
