@@ -53,7 +53,8 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (void)setUp {
   [super setUp];
 
-  // Clean up before the test in case the cleanup was not completed in previous tests for some reason (e.g. a crash).
+  // Clean up before the test in case the cleanup was not completed in previous tests for some
+  // reason (e.g. a crash).
   [self cleanupStorageDir];
 
   self.storage = [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
@@ -321,7 +322,7 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
   // Wait until all storage operations completed.
   dispatch_barrier_sync(concurrentQueue, ^{
-  });
+                        });
 }
 
 - (void)testConcurrentReadWritesToTheSameFileFromDifferentInstances {
@@ -349,7 +350,7 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 
   // Wait until all storage operations completed.
   dispatch_barrier_sync(concurrentQueue, ^{
-  });
+                        });
 }
 
 #pragma mark - Version Compatibility (#36)
