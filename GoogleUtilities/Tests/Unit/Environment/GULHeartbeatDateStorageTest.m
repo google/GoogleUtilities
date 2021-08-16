@@ -53,6 +53,10 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (void)setUp {
   [super setUp];
 
+  // Clean up before the test in case the cleanup was not completed in previous tests for some
+  // reason (e.g. a crash).
+  [self cleanupStorageDir];
+
   self.storage = [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
   [self assertInitializationDoesNotAccessFileSystem];
 }
@@ -60,9 +64,7 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (void)tearDown {
   [super tearDown];
 
-  // Removes the Heartbeat Storage Directory if it exists.
-  NSURL *directoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
-  [[NSFileManager defaultManager] removeItemAtURL:directoryURL error:nil];
+  [self cleanupStorageDir];
 
   self.storage = nil;
 }
@@ -304,6 +306,53 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
   XCTAssertTrue([self.storage conformsToProtocol:@protocol(GULHeartbeatDateStorable)]);
 }
 
+#pragma mark - Concurrency tests
+
+- (void)testConcurrentReadWriteWithSingleInstance {
+  dispatch_queue_t concurrentQueue = dispatch_queue_create(
+      "testConcurrentReadWriteToTheSameFileFromDifferentInstances", DISPATCH_QUEUE_CONCURRENT);
+
+  NSUInteger attemptsCount = 50;
+
+  for (NSUInteger i = 0; i < attemptsCount; i++) {
+    dispatch_async(concurrentQueue, ^{
+      [self assertWriteAndReadNoFileCorruption:self.storage];
+    });
+  }
+
+  // Wait until all storage operations completed.
+  dispatch_barrier_sync(concurrentQueue, ^{
+                        });
+}
+
+- (void)testConcurrentReadWritesToTheSameFileFromDifferentInstances {
+  dispatch_queue_t concurrentQueue = dispatch_queue_create(
+      "testConcurrentReadWriteToTheSameFileFromDifferentInstances", DISPATCH_QUEUE_CONCURRENT);
+
+  GULHeartbeatDateStorage *storage1 =
+      [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
+  GULHeartbeatDateStorage *storage2 =
+      [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
+
+  NSUInteger attemptsCount = 50;
+
+  for (NSUInteger i = 0; i < attemptsCount; i++) {
+    dispatch_async(concurrentQueue, ^{
+      [self assertWriteAndReadNoFileCorruption:storage1];
+    });
+  }
+
+  for (NSUInteger i = 0; i < attemptsCount; i++) {
+    dispatch_async(concurrentQueue, ^{
+      [self assertWriteAndReadNoFileCorruption:storage2];
+    });
+  }
+
+  // Wait until all storage operations completed.
+  dispatch_barrier_sync(concurrentQueue, ^{
+                        });
+}
+
 #pragma mark - Version Compatibility (#36)
 
 - (void)testCompatibility_pre7_4_0 {
@@ -433,6 +482,24 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
     XCTAssertFalse([heartbeatDict isKindOfClass:[NSMutableDictionary class]]);
   }
   XCTAssertTrue([heartbeatDict isKindOfClass:class]);
+}
+
+- (void)assertWriteAndReadNoFileCorruption:(GULHeartbeatDateStorage *)storage {
+  NSString *tag = self.name;
+  NSDate *date = [NSDate date];
+  [storage setHearbeatDate:date forTag:tag];
+
+  // Assert that the file was not corrupted by concurrent access.
+  // NOTE: With the current synchronization model we cannot expect the read date to be equal the
+  // date just set because another date may be set from another thread before read is performed.
+  // Prevent the read/modify/write data race is currently the storage clients responsibility.
+  XCTAssertNotNil([storage heartbeatDateForTag:tag]);
+}
+
+- (void)cleanupStorageDir {
+  // Removes the Heartbeat Storage Directory if it exists.
+  NSURL *directoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  [[NSFileManager defaultManager] removeItemAtURL:directoryURL error:nil];
 }
 
 @end
