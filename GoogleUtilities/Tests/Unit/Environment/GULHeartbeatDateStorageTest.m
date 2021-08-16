@@ -310,7 +310,6 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
   dispatch_queue_t concurrentQueue = dispatch_queue_create(
       "testConcurrentReadWriteToTheSameFileFromDifferentInstances", DISPATCH_QUEUE_CONCURRENT);
 
-  NSString *tag = self.name;
   NSUInteger attemptsCount = 50;
 
   XCTestExpectation *expectation = [self expectationWithDescription:self.name];
@@ -329,8 +328,6 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (void)testConcurrentReadWritesToTheSameFileFromDifferentInstances {
   dispatch_queue_t concurrentQueue = dispatch_queue_create(
       "testConcurrentReadWriteToTheSameFileFromDifferentInstances", DISPATCH_QUEUE_CONCURRENT);
-
-  NSString *tag = self.name;
 
   GULHeartbeatDateStorage *storage1 =
       [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
