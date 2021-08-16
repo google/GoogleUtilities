@@ -21,9 +21,6 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 
 @interface GULHeartbeatDateStorage ()
 
-/** Dispatch queue to access the file. */
-@property(nonatomic, readonly) dispatch_queue_t queue;
-
 /** The name of the file that stores heartbeat information. */
 @property(nonatomic, readonly) NSString *fileName;
 @end
@@ -32,21 +29,14 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 
 @synthesize fileURL = _fileURL;
 
-- (instancetype)initWithFileName:(NSString *)fileName queue:(dispatch_queue_t)queue {
+- (instancetype)initWithFileName:(NSString *)fileName {
   if (fileName == nil) return nil;
 
   self = [super init];
   if (self) {
-    _queue = queue;
     _fileName = fileName;
   }
   return self;
-}
-
-- (instancetype)initWithFileName:(NSString *)fileName {
-  return [self
-      initWithFileName:fileName
-                 queue:dispatch_queue_create("GULHeartbeatDateStorage", DISPATCH_QUEUE_SERIAL)];
 }
 
 /** Lazy getter for fileURL.
@@ -93,33 +83,32 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
 }
 
 - (nullable NSDate *)heartbeatDateForTag:(NSString *)tag {
-  __block NSDate *heartbeatDate;
-  NSError *error;
-
-  dispatch_sync(self.queue, ^{
+  @synchronized(self.class) {
     NSDictionary *heartbeatDictionary = [self heartbeatDictionaryWithFileURL:self.fileURL];
-    heartbeatDate = heartbeatDictionary[tag];
+    NSDate *heartbeatDate = heartbeatDictionary[tag];
     if (![heartbeatDate isKindOfClass:[NSDate class]]) {
       heartbeatDate = nil;
     }
-  });
 
-  return heartbeatDate;
+    return heartbeatDate;
+  }
 }
 
 - (BOOL)setHearbeatDate:(NSDate *)date forTag:(NSString *)tag {
-  NSError *error;
-  __block BOOL isSuccess = false;
-  dispatch_sync(self.queue, ^{
+  // Synchronize on the class to ensure that the different instances of the class will not access
+  // the same file concurrently.
+  // TODO: Consider a different synchronization strategy here and in `-heartbeatDateForTag:` method.
+  // Currently no heartbeats can be read/written concurrently even if they are in different files.
+  @synchronized(self.class) {
     NSMutableDictionary *heartbeatDictionary =
         [[self heartbeatDictionaryWithFileURL:self.fileURL] mutableCopy];
     heartbeatDictionary[tag] = date;
     NSError *error;
-    isSuccess = [self writeDictionary:[heartbeatDictionary copy]
-                        forWritingURL:self.fileURL
-                                error:&error];
-  });
-  return isSuccess;
+    BOOL isSuccess = [self writeDictionary:[heartbeatDictionary copy]
+                             forWritingURL:self.fileURL
+                                     error:&error];
+    return isSuccess;
+  }
 }
 
 - (NSDictionary *)heartbeatDictionaryWithFileURL:(NSURL *)readingFileURL {
