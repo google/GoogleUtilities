@@ -53,6 +53,9 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (void)setUp {
   [super setUp];
 
+  // Clean up before the test in case the cleanup was not completed in previous tests for some reason (e.g. a crash).
+  [self cleanupStorageDir];
+
   self.storage = [[GULHeartbeatDateStorage alloc] initWithFileName:kTestFileName];
   [self assertInitializationDoesNotAccessFileSystem];
 }
@@ -60,9 +63,7 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
 - (void)tearDown {
   [super tearDown];
 
-  // Removes the Heartbeat Storage Directory if it exists.
-  NSURL *directoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
-  [[NSFileManager defaultManager] removeItemAtURL:directoryURL error:nil];
+  [self cleanupStorageDir];
 
   self.storage = nil;
 }
@@ -501,6 +502,12 @@ static NSString *const kTestFileName = @"GULStorageHeartbeatTestFile";
   // date just set because another date may be set from another thread before read is performed.
   // Prevent the read/modify/write data race is currently the storage clients responsibility.
   XCTAssertNotNil([storage heartbeatDateForTag:tag]);
+}
+
+- (void)cleanupStorageDir {
+  // Removes the Heartbeat Storage Directory if it exists.
+  NSURL *directoryURL = [self pathURLForDirectory:kGULHeartbeatStorageDirectory];
+  [[NSFileManager defaultManager] removeItemAtURL:directoryURL error:nil];
 }
 
 @end
