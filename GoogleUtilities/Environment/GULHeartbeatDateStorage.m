@@ -86,6 +86,9 @@ NSString *const kGULHeartbeatStorageDirectory = @"Google/FIRApp";
   @synchronized(self.class) {
     NSDictionary *heartbeatDictionary = [self heartbeatDictionaryWithFileURL:self.fileURL];
     NSDate *heartbeatDate = heartbeatDictionary[tag];
+
+    // Validate the value type. If the storage file was corrupted or updated with a different format
+    // by a newer SDK version the value type may be different.
     if (![heartbeatDate isKindOfClass:[NSDate class]]) {
       heartbeatDate = nil;
     }
