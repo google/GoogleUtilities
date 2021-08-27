@@ -1,5 +1,5 @@
 # 7.5.2
-- Set the class of a swizzled object back to its original class upon deallocation. (#8321)
+- Do not dispose a swizzler's generated class when using the Zombies instrument. (#8321)
 
 # 7.5.1
 - `GULHeartbeatDateStorage`: replace `NSFileCoordinator` with in-process synchronization mechanism. (#51)

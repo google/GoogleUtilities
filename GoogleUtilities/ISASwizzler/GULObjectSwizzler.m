@@ -163,8 +163,16 @@
   if (_generatedClass) {
     if (_swizzledObject == nil) {
       // The swizzled object has been deallocated already, so the generated class can be disposed
-      // now.
-      objc_disposeClassPair(_generatedClass);
+      // now (unless the Zombies instrument is enabled).
+
+      // When the Zombies instrument is enabled, a zombie is created for the
+      // swizzled object upon deallocation. Because this zombie subclasses
+      // the generated class, the swizzler should not dispose it.
+      NSDictionary *environment = [[NSProcessInfo processInfo] environment];
+      BOOL zombiesEnabled = [[environment objectForKey:@"NSZombieEnabled"] boolValue];
+      if (!zombiesEnabled) {
+        objc_disposeClassPair(_generatedClass);
+      }
       return;
     }
 
