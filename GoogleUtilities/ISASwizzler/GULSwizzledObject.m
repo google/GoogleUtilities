@@ -18,6 +18,7 @@
 #import "GoogleUtilities/ISASwizzler/Public/GoogleUtilities/GULSwizzledObject.h"
 
 NSString *kGULSwizzlerAssociatedObjectKey = @"gul_objectSwizzler";
+static NSString *const kGULSwizzlerDeallocSEL = @"dealloc";
 
 @interface GULSwizzledObject ()
 
@@ -28,7 +29,10 @@ NSString *kGULSwizzlerAssociatedObjectKey = @"gul_objectSwizzler";
 + (void)copyDonorSelectorsUsingObjectSwizzler:(GULObjectSwizzler *)objectSwizzler {
   [objectSwizzler copySelector:@selector(gul_objectSwizzler) fromClass:self isClassSelector:NO];
   [objectSwizzler copySelector:@selector(gul_class) fromClass:self isClassSelector:NO];
-
+  // ARC does not allow `@selector(dealloc)`.
+  [objectSwizzler copySelector:NSSelectorFromString(kGULSwizzlerDeallocSEL)
+                     fromClass:self
+               isClassSelector:NO];
   // This is needed because NSProxy objects usually override -[NSObjectProtocol respondsToSelector:]
   // and ask this question to the underlying object. Since we don't swizzle the underlying object
   // but swizzle the proxy, when someone calls -[NSObjectProtocol respondsToSelector:] on the proxy,
@@ -59,6 +63,20 @@ NSString *kGULSwizzlerAssociatedObjectKey = @"gul_objectSwizzler";
 - (BOOL)respondsToSelector:(SEL)aSelector {
   Class gulClass = [[self gul_objectSwizzler] generatedClass];
   return [gulClass instancesRespondToSelector:aSelector] || [super respondsToSelector:aSelector];
+}
+
+- (void)dealloc {
+  // Set the generated class to the original class.
+  Class originalClass = [[self gul_class] superclass];
+  object_setClass(self, originalClass);
+
+  // `self` is now the original class.
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+  // Call the original class's `dealloc` implementation.
+  [self performSelector:NSSelectorFromString(kGULSwizzlerDeallocSEL)];
+#pragma clang diagnostic pop
 }
 
 @end
