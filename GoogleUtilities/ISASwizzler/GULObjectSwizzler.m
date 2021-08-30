@@ -164,7 +164,7 @@
     if (_swizzledObject == nil) {
       // The swizzled object has been deallocated already, so the generated class can be disposed
       // now.
-        objc_disposeClassPair(_generatedClass);
+      objc_disposeClassPair(_generatedClass);
       return;
     }
 
