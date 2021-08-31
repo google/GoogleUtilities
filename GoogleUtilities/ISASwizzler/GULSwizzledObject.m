@@ -66,17 +66,22 @@ static NSString *const kGULSwizzlerDeallocSEL = @"dealloc";
 }
 
 - (void)dealloc {
-  // Set the generated class to the original class.
-  Class originalClass = [[self gul_class] superclass];
-  object_setClass(self, originalClass);
+  @autoreleasepool {
+    // Set the generated class to the original class.
+    Class originalClass = [[self gul_class] superclass];
+    if (![originalClass superclass] || [self isProxy]) {
+      return;
+    }
 
-  // `self` is now the original class.
+    // `self` is now the original class.
+    object_setClass(self, originalClass);
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-  // Call the original class's `dealloc` implementation.
-  [self performSelector:NSSelectorFromString(kGULSwizzlerDeallocSEL)];
+    // Call the original class's `dealloc` implementation.
+    [self performSelector:NSSelectorFromString(kGULSwizzlerDeallocSEL)];
 #pragma clang diagnostic pop
+  }
 }
 
 @end
