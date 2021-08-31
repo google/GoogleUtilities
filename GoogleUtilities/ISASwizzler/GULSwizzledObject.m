@@ -138,6 +138,5 @@ static NSString *const kGULSwizzlerDeallocSEL = @"dealloc";
 #pragma clang diagnostic pop
   }
 }
-}
 
 @end
