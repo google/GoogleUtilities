@@ -66,6 +66,33 @@ static NSString *const kGULSwizzlerDeallocSEL = @"dealloc";
 }
 
 - (void)dealloc {
+  // The goal of this `dealloc` is to switch the swizzled object's class to 
+  // the original object's class before complete deallocation. 
+  //
+  // Additional Context:
+  // 
+  // - Problem
+  //   When the Zombies instrument is enabled, a zombie is created as a subclass
+  //   of the deallocating object. In the case of a deallocated swizzled object,
+  //   the zombie will subclass the swizzled object's generated class. This 
+  //   leads to a crash that occurs when the generated class is later disposed
+  //   by the swizzler (see `dealloc` in `GULObjectSwizzler.m`). 
+  //   
+  //   This problem only occurs when the Zombies instrument is enabled 
+  //   for the above reasoning. See firebase-ios-sdk/issues/8321
+  //
+  // - Solution
+  //   The solution is to switch the swizzled object's class to the original
+  //   object's class before complete deallocation. This way, when the 
+  //   Zombies instrument is enabled, a zombie will be created using the 
+  //   original class. This allows `GULObjectSwizzler` to safely dispose its
+  //   generated classes. This approach yields the following order of 
+  //   deallocation when a swizzled object's reference count goes to 0.
+  //   - Order of deallocation:
+  //     1. Swizzled object (generated class)
+  //     2. Original object (original class) and its super classes
+  //     3. Swizzler
+
   @autoreleasepool {
     // Set the generated class to the original class.
     Class originalClass = [[self gul_class] superclass];
