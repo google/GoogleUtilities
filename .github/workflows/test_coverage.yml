@@ -58,9 +58,7 @@ jobs:
         metrics-access.json "${{ env.METRICS_SERVICE_SECRET }}"
         gcloud auth activate-service-account --key-file metrics-access.json
     - name: Build code coverage tool
-      run: |
-        cd firebase-ios-sdk/scripts/health_metrics/generate_code_coverage_report/
-        swift build
+      run: swift build --package-path firebase-ios-sdk/scripts/health_metrics/generate_code_coverage_report/
     - name: Generate report
       if: github.event.pull_request.merged != true && env.METRICS_SERVICE_SECRET
       env:
