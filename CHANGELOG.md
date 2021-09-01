@@ -3,7 +3,6 @@
 
 # 7.5.1
 - `GULHeartbeatDateStorage`: replace `NSFileCoordinator` with in-process synchronization mechanism. (#51)
-
 # 7.5.0
 - Bump Promises dependency. (#8334)
 
