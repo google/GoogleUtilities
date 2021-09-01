@@ -1,5 +1,9 @@
+# 7.5.2
+- Set the class of a swizzled object back to its original class upon deallocation. (#8321)
+
 # 7.5.1
 - `GULHeartbeatDateStorage`: replace `NSFileCoordinator` with in-process synchronization mechanism. (#51)
+
 # 7.5.0
 - Bump Promises dependency. (#8334)
 
