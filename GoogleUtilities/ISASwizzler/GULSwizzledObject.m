@@ -29,7 +29,7 @@ static NSString *const kGULSwizzlerDeallocSEL = @"dealloc";
 + (void)copyDonorSelectorsUsingObjectSwizzler:(GULObjectSwizzler *)objectSwizzler {
   [objectSwizzler copySelector:@selector(gul_objectSwizzler) fromClass:self isClassSelector:NO];
   [objectSwizzler copySelector:@selector(gul_class) fromClass:self isClassSelector:NO];
-  // ARC does not allow `@selector(dealloc)`.
+  // ARC does not allow `@selector(dealloc)` so `NSSelectorFromString(@"dealloc")` is used instead.
   [objectSwizzler copySelector:NSSelectorFromString(kGULSwizzlerDeallocSEL)
                      fromClass:self
                isClassSelector:NO];
@@ -134,6 +134,8 @@ static NSString *const kGULSwizzlerDeallocSEL = @"dealloc";
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
     // Call the original class's `dealloc` implementation.
+    // ARC does not allow `@selector(dealloc)` so `NSSelectorFromString(@"dealloc")` is used
+    // instead.
     [self performSelector:NSSelectorFromString(kGULSwizzlerDeallocSEL)];
 #pragma clang diagnostic pop
   }
