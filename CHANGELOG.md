@@ -1,3 +1,6 @@
+# 7.5.2
+- Do not dispose a swizzler's generated class when using the Zombies instrument. (#8321)
+
 # 7.5.1
 - `GULHeartbeatDateStorage`: replace `NSFileCoordinator` with in-process synchronization mechanism. (#51)
 # 7.5.0
