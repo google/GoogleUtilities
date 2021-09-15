@@ -66,8 +66,8 @@ let package = Package(
     .package(name: "Promises", url: "https://github.com/google/promises.git", "1.2.8" ..< "3.0.0"),
     .package(
       name: "OCMock",
-      url: "https://github.com/firebase/ocmock.git",
-      .revision("7291762d3551c5c7e31c49cce40a0e391a52e889")
+      url: "https://github.com/erikdoe/ocmock.git",
+      .revision("21cce26d223d49a9ab5ae47f28864f422bfe3951")
     ),
   ],
   // TODO: Restructure directory structure to simplify the excludes here.
