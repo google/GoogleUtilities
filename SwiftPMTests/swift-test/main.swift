@@ -34,7 +34,8 @@ class importTest: XCTestCase {
       XCTAssertFalse(GULAppEnvironmentUtil.isSimulator())
     #endif
     XCTAssertFalse(GULAppEnvironmentUtil.isAppExtension())
-    XCTAssertEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
+    // Device model should now return the appropriate hardware model on macOS.
+    XCTAssertNotEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
 
     print("System version? Answer: \(GULAppEnvironmentUtil.systemVersion())")
   }
