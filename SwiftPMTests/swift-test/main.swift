@@ -40,7 +40,7 @@ class importTest: XCTestCase {
       XCTAssertNotEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
     #else
       // Device model should show up as x86_64 for iOS, tvOS, and watchOS
-      // simulators..
+      // simulators.
       XCTAssertEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
     #endif
 
