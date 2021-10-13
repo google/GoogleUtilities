@@ -35,7 +35,7 @@ class importTest: XCTestCase {
     #endif
     XCTAssertFalse(GULAppEnvironmentUtil.isAppExtension())
 
-#if os(macOS) || os(macCatalyst)
+#if os(macOS) || targetEnvironment(macCatalyst)
     // Device model should now return the appropriate hardware model on macOS.
     XCTAssertNotEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
 #else
