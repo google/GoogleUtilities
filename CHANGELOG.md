@@ -1,3 +1,6 @@
+# 7.6.0
+- Add proper device model parsing for macOS and Catalyst. (#59)
+
 # 7.5.2
 - Do not dispose a swizzler's generated class when using the Zombies instrument. (#8321)
 
