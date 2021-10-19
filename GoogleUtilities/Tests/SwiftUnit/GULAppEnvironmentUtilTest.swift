@@ -18,7 +18,7 @@ import XCTest
 @testable import GoogleUtilities
 
 class GULAppEnvironmentUtilTest: XCTestCase {
-  func testHasSwiftRuntime() throws {
-    XCTAssertTrue(GULAppEnvironmentUtil.hasSwiftRuntime())
+  func testIsAppExtension() throws {
+    XCTAssertFalse(GULAppEnvironmentUtil.isAppExtension())
   }
 }
