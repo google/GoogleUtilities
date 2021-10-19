@@ -101,8 +101,4 @@
   XCTAssertEqualObjects([GULAppEnvironmentUtil applePlatform], expectedPlatform);
 }
 
-- (void)testHasSwiftRuntime {
-  XCTAssertFalse([GULAppEnvironmentUtil hasSwiftRuntime]);
-}
-
 @end
