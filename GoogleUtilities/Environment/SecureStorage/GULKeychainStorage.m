@@ -179,6 +179,10 @@
     query[(__bridge NSString *)kSecAttrAccessGroup] = accessGroup;
   }
 
+  if (@available(iOS 13.0, macOS 10.15, macCatalyst 13.0, tvOS 13.0, watchOS 6.0, *)) {
+    query[(__bridge id)kSecUseDataProtectionKeychain] = (__bridge id)kCFBooleanTrue;
+  }
+
 #if TARGET_OS_OSX
   if (self.keychainRef) {
     query[(__bridge NSString *)kSecUseKeychain] = (__bridge id)(self.keychainRef);
