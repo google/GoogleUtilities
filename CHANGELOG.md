@@ -1,3 +1,6 @@
+# Unreleased
+- Use `kSecUseDataProtectionKeychain` key to avoid keychain prompts on macOS. (#63)
+
 # 7.6.0
 - Add proper device model parsing for macOS and Catalyst. (#59)
 - Deprecate `hasSwiftRuntime` method. (#62)
