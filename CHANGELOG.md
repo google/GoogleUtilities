@@ -1,9 +1,13 @@
+# 7.7.0
+- Do not dispose a swizzler's generated class when `GULGeneratedClassDisposeDisabled`
+  environment variable is set. (#66)
+
 # 7.6.0
 - Add proper device model parsing for macOS and Catalyst. (#59)
 - Deprecate `hasSwiftRuntime` method. (#62)
 
 # 7.5.2
-- Do not dispose a swizzler's generated class when using the Zombies instrument. (#8321)
+- Do not dispose a swizzler's generated class when using the Zombies instrument. (#57)
 
 # 7.5.1
 - `GULHeartbeatDateStorage`: replace `NSFileCoordinator` with in-process synchronization mechanism. (#51)
