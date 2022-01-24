@@ -11,6 +11,7 @@
 		51B0F0E22798DEE0003C703E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51B0F0E12798DEE0003C703E /* ContentView.swift */; };
 		51B0F0E42798DEE2003C703E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 51B0F0E32798DEE2003C703E /* Assets.xcassets */; };
 		51B0F0E72798DEE2003C703E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 51B0F0E62798DEE2003C703E /* Preview Assets.xcassets */; };
+		51B0F0F4279F48B0003C703E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 51B0F0F3279F48B0003C703E /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		51B0F0E62798DEE2003C703E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		51B0F0ED2798E127003C703E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		51B0F0EE2798E131003C703E /* SwiftUISample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SwiftUISample.entitlements; sourceTree = "<group>"; };
+		51B0F0F3279F48B0003C703E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 		51B0F0DE2798DEE0003C703E /* SwiftUISample */ = {
 			isa = PBXGroup;
 			children = (
+				51B0F0F3279F48B0003C703E /* GoogleService-Info.plist */,
 				51B0F0EE2798E131003C703E /* SwiftUISample.entitlements */,
 				51B0F0ED2798E127003C703E /* Info.plist */,
 				51B0F0DF2798DEE0003C703E /* SwiftUISampleApp.swift */,
@@ -139,6 +142,7 @@
 			files = (
 				51B0F0E72798DEE2003C703E /* Preview Assets.xcassets in Resources */,
 				51B0F0E42798DEE2003C703E /* Assets.xcassets in Resources */,
+				51B0F0F4279F48B0003C703E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,11 +283,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = SwiftUISample/SwiftUISample.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftUISample/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = EQHXZ8M8AV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SwiftUISample/Info.plist;
@@ -300,7 +304,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.extensions.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "Firebase iOS App Extensions Dev";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -313,11 +317,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = SwiftUISample/SwiftUISample.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftUISample/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = EQHXZ8M8AV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SwiftUISample/Info.plist;
@@ -334,7 +338,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.google.firebase.extensions.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "Firebase iOS App Extensions Dev";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

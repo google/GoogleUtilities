@@ -14,9 +14,15 @@
 
 #import "GoogleMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
 
+@protocol GULMulticastAppDelegateProtocol <NSObject>
 
-@interface GULMulticastAppDelegate () {
-  id<UIApplicationDelegate> _appDelegate;
+- (void)addInterceptorWithDelegate:(id<UIApplicationDelegate>) interceptor;
+
+- (void)removeInterceptorWithDelegate:(id<UIApplicationDelegate>) interceptor;
+
+@end
+
+@interface GULMulticastAppDelegate ()<GULMulticastAppDelegateProtocol> {
   NSMutableArray<id>* _interceptors;
 }
 @end
@@ -39,20 +45,25 @@
   [_interceptors removeObject:interceptor];
 }
 
--(void)setAppDelegate:(id<UIApplicationDelegate>)appDelegate {
-  _appDelegate = appDelegate;
-  [self addInterceptorWithDelegate:appDelegate];
-}
-
 - (BOOL)respondsToSelector:(SEL)aSelector {
   if ([[self class] instancesRespondToSelector:aSelector]) {
     return YES;
   }
-  return _appDelegate? [_appDelegate respondsToSelector:aSelector] : NO ;
+  for (id<UIApplicationDelegate> interceptor in _interceptors) {
+    if (interceptor && [interceptor respondsToSelector:aSelector]) {
+      return YES;
+    }
+  }
+  return NO;
 }
 
 - (id)forwardingTargetForSelector:(SEL)aSelector {
-  return _appDelegate;
+  for (id<UIApplicationDelegate> interceptor in _interceptors) {
+    if (interceptor && [interceptor respondsToSelector:aSelector]) {
+      return interceptor;
+    }
+  }
+  return nil;
 }
 
 

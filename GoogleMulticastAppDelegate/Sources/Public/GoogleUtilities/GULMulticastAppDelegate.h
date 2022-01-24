@@ -16,17 +16,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol GULMulticastAppDelegateProtocol <NSObject>
+@interface GULMulticastAppDelegate : NSObject<UIApplicationDelegate>
 
-- (void)addInterceptorWithDelegate:(id<UIApplicationDelegate>) interceptor;
+-(void)addInterceptorWithDelegate:(id<UIApplicationDelegate>)delegate;
 
-- (void)removeInterceptorWithDelegate:(id<UIApplicationDelegate>) interceptor;
-
-@end
-
-@interface GULMulticastAppDelegate : NSObject<GULMulticastAppDelegateProtocol, UIApplicationDelegate>
-
-@property (nonatomic, readwrite) id<UIApplicationDelegate> appDelegate;
 - (instancetype)init NS_UNAVAILABLE;
 
 @end

@@ -25,6 +25,7 @@ import nanopb
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
   
+//  The following implementations should not be needed for Messaging/Auth to function.
 //  func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 //
 //  }
@@ -92,7 +93,7 @@ struct SwiftUISampleApp: App {
   @UIApplicationDelegateAdaptor(GULMulticastAppDelegate.self) var delegate
   
   init() {
-    self.delegate.appDelegate = AppDelegate()
+    self.delegate.addInterceptor(with: AppDelegate())
   }
 
     var body: some Scene {
