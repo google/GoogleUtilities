@@ -1,0 +1,17 @@
+use_frameworks!
+
+source 'https://github.com/firebase/SpecsDev.git'
+source 'https://github.com/firebase/SpecsStaging.git'
+source 'https://cdn.cocoapods.org/'
+
+target 'SwiftUISample' do
+  platform :ios, '15.0'
+
+  pod 'FirebaseAuth'
+  pod 'FirebaseCore'
+  pod 'FirebaseMessaging'
+  pod 'FirebaseStorage'
+  pod 'GoogleMulticastAppDelegate', :path => '../../../'
+  pod 'GoogleUtilities', :path => '../../../'
+
+end
