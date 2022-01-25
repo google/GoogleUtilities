@@ -11,14 +11,47 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #import <Foundation/Foundation.h>
+
+#if TARGET_OS_IOS || TARGET_OS_TV
+
 #import <UIKit/UIKit.h>
+
+#define GULApplication UIApplication
+#define GULApplicationDelegate UIApplicationDelegate
+#define GULUserActivityRestoring UIUserActivityRestoring
+
+static NSString *const kGULApplicationClassName = @"UIApplication";
+
+#elif TARGET_OS_OSX
+
+#import <AppKit/AppKit.h>
+
+#define GULApplication NSApplication
+#define GULApplicationDelegate NSApplicationDelegate
+#define GULUserActivityRestoring NSUserActivityRestoring
+
+static NSString *const kGULApplicationClassName = @"NSApplication";
+
+#elif TARGET_OS_WATCH
+
+#import <WatchKit/WatchKit.h>
+
+// We match the according watchOS API but swizzling should not work in watch
+#define GULApplication WKExtension
+#define GULApplicationDelegate WKExtensionDelegate
+#define GULUserActivityRestoring NSUserActivityRestoring
+
+static NSString *const kGULApplicationClassName = @"WKExtension";
+
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface GULMulticastAppDelegate : NSObject<UIApplicationDelegate>
+@interface GULMulticastAppDelegate : NSObject<GULApplicationDelegate>
 
--(void)addInterceptorWithDelegate:(id<UIApplicationDelegate>)delegate;
+-(void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)delegate;
 
 - (instancetype)init NS_UNAVAILABLE;
 

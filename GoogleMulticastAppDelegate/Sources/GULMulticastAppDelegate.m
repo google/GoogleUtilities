@@ -16,9 +16,9 @@
 
 @protocol GULMulticastAppDelegateProtocol <NSObject>
 
-- (void)addInterceptorWithDelegate:(id<UIApplicationDelegate>) interceptor;
+- (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>) interceptor;
 
-- (void)removeInterceptorWithDelegate:(id<UIApplicationDelegate>) interceptor;
+- (void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>) interceptor;
 
 @end
 
@@ -37,11 +37,11 @@
   return self;
 }
 
--(void)addInterceptorWithDelegate:(id<UIApplicationDelegate>)interceptor {
+-(void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
   [_interceptors addObject:interceptor];
 }
 
--(void)removeInterceptorWithDelegate:(id<UIApplicationDelegate>)interceptor {
+-(void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
   [_interceptors removeObject:interceptor];
 }
 
@@ -49,7 +49,7 @@
   if ([[self class] instancesRespondToSelector:aSelector]) {
     return YES;
   }
-  for (id<UIApplicationDelegate> interceptor in _interceptors) {
+  for (id<GULApplicationDelegate> interceptor in _interceptors) {
     if (interceptor && [interceptor respondsToSelector:aSelector]) {
       return YES;
     }
@@ -58,7 +58,7 @@
 }
 
 - (id)forwardingTargetForSelector:(SEL)aSelector {
-  for (id<UIApplicationDelegate> interceptor in _interceptors) {
+  for (id<GULApplicationDelegate> interceptor in _interceptors) {
     if (interceptor && [interceptor respondsToSelector:aSelector]) {
       return interceptor;
     }
@@ -66,9 +66,9 @@
   return nil;
 }
 
-
+#if !TARGET_OS_WATCH
 #pragma mark - Open URL
-- (BOOL)application:(UIApplication *)app
+- (BOOL)application:(GULApplication *)app
             openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
   BOOL result = NO;
@@ -79,26 +79,33 @@
 }
 
 #pragma mark - APNS methods
-
-- (void)application:(UIApplication *)application
+- (void)application:(GULApplication *)application
     didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-  for (id<UIApplicationDelegate> interceptor in _interceptors) {
+  for (id<GULApplicationDelegate> interceptor in _interceptors) {
     [interceptor application:application didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
   }
 }
 
+#else // !TARGET_OS_WATCH
+- (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+  for (id<GULApplicationDelegate> interceptor in _interceptors) {
+    [interceptor didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+  }
+}
+#endif // !TARGET_OS_WATCH
+
 #if TARGET_OS_IOS || TARGET_OS_TV
-- (void)application:(UIApplication *)application
+- (void)application:(GULApplication *)application
     didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-  for (id<UIApplicationDelegate> interceptor in _interceptors) {
+  for (id<GULApplicationDelegate> interceptor in _interceptors) {
     [interceptor application:application didFailToRegisterForRemoteNotificationsWithError:error];
   }
 }
 
-- (void)application:(UIApplication *)application
+- (void)application:(GULApplication *)application
     didReceiveRemoteNotification:(NSDictionary *)userInfo
           fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  for (id<UIApplicationDelegate> interceptor in _interceptors) {
+  for (id<GULApplicationDelegate> interceptor in _interceptors) {
     [interceptor application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
   }
 }
