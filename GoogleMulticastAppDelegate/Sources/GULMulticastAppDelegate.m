@@ -14,13 +14,7 @@
 
 #import "GoogleMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
 
-@protocol GULMulticastAppDelegateProtocol <NSObject>
 
-- (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>) interceptor;
-
-- (void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>) interceptor;
-
-@end
 
 @interface GULMulticastAppDelegate ()<GULMulticastAppDelegateProtocol> {
   NSMutableArray<id>* _interceptors;
@@ -36,6 +30,24 @@
   }
   return self;
 }
+
++ (id<GULMulticastAppDelegateProtocol>)multicastDelegate {
+  
+  id<UIApplicationDelegate> appDelegate = [UIApplication sharedApplication].delegate;
+  if (appDelegate && [appDelegate respondsToSelector:@selector(getMulticastDelegate)]) {
+    
+    id<GULMulticastAppDelegateProtocol> multicastDelegate = [appDelegate performSelector:@selector(getMulticastDelegate)];
+    CFRetain((__bridge CFTypeRef)(multicastDelegate));
+    return multicastDelegate;
+  }
+  return nil;
+}
+
+
+- (id<GULMulticastAppDelegateProtocol>)getMulticastDelegate {
+  return self;
+}
+
 
 -(void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
   [_interceptors addObject:interceptor];

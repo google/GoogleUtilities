@@ -49,12 +49,19 @@ static NSString *const kGULApplicationClassName = @"WKExtension";
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol GULMulticastAppDelegateProtocol <NSObject>
+
+- (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>) interceptor;
+
+- (void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>) interceptor;
+
+@end
+
 @interface GULMulticastAppDelegate : NSObject<GULApplicationDelegate>
 
--(void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)delegate;
+- (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)delegate;
 
-- (instancetype)init NS_UNAVAILABLE;
-
++ (id<GULMulticastAppDelegateProtocol>)multicastDelegate;
 @end
 
 NS_ASSUME_NONNULL_END
