@@ -40,7 +40,8 @@ static NSString *const kGULGoogleAppDelegateProxyEnabledPlistKey =
 /** This class conforms to the application delegate protocol and is there to be able to test the
  *  App Delegate Swizzler's behavior.
  */
-@interface GULTestAppDelegate : NSObject, UIApplicationDelegate {
+@interface GULTestAppDelegate : NSObject
+, UIApplicationDelegate {
  @public  // Because we want to access the ivars from outside the class like obj->ivar for testing.
   /** YES if the application:openURL:options: was called on an instance, NO otherwise. */
   BOOL _isOpenURLOptionsMethodCalled;

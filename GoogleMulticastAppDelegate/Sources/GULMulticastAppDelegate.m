@@ -24,13 +24,13 @@ static NSString *const kGULApplicationClassName = @"NSApplication";
 
 #elif TARGET_OS_WATCH
 
-static NSString *const kGULApplicationClassName = @"WKExtension";
+static NSString* const kGULApplicationClassName = @"WKExtension";
 
 #endif
 
-@interface GULMulticastAppDelegate ()<GULMulticastAppDelegateProtocol> {
-  NSMutableArray<id>* _interceptors;
-  id<GULApplicationDelegate> _appDelegate;
+@interface GULMulticastAppDelegate () <GULMulticastAppDelegateProtocol> {
+  NSMutableArray<id> *_interceptors;
+  id<GULApplicationDelegate> _defaultAppDelegate;
 }
 @end
 
@@ -49,7 +49,7 @@ static NSString *const kGULApplicationClassName = @"WKExtension";
   if (self) {
     _interceptors = [[NSMutableArray alloc] init];
     [_interceptors addObject:delegate];
-    _appDelegate = delegate;
+    _defaultAppDelegate = delegate;
   }
   return self;
 }
@@ -60,30 +60,28 @@ static NSString *const kGULApplicationClassName = @"WKExtension";
     return nil;
   }
   if ([appDelegate conformsToProtocol:@protocol(GULMulticastAppDelegateProtocol)]) {
-    id<GULMulticastAppDelegateProtocol> multicastAppDelegate = appDelegate;
+    id<GULMulticastAppDelegateProtocol> multicastAppDelegate =
+        (id<GULMulticastAppDelegateProtocol>)appDelegate;
     return multicastAppDelegate;
   }
   if (appDelegate && [appDelegate respondsToSelector:@selector(getMulticastDelegate)]) {
-    id<GULMulticastAppDelegateProtocol> multicastDelegate = [appDelegate performSelector:@selector(getMulticastDelegate)];
+    id<GULMulticastAppDelegateProtocol> multicastDelegate =
+        [appDelegate performSelector:@selector(getMulticastDelegate)];
     CFRetain((__bridge CFTypeRef)(multicastDelegate));
     return multicastDelegate;
   }
   return nil;
 }
 
-
 - (id<GULMulticastAppDelegateProtocol>)getMulticastDelegate {
   return self;
 }
 
-
--(void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
+- (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
   [_interceptors addObject:interceptor];
-  _appDelegate = interceptor;
-
 }
 
--(void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
+- (void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
   [_interceptors removeObject:interceptor];
 }
 
@@ -100,12 +98,7 @@ static NSString *const kGULApplicationClassName = @"WKExtension";
 }
 
 - (id)forwardingTargetForSelector:(SEL)aSelector {
-  for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    if (interceptor && [interceptor respondsToSelector:aSelector]) {
-      return interceptor;
-    }
-  }
-  return nil;
+  return _defaultAppDelegate;
 }
 
 #if !TARGET_OS_WATCH
@@ -124,23 +117,33 @@ static NSString *const kGULApplicationClassName = @"WKExtension";
 - (void)application:(GULApplication *)application
     didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    [interceptor application:application didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+    if ([interceptor respondsToSelector:@selector(application:
+                                            didRegisterForRemoteNotificationsWithDeviceToken:)]) {
+      [interceptor application:application
+          didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+    }
   }
 }
 
-#else // !TARGET_OS_WATCH
+#else   // !TARGET_OS_WATCH
 - (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    [interceptor didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+    if ([interceptor
+            respondsToSelector:@selector(didRegisterForRemoteNotificationsWithDeviceToken)]) {
+      [interceptor didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+    }
   }
 }
-#endif // !TARGET_OS_WATCH
+#endif  // !TARGET_OS_WATCH
 
 #if TARGET_OS_IOS || TARGET_OS_TV
 - (void)application:(GULApplication *)application
     didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
   for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    [interceptor application:application didFailToRegisterForRemoteNotificationsWithError:error];
+    if ([interceptor respondsToSelector:@selector(application:
+                                            didFailToRegisterForRemoteNotificationsWithError:)]) {
+      [interceptor application:application didFailToRegisterForRemoteNotificationsWithError:error];
+    }
   }
 }
 
@@ -148,7 +151,12 @@ static NSString *const kGULApplicationClassName = @"WKExtension";
     didReceiveRemoteNotification:(NSDictionary *)userInfo
           fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
   for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    [interceptor application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
+    if ([interceptor respondsToSelector:@selector
+                     (application:didReceiveRemoteNotification:fetchCompletionHandler:)]) {
+      [interceptor application:application
+          didReceiveRemoteNotification:userInfo
+                fetchCompletionHandler:completionHandler];
+    }
   }
 }
 #endif
