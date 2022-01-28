@@ -22,8 +22,6 @@
 #define GULApplicationDelegate UIApplicationDelegate
 #define GULUserActivityRestoring UIUserActivityRestoring
 
-static NSString *const kGULApplicationClassName = @"UIApplication";
-
 #elif TARGET_OS_OSX
 
 #import <AppKit/AppKit.h>
@@ -31,8 +29,6 @@ static NSString *const kGULApplicationClassName = @"UIApplication";
 #define GULApplication NSApplication
 #define GULApplicationDelegate NSApplicationDelegate
 #define GULUserActivityRestoring NSUserActivityRestoring
-
-static NSString *const kGULApplicationClassName = @"NSApplication";
 
 #elif TARGET_OS_WATCH
 
@@ -42,8 +38,6 @@ static NSString *const kGULApplicationClassName = @"NSApplication";
 #define GULApplication WKExtension
 #define GULApplicationDelegate WKExtensionDelegate
 #define GULUserActivityRestoring NSUserActivityRestoring
-
-static NSString *const kGULApplicationClassName = @"WKExtension";
 
 #endif
 
@@ -58,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface GULMulticastAppDelegate : NSObject<GULApplicationDelegate>
+
+- (instancetype)initWithAppDelegate:(id<GULApplicationDelegate>)delegate;
 
 - (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)delegate;
 

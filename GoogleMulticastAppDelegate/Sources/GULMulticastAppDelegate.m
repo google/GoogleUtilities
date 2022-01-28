@@ -14,10 +14,23 @@
 
 #import "GoogleMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
 
+#if TARGET_OS_IOS || TARGET_OS_TV
 
+static NSString *const kGULApplicationClassName = @"UIApplication";
+
+#elif TARGET_OS_OSX
+
+static NSString *const kGULApplicationClassName = @"NSApplication";
+
+#elif TARGET_OS_WATCH
+
+static NSString *const kGULApplicationClassName = @"WKExtension";
+
+#endif
 
 @interface GULMulticastAppDelegate ()<GULMulticastAppDelegateProtocol> {
   NSMutableArray<id>* _interceptors;
+  id<GULApplicationDelegate> _appDelegate;
 }
 @end
 
@@ -31,11 +44,26 @@
   return self;
 }
 
+- (instancetype)initWithAppDelegate:(id<GULApplicationDelegate>)delegate {
+  self = [super init];
+  if (self) {
+    _interceptors = [[NSMutableArray alloc] init];
+    [_interceptors addObject:delegate];
+    _appDelegate = delegate;
+  }
+  return self;
+}
+
 + (id<GULMulticastAppDelegateProtocol>)multicastDelegate {
-  
   id<UIApplicationDelegate> appDelegate = [UIApplication sharedApplication].delegate;
+  if (!appDelegate) {
+    return nil;
+  }
+  if ([appDelegate conformsToProtocol:@protocol(GULMulticastAppDelegateProtocol)]) {
+    id<GULMulticastAppDelegateProtocol> multicastAppDelegate = appDelegate;
+    return multicastAppDelegate;
+  }
   if (appDelegate && [appDelegate respondsToSelector:@selector(getMulticastDelegate)]) {
-    
     id<GULMulticastAppDelegateProtocol> multicastDelegate = [appDelegate performSelector:@selector(getMulticastDelegate)];
     CFRetain((__bridge CFTypeRef)(multicastDelegate));
     return multicastDelegate;
@@ -51,6 +79,8 @@
 
 -(void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
   [_interceptors addObject:interceptor];
+  _appDelegate = interceptor;
+
 }
 
 -(void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
