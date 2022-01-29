@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   # TODO: Is `GoogleMulticastAppDelegate` name fine?
   s.name             = 'GoogleMulticastAppDelegate'
-  s.version          = '7.5.0'
+  s.version          = '7.7.0'
   s.summary          = 'GoogleMulticastAppDelegate'
 
   s.description      = <<-DESC
@@ -41,6 +41,8 @@ Pod::Spec.new do |s|
   s.source_files = [
     base_dir + 'Sources/**/*.[hm]',
   ]
+
+  s.dependency 'GoogleUtilities/AppDelegateSwizzler', '~> 7.7'
 
   # s.test_spec 'unit' do |unit_tests|
   #   unit_tests.scheme = { :code_coverage => true }

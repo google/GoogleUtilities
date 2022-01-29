@@ -14,32 +14,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if TARGET_OS_IOS || TARGET_OS_TV
-
-#import <UIKit/UIKit.h>
-
-#define GULApplication UIApplication
-#define GULApplicationDelegate UIApplicationDelegate
-#define GULUserActivityRestoring UIUserActivityRestoring
-
-#elif TARGET_OS_OSX
-
-#import <AppKit/AppKit.h>
-
-#define GULApplication NSApplication
-#define GULApplicationDelegate NSApplicationDelegate
-#define GULUserActivityRestoring NSUserActivityRestoring
-
-#elif TARGET_OS_WATCH
-
-#import <WatchKit/WatchKit.h>
-
-// We match the according watchOS API but swizzling should not work in watch
-#define GULApplication WKExtension
-#define GULApplicationDelegate WKExtensionDelegate
-#define GULUserActivityRestoring NSUserActivityRestoring
-
-#endif
+#import <GoogleUtilities/GULApplication.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -14,20 +14,6 @@
 
 #import "GoogleMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
 
-#if TARGET_OS_IOS || TARGET_OS_TV
-
-static NSString *const kGULApplicationClassName = @"UIApplication";
-
-#elif TARGET_OS_OSX
-
-static NSString *const kGULApplicationClassName = @"NSApplication";
-
-#elif TARGET_OS_WATCH
-
-static NSString* const kGULApplicationClassName = @"WKExtension";
-
-#endif
-
 @interface GULMulticastAppDelegate () <GULMulticastAppDelegateProtocol> {
   NSMutableArray<id> *_interceptors;
   id<GULApplicationDelegate> _defaultAppDelegate;
@@ -95,6 +81,11 @@ static NSString* const kGULApplicationClassName = @"WKExtension";
     }
   }
   return NO;
+}
+
+- (void)setDefaultAppDelegate:(id<UIApplicationDelegate>)defaultAppDelegate {
+  [_interceptors addObject:defaultAppDelegate];
+  _defaultAppDelegate = defaultAppDelegate;
 }
 
 - (id)forwardingTargetForSelector:(SEL)aSelector {
