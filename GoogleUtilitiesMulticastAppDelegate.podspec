@@ -1,10 +1,10 @@
 Pod::Spec.new do |s|
-  s.name             = 'GoogleMulticastAppDelegate'
+  s.name             = 'GoogleUtilitiesMulticastAppDelegate'
   s.version          = '7.7.0'
-  s.summary          = 'GoogleMulticastAppDelegate'
+  s.summary          = 'GoogleUtilitiesMulticastAppDelegate'
 
   s.description      = <<-DESC
-  GoogleMulticastAppDelegate
+  GoogleUtilitiesMulticastAppDelegate
                        DESC
 
   s.homepage         = 'https://github.com/google/GoogleUtilities'
@@ -34,7 +34,7 @@ Pod::Spec.new do |s|
     'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}"',
   }
 
-  base_dir = "GoogleMulticastAppDelegate/"
+  base_dir = "GoogleUtilitiesMulticastAppDelegate/"
   s.source_files = [
     base_dir + 'Sources/**/*.[hm]',
   ]

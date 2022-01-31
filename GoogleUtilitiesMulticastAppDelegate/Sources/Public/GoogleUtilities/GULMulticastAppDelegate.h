@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GULMulticastAppDelegate : NSObject <GULApplicationDelegate>
 
-@property(nonatomic, copy) id<GULApplicationDelegate> defaultAppDelegate;
+@property(nonatomic, weak, copy) id<GULApplicationDelegate> defaultAppDelegate;
 
 - (instancetype)initWithAppDelegate:(id<GULApplicationDelegate>)delegate;
 

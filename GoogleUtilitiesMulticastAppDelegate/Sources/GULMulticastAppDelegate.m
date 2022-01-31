@@ -33,8 +33,7 @@
 - (instancetype)initWithAppDelegate:(id<GULApplicationDelegate>)delegate {
   self = [super init];
   if (self) {
-    _interceptors = [[NSMutableArray alloc] init];
-    [_interceptors addObject:delegate];
+    _interceptors = [NSMutableArray arrayWithObject:delegate];
     _defaultAppDelegate = delegate;
   }
   return self;
