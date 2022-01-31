@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "GoogleMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
+#import "GoogleUtilitiesMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
 
 @interface GULMulticastAppDelegate () <GULMulticastAppDelegateProtocol> {
   NSMutableArray<id> *_interceptors;
@@ -49,7 +49,7 @@
         (id<GULMulticastAppDelegateProtocol>)appDelegate;
     return multicastAppDelegate;
   }
-  if (appDelegate && [appDelegate respondsToSelector:@selector(getMulticastDelegate)]) {
+  if ([appDelegate respondsToSelector:@selector(getMulticastDelegate)]) {
     id<GULMulticastAppDelegateProtocol> multicastDelegate =
         [appDelegate performSelector:@selector(getMulticastDelegate)];
     CFRetain((__bridge CFTypeRef)(multicastDelegate));
@@ -62,11 +62,11 @@
   return self;
 }
 
-- (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
+- (void)addInterceptorWithInterceptor:(id<GULApplicationDelegate>)interceptor {
   [_interceptors addObject:interceptor];
 }
 
-- (void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor {
+- (void)removeInterceptorWithInterceptor:(id<GULApplicationDelegate>)interceptor {
   [_interceptors removeObject:interceptor];
 }
 

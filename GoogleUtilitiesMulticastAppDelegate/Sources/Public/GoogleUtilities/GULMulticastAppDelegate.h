@@ -20,19 +20,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol GULMulticastAppDelegateProtocol <NSObject>
 
-- (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor;
+- (void)addInterceptorWithInterceptor:(id<GULApplicationDelegate>)interceptor;
 
-- (void)removeInterceptorWithDelegate:(id<GULApplicationDelegate>)interceptor;
+- (void)removeInterceptorWithInterceptor:(id<GULApplicationDelegate>)interceptor;
 
 @end
 
 @interface GULMulticastAppDelegate : NSObject <GULApplicationDelegate>
 
-@property(nonatomic, weak, copy) id<GULApplicationDelegate> defaultAppDelegate;
+@property(nonatomic, copy) id<GULApplicationDelegate> defaultAppDelegate;
 
 - (instancetype)initWithAppDelegate:(id<GULApplicationDelegate>)delegate;
 
-- (void)addInterceptorWithDelegate:(id<GULApplicationDelegate>)delegate;
+- (void)addInterceptorWithInterceptor:(id<GULApplicationDelegate>)delegate;
 
 + (id<GULMulticastAppDelegateProtocol>)multicastDelegate;
 @end
