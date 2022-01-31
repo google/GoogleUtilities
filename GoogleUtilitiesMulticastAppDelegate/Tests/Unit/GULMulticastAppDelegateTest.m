@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "GoogleMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
+#import "GoogleUtilitiesMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
 
 #import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
