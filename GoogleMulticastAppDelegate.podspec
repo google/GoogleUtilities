@@ -1,5 +1,4 @@
 Pod::Spec.new do |s|
-  # TODO: Is `GoogleMulticastAppDelegate` name fine?
   s.name             = 'GoogleMulticastAppDelegate'
   s.version          = '7.7.0'
   s.summary          = 'GoogleMulticastAppDelegate'
@@ -26,8 +25,6 @@ Pod::Spec.new do |s|
   # s.osx.deployment_target = osx_deployment_target
   # s.tvos.deployment_target = tvos_deployment_target
   # s.watchos.deployment_target = watchos_deployment_target
-
-  s.swift_versions = ['5.0', '5.2']
 
   s.cocoapods_version = '>= 1.4.0'
   s.prefix_header_file = false
