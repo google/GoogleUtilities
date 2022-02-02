@@ -51,3 +51,5 @@ firebase-ios-sdk/
 
 #scripts link
 scripts
+
+GoogleMulticastAppDelegate/Apps/SwiftUISample/SwiftUISample/GoogleService-Info.plist
