@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #import <GoogleUtilitiesMulticastAppDelegate/GULMulticastAppDelegate.h>
+//#import <GoogleUtilities/GULAppDelegateSwizzler.h>
 
 @interface GULMulticastAppDelegate () <GULMulticastAppDelegateProtocol> {
   NSMutableArray<id> *_interceptors;
@@ -40,7 +41,7 @@
 }
 
 + (id<GULMulticastAppDelegateProtocol>)multicastDelegate {
-  id<UIApplicationDelegate> appDelegate = [UIApplication sharedApplication].delegate;
+  id<UIApplicationDelegate> appDelegate = [GULAppDelegateSwizzler sharedApplication].delegate;
   if (!appDelegate) {
     return nil;
   }
@@ -64,6 +65,9 @@
 
 - (void)addInterceptorWithInterceptor:(id<GULApplicationDelegate>)interceptor {
   [_interceptors addObject:interceptor];
+  if (!_defaultAppDelegate) {
+    _defaultAppDelegate = interceptor;
+  }
 }
 
 - (void)removeInterceptorWithInterceptor:(id<GULApplicationDelegate>)interceptor {
@@ -71,6 +75,9 @@
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
+  if (_defaultAppDelegate && [_defaultAppDelegate respondsToSelector:aSelector]) {
+    return YES;
+  }
   if ([[self class] instancesRespondToSelector:aSelector]) {
     return YES;
   }
@@ -79,6 +86,7 @@
       return YES;
     }
   }
+
   return NO;
 }
 
@@ -130,7 +138,8 @@
 
 - (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
   for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    if ([interceptor respondsToSelector:@selector(didFailToRegisterForRemoteNotificationsWithError:)]) {
+    if ([interceptor
+            respondsToSelector:@selector(didFailToRegisterForRemoteNotificationsWithError:)]) {
       [interceptor didFailToRegisterForRemoteNotificationsWithError:error];
     }
   }
@@ -159,25 +168,5 @@
   }
 }
 #endif
-
-#pragma mark - UNUserNotificationCenterDelegate
-
-//-(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler  API_AVAILABLE(ios(10.0)){
-//  for (id<UNUserNotificationCenterDelegate> interceptor in _interceptors) {
-//    if ([interceptor respondsToSelector:@selector
-//                     (userNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
-//      [interceptor userNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
-//    }
-//  }
-//}
-//
-//-(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler  API_AVAILABLE(ios(10.0)){
-//  for (id<UNUserNotificationCenterDelegate> interceptor in _interceptors) {
-//    if ([interceptor respondsToSelector:@selector
-//                     (userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
-//      [interceptor userNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
-//    }
-//  }
-//}
 
 @end

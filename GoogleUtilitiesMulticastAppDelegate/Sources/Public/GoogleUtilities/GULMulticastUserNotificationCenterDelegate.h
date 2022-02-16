@@ -23,15 +23,20 @@
 NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(ios(10.0))
-@interface GULMulticastUserNotificationCenterDelegate : NSObject <GULApplicationDelegate, UNUserNotificationCenterDelegate>
+@protocol GULMulticastNotificationProtocol <NSObject>
 
-@property(nonatomic, copy) id<GULApplicationDelegate, UNUserNotificationCenterDelegate> defaultAppDelegate;
+- (void)addInterceptorWithInterceptor:(id<UNUserNotificationCenterDelegate>)interceptor;
 
--(instancetype)initWithAppDelegate:(id<GULApplicationDelegate, UNUserNotificationCenterDelegate>)delegate;
+- (void)removeInterceptorWithInterceptor:(id<UNUserNotificationCenterDelegate>)interceptor;
 
--(void)addInterceptorWithInterceptor:(id<GULApplicationDelegate, UNUserNotificationCenterDelegate>)delegate;
+@end
 
-+ (id<GULMulticastAppDelegateProtocol>)multicastDelegate;
+API_AVAILABLE(ios(10.0))
+@interface GULMulticastUserNotificationCenterDelegate : NSObject <UNUserNotificationCenterDelegate>
+
+@property(nonatomic, copy) id<UNUserNotificationCenterDelegate> defaultAppDelegate;
+
++ (id<GULMulticastNotificationProtocol>)multicastDelegate;
 @end
 
 NS_ASSUME_NONNULL_END

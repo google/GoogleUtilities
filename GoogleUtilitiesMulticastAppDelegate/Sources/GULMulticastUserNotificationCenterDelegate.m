@@ -17,37 +17,36 @@
 API_AVAILABLE(ios(10.0))
 @interface GULMulticastUserNotificationCenterDelegate () <GULMulticastAppDelegateProtocol> {
   NSMutableArray<id> *_interceptors;
-  id<GULApplicationDelegate,UNUserNotificationCenterDelegate> _defaultAppDelegate;
+  id<UNUserNotificationCenterDelegate> _defaultAppDelegate;
 }
 @end
 
 @implementation GULMulticastUserNotificationCenterDelegate
 
-- (instancetype)initWithAppDelegate:(id<GULApplicationDelegate,UNUserNotificationCenterDelegate>)delegate  API_AVAILABLE(ios(10.0)){
+- (instancetype)init API_AVAILABLE(ios(10.0)) {
   self = [super init];
   if (self) {
-    _interceptors = [NSMutableArray arrayWithObject:delegate];
-    [UNUserNotificationCenter currentNotificationCenter].delegate = delegate;
-    _defaultAppDelegate = delegate;
+    _interceptors = [NSMutableArray array];
   }
   return self;
 }
 
-+ (id<GULMulticastAppDelegateProtocol>)multicastDelegate {
++ (id<GULMulticastNotificationProtocol>)multicastDelegate {
   if (@available(iOS 10.0, *)) {
-    id<UIApplicationDelegate> appDelegate = [UIApplication sharedApplication].delegate;
+    id<UNUserNotificationCenterDelegate> appDelegate =
+        [UNUserNotificationCenter currentNotificationCenter].delegate;
 
     if (!appDelegate) {
       return nil;
     }
-    if ([appDelegate conformsToProtocol:@protocol(GULMulticastAppDelegateProtocol)]) {
-      id<GULMulticastAppDelegateProtocol> multicastAppDelegate =
-      (id<GULMulticastAppDelegateProtocol>)appDelegate;
+    if ([appDelegate conformsToProtocol:@protocol(GULMulticastNotificationProtocol)]) {
+      id<GULMulticastNotificationProtocol> multicastAppDelegate =
+          (id<GULMulticastNotificationProtocol>)appDelegate;
       return multicastAppDelegate;
     }
     if ([appDelegate respondsToSelector:@selector(getMulticastDelegate)]) {
-      id<GULMulticastAppDelegateProtocol> multicastDelegate =
-      [appDelegate performSelector:@selector(getMulticastDelegate)];
+      id<GULMulticastNotificationProtocol> multicastDelegate =
+          [appDelegate performSelector:@selector(getMulticastDelegate)];
       CFRetain((__bridge CFTypeRef)(multicastDelegate));
       return multicastDelegate;
     }
@@ -61,11 +60,13 @@ API_AVAILABLE(ios(10.0))
   return self;
 }
 
-- (void)addInterceptorWithInterceptor:(id<GULApplicationDelegate,UNUserNotificationCenterDelegate>)interceptor  API_AVAILABLE(ios(10.0)){
+- (void)addInterceptorWithInterceptor:(id<UNUserNotificationCenterDelegate>)interceptor
+    API_AVAILABLE(ios(10.0)) {
   [_interceptors addObject:interceptor];
 }
 
-- (void)removeInterceptorWithInterceptor:(id<GULApplicationDelegate,UNUserNotificationCenterDelegate>)interceptor  API_AVAILABLE(ios(10.0)){
+- (void)removeInterceptorWithInterceptor:(id<UNUserNotificationCenterDelegate>)interceptor
+    API_AVAILABLE(ios(10.0)) {
   [_interceptors removeObject:interceptor];
 }
 
@@ -73,7 +74,7 @@ API_AVAILABLE(ios(10.0))
   if ([[self class] instancesRespondToSelector:aSelector]) {
     return YES;
   }
-  for (id<GULApplicationDelegate, UNUserNotificationCenterDelegate> interceptor in _interceptors) {
+  for (id<UNUserNotificationCenterDelegate> interceptor in _interceptors) {
     if (interceptor && [interceptor respondsToSelector:aSelector]) {
       return YES;
     }
@@ -81,7 +82,8 @@ API_AVAILABLE(ios(10.0))
   return NO;
 }
 
-- (void)setDefaultAppDelegate:(id<GULApplicationDelegate,UNUserNotificationCenterDelegate>)defaultAppDelegate  API_AVAILABLE(ios(10.0)){
+- (void)setDefaultAppDelegate:(id<UNUserNotificationCenterDelegate>)defaultAppDelegate
+    API_AVAILABLE(ios(10.0)) {
   [_interceptors addObject:defaultAppDelegate];
   _defaultAppDelegate = defaultAppDelegate;
 }
@@ -90,91 +92,32 @@ API_AVAILABLE(ios(10.0))
   return _defaultAppDelegate;
 }
 
-#if !TARGET_OS_WATCH
-#pragma mark - Open URL
-- (BOOL)application:(GULApplication *)app
-            openURL:(NSURL *)url
-            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-  BOOL result = NO;
-  for (id<UIApplicationDelegate> interceptor in _interceptors) {
-    result = result || [interceptor application:app openURL:url options:options];
-  }
-  return result;
-}
-
-#pragma mark - APNS methods
-- (void)application:(GULApplication *)application
-    didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-  for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    if ([interceptor respondsToSelector:@selector(application:
-                                            didRegisterForRemoteNotificationsWithDeviceToken:)]) {
-      [interceptor application:application
-          didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
-    }
-  }
-}
-
-#else   // !TARGET_OS_WATCH
-- (void)didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-  for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    if ([interceptor
-            respondsToSelector:@selector(didRegisterForRemoteNotificationsWithDeviceToken)]) {
-      [interceptor didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
-    }
-  }
-}
-#endif  // !TARGET_OS_WATCH
-
-#if TARGET_OS_WATCH
-
-- (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-  for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    if ([interceptor respondsToSelector:@selector(didFailToRegisterForRemoteNotificationsWithError:)]) {
-      [interceptor didFailToRegisterForRemoteNotificationsWithError:error];
-    }
-  }
-}
-#elif TARGET_OS_IOS || TARGET_OS_TV
-- (void)application:(GULApplication *)application
-    didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-  for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    if ([interceptor respondsToSelector:@selector(application:
-                                            didFailToRegisterForRemoteNotificationsWithError:)]) {
-      [interceptor application:application didFailToRegisterForRemoteNotificationsWithError:error];
-    }
-  }
-}
-
-- (void)application:(GULApplication *)application
-    didReceiveRemoteNotification:(NSDictionary *)userInfo
-          fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  for (id<GULApplicationDelegate> interceptor in _interceptors) {
-    if ([interceptor respondsToSelector:@selector
-                     (application:didReceiveRemoteNotification:fetchCompletionHandler:)]) {
-      [interceptor application:application
-          didReceiveRemoteNotification:userInfo
-                fetchCompletionHandler:completionHandler];
-    }
-  }
-}
-#endif
-
 #pragma mark - UNUserNotificationCenterDelegate
 
--(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler  API_AVAILABLE(ios(10.0)){
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler
+    API_AVAILABLE(ios(10.0)) {
   for (id<UNUserNotificationCenterDelegate> interceptor in _interceptors) {
-    if ([interceptor respondsToSelector:@selector
-                     (userNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
-      [interceptor userNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
+    if ([interceptor respondsToSelector:@selector(userNotificationCenter:
+                                                 willPresentNotification:withCompletionHandler:)]) {
+      [interceptor userNotificationCenter:center
+                  willPresentNotification:notification
+                    withCompletionHandler:completionHandler];
     }
   }
 }
 
--(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler  API_AVAILABLE(ios(10.0)){
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+    didReceiveNotificationResponse:(UNNotificationResponse *)response
+             withCompletionHandler:(void (^)(void))completionHandler API_AVAILABLE(ios(10.0)) {
   for (id<UNUserNotificationCenterDelegate> interceptor in _interceptors) {
-    if ([interceptor respondsToSelector:@selector
-                     (userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
-      [interceptor userNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
+    if ([interceptor
+            respondsToSelector:@selector(userNotificationCenter:
+                                   didReceiveNotificationResponse:withCompletionHandler:)]) {
+      [interceptor userNotificationCenter:center
+           didReceiveNotificationResponse:response
+                    withCompletionHandler:completionHandler];
     }
   }
 }
