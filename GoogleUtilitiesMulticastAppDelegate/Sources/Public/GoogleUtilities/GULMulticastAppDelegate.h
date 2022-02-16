@@ -14,7 +14,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <GoogleUtilities/GULApplication.h>
+#import <GoogleUtilities/GULAppDelegateSwizzler.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,8 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, copy) id<GULApplicationDelegate> defaultAppDelegate;
 
 - (instancetype)initWithAppDelegate:(id<GULApplicationDelegate>)delegate;
-
-- (void)addInterceptorWithInterceptor:(id<GULApplicationDelegate>)delegate;
 
 + (id<GULMulticastAppDelegateProtocol>)multicastDelegate;
 @end

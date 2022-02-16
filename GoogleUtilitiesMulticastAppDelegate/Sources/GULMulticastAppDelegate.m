@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import "GoogleUtilitiesMulticastAppDelegate/Sources/Public/GoogleUtilities/GULMulticastAppDelegate.h"
+#import <GoogleUtilitiesMulticastAppDelegate/GULMulticastAppDelegate.h>
+//#import <GoogleUtilities/GULAppDelegateSwizzler.h>
 
 @interface GULMulticastAppDelegate () <GULMulticastAppDelegateProtocol> {
   NSMutableArray<id> *_interceptors;
@@ -40,7 +41,7 @@
 }
 
 + (id<GULMulticastAppDelegateProtocol>)multicastDelegate {
-  id<UIApplicationDelegate> appDelegate = [UIApplication sharedApplication].delegate;
+  id<UIApplicationDelegate> appDelegate = [GULAppDelegateSwizzler sharedApplication].delegate;
   if (!appDelegate) {
     return nil;
   }
@@ -64,6 +65,9 @@
 
 - (void)addInterceptorWithInterceptor:(id<GULApplicationDelegate>)interceptor {
   [_interceptors addObject:interceptor];
+  if (!_defaultAppDelegate) {
+    _defaultAppDelegate = interceptor;
+  }
 }
 
 - (void)removeInterceptorWithInterceptor:(id<GULApplicationDelegate>)interceptor {
@@ -71,6 +75,9 @@
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
+  if (_defaultAppDelegate && [_defaultAppDelegate respondsToSelector:aSelector]) {
+    return YES;
+  }
   if ([[self class] instancesRespondToSelector:aSelector]) {
     return YES;
   }
@@ -79,6 +86,7 @@
       return YES;
     }
   }
+
   return NO;
 }
 
@@ -126,7 +134,17 @@
 }
 #endif  // !TARGET_OS_WATCH
 
-#if TARGET_OS_IOS || TARGET_OS_TV
+#if TARGET_OS_WATCH
+
+- (void)didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+  for (id<GULApplicationDelegate> interceptor in _interceptors) {
+    if ([interceptor
+            respondsToSelector:@selector(didFailToRegisterForRemoteNotificationsWithError:)]) {
+      [interceptor didFailToRegisterForRemoteNotificationsWithError:error];
+    }
+  }
+}
+#elif TARGET_OS_IOS || TARGET_OS_TV
 - (void)application:(GULApplication *)application
     didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
   for (id<GULApplicationDelegate> interceptor in _interceptors) {
