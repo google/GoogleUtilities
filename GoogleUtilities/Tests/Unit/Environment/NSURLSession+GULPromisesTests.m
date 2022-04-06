@@ -18,7 +18,7 @@
 
 #import "FBLPromise+Testing.h"
 #import "GoogleUtilities/Tests/Unit/Shared/URLSession/FIRURLSessionOCMockStub.h"
-#import "OCMock.h"
+#import <OCMock/OCMock.h>
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULURLSessionDataResponse.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/NSURLSession+GULPromises.h"

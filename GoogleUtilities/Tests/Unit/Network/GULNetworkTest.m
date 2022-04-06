@@ -15,7 +15,7 @@
 #import "GoogleUtilities/Tests/Unit/Network/third_party/GTMHTTPServer.h"
 
 #import <XCTest/XCTest.h>
-#import "OCMock.h"
+#import <OCMock/OCMock.h>
 
 #if !TARGET_OS_MACCATALYST
 // These tests are flaky on Catalyst. One of the tests typically fails.

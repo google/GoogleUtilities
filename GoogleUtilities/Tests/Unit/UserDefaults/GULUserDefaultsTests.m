@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #import <XCTest/XCTest.h>
-#import "OCMock.h"
+#import <OCMock/OCMock.h>
 
 #import "GoogleUtilities/Network/Public/GoogleUtilities/GULMutableDictionary.h"
 #import "GoogleUtilities/UserDefaults/Public/GoogleUtilities/GULUserDefaults.h"
