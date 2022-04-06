@@ -1,3 +1,7 @@
+# 7.7.1
+- Swift Package Manager only release. Unify OCMock dependency with Firebase
+  repo. (https://github.com/firebase/firebase-ios-sdk/issues/9591)
+
 # 7.7.0
 - Do not dispose a swizzler's generated class when `GULGeneratedClassDisposeDisabled`
   environment variable is set. (#66)
