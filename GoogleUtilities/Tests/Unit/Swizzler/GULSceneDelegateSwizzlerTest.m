@@ -15,9 +15,9 @@
 #import "GoogleUtilities/AppDelegateSwizzler/Internal/GULSceneDelegateSwizzler_Private.h"
 #import "GoogleUtilities/AppDelegateSwizzler/Public/GoogleUtilities/GULSceneDelegateSwizzler.h"
 
+#import <OCMock/OCMock.h>
 #import <XCTest/XCTest.h>
 #import <objc/runtime.h>
-#import "OCMock.h"
 
 /** Plist key that allows Firebase developers to disable Scene Delegate Proxying.  Source of truth
  * is the GULAppDelegateSwizzler class.
