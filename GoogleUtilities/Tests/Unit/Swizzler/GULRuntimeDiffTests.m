@@ -24,7 +24,7 @@
 @implementation GULRuntimeDiffTests
 
 /** Tests various different permutations of diff hashes and equality. */
-- (void)testHashAndEquality {
+- (void)SKIP_testHashAndEquality {
   GULRuntimeDiff *runtimeDiff1 = [[GULRuntimeDiff alloc] init];
   GULRuntimeDiff *runtimeDiff2 = [[GULRuntimeDiff alloc] init];
   XCTAssertEqual([runtimeDiff1 hash], [runtimeDiff2 hash]);

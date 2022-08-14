@@ -31,12 +31,12 @@
 
 @implementation GULRuntimeStateHelperTests
 
-- (void)testCaptureRuntimeState {
+- (void)SKIP_testCaptureRuntimeState {
   NSUInteger snapshot1 = 0;
   XCTAssertNoThrow(snapshot1 = [GULRuntimeStateHelper captureRuntimeState]);
 }
 
-- (void)testDiffBetweenFirstSnapshotSecondSnapshot {
+- (void)SKIP_testDiffBetweenFirstSnapshotSecondSnapshot {
   NSUInteger snapshot1 = [GULRuntimeStateHelper captureRuntimeState];
 
   NSString *newClassName = [NSStringFromClass([self class]) stringByAppendingString:@"_gen"];

@@ -50,7 +50,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 @implementation GULSceneDelegateSwizzlerTest
 
-- (void)testProxySceneDelegateWithNoSceneDelegate {
+- (void)SKIP_testProxySceneDelegateWithNoSceneDelegate {
   if (@available(iOS 13, tvOS 13, *)) {
     id mockSharedScene = OCMClassMock([UIScene class]);
     OCMStub([mockSharedScene delegate]).andReturn(nil);
@@ -60,7 +60,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
   }
 }
 
-- (void)testProxySceneDelegate {
+- (void)SKIP_testProxySceneDelegate {
   if (@available(iOS 13, tvOS 13, *)) {
     GULTestSceneDelegate *realSceneDelegate = [[GULTestSceneDelegate alloc] init];
     id mockSharedScene = OCMClassMock([UIScene class]);
@@ -94,7 +94,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
   }
 }
 
-- (void)testProxyProxiedSceneDelegate {
+- (void)SKIP_testProxyProxiedSceneDelegate {
   if (@available(iOS 13, tvOS 13, *)) {
     GULTestSceneDelegate *realSceneDelegate = [[GULTestSceneDelegate alloc] init];
     id mockSharedScene = OCMClassMock([UIScene class]);
@@ -116,7 +116,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
   }
 }
 
-- (void)testSceneOpenURLContextsIsInvokedOnInterceptors {
+- (void)SKIP_testSceneOpenURLContextsIsInvokedOnInterceptors {
   if (@available(iOS 13, tvOS 13, *)) {
     NSSet *urlContexts = [NSSet set];
 
@@ -147,7 +147,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 #if !TARGET_OS_MACCATALYST
 // Test fails on Catalyst.
 
-- (void)testNotificationCenterRegister {
+- (void)SKIP_testNotificationCenterRegister {
   if (@available(iOS 13, tvOS 13, *)) {
     [GULSceneDelegateSwizzler proxyOriginalSceneDelegate];
 
@@ -165,7 +165,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 #pragma mark - Tests to test that Plist flag is honored
 
 /** Tests that scene delegate proxy is enabled when there is no Info.plist dictionary. */
-- (void)testAppProxyPlistFlag_NoFlag {
+- (void)SKIP_testAppProxyPlistFlag_NoFlag {
   // No keys anywhere. If there is no key, the default should be enabled.
   NSDictionary *mainDictionary = nil;
   id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
@@ -179,7 +179,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 /** Tests that scene delegate proxy is enabled when there is neither the Firebase nor the
  * non-Firebase Info.plist key present.
  */
-- (void)testAppProxyPlistFlag_NoSceneDelegateProxyKey {
+- (void)SKIP_testAppProxyPlistFlag_NoSceneDelegateProxyKey {
   // No scene delegate disable key. If there is no key, the default should be enabled.
   NSDictionary *mainDictionary = @{@"randomKey" : @"randomValue"};
   id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
@@ -192,7 +192,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that scene delegate proxy is enabled when the Firebase plist is explicitly set to YES and
  * the Google flag is not present. */
-- (void)testAppProxyPlistFlag_FirebaseEnabled {
+- (void)SKIP_testAppProxyPlistFlag_FirebaseEnabled {
   // Set proxy enabled to YES.
   NSDictionary *mainDictionary = @{kGULFirebaseSceneDelegateProxyEnabledPlistKey : @(YES)};
   id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
@@ -205,7 +205,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that scene delegate proxy is enabled when the Google plist is explicitly set to YES and
  * the Firebase flag is not present. */
-- (void)testAppProxyPlistFlag_GoogleEnabled {
+- (void)SKIP_testAppProxyPlistFlag_GoogleEnabled {
   // Set proxy enabled to YES.
   NSDictionary *mainDictionary = @{kGULGoogleSceneDelegateProxyEnabledPlistKey : @(YES)};
   id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
@@ -218,7 +218,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that the scene delegate proxy is enabled when the Firebase flag has the wrong type of
  * value and the Google flag is not present. */
-- (void)testAppProxyPlist_WrongFirebaseDisableFlagValueType {
+- (void)SKIP_testAppProxyPlist_WrongFirebaseDisableFlagValueType {
   // Set proxy enabled to "NO" - a string.
   NSDictionary *mainDictionary = @{kGULFirebaseSceneDelegateProxyEnabledPlistKey : @"NO"};
   id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
@@ -231,7 +231,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that the scene delegate proxy is enabled when the Google flag has the wrong type of value
  * and the Firebase flag is not present. */
-- (void)testAppProxyPlist_WrongGoogleDisableFlagValueType {
+- (void)SKIP_testAppProxyPlist_WrongGoogleDisableFlagValueType {
   // Set proxy enabled to "NO" - a string.
   NSDictionary *mainDictionary = @{kGULGoogleSceneDelegateProxyEnabledPlistKey : @"NO"};
   id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
@@ -244,7 +244,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that the scene delegate proxy is disabled when the Firebase flag is set to NO and the
  * Google flag is not present. */
-- (void)testAppProxyPlist_FirebaseDisableFlag {
+- (void)SKIP_testAppProxyPlist_FirebaseDisableFlag {
   // Set proxy enabled to NO.
   NSDictionary *mainDictionary = @{kGULFirebaseSceneDelegateProxyEnabledPlistKey : @(NO)};
   id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
@@ -257,7 +257,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that the scene delegate proxy is disabled when the Google flag is set to NO and the
  * Firebase flag is not present. */
-- (void)testAppProxyPlist_GoogleDisableFlag {
+- (void)SKIP_testAppProxyPlist_GoogleDisableFlag {
   // Set proxy enabled to NO.
   NSDictionary *mainDictionary = @{kGULGoogleSceneDelegateProxyEnabledPlistKey : @(NO)};
   id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
@@ -270,7 +270,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that the scene delegate proxy is disabled when the Google flag is set to NO and the
  * Firebase flag is set to YES. */
-- (void)testAppProxyPlist_GoogleDisableFlagFirebaseEnableFlag {
+- (void)SKIP_testAppProxyPlist_GoogleDisableFlagFirebaseEnableFlag {
   // Set proxy enabled to NO.
   NSDictionary *mainDictionary = @{
     kGULGoogleSceneDelegateProxyEnabledPlistKey : @(NO),
@@ -286,7 +286,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that the scene delegate proxy is disabled when the Google flag is set to NO and the
  * Firebase flag is set to YES. */
-- (void)testAppProxyPlist_FirebaseDisableFlagGoogleEnableFlag {
+- (void)SKIP_testAppProxyPlist_FirebaseDisableFlagGoogleEnableFlag {
   // Set proxy enabled to NO.
   NSDictionary *mainDictionary = @{
     kGULGoogleSceneDelegateProxyEnabledPlistKey : @(YES),
@@ -302,7 +302,7 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
 /** Tests that the scene delegate proxy is disabled when the Google flag is set to NO and the
  * Firebase flag is set to NO. */
-- (void)testAppProxyPlist_FirebaseDisableFlagGoogleDisableFlag {
+- (void)SKIP_testAppProxyPlist_FirebaseDisableFlagGoogleDisableFlag {
   // Set proxy enabled to NO.
   NSDictionary *mainDictionary = @{
     kGULGoogleSceneDelegateProxyEnabledPlistKey : @(NO),

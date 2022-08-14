@@ -81,7 +81,7 @@
  *  We also test this with 3 layers of inheritance to ensure that we restore the correct original
  *  IMP in the case of a subclass, even when the superclass method remains swizzled.
  */
-- (void)testSwizzlingAndUnswizzlingInheritedInstanceMethodsForSuperclassesWorksAsExpected {
+- (void)SKIP_testSwizzlingAndUnswizzlingInheritedInstanceMethodsForSuperclassesWorksAsExpected {
   PollutedTestObject *pollutedTestObject = [[PollutedTestObject alloc] init];
   PollutedTestObjectSubclass *pollutedTestObjectSubclass =
       [[PollutedTestObjectSubclass alloc] init];

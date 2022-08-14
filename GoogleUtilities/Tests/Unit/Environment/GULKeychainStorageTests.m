@@ -40,9 +40,9 @@
 @property(nonatomic, strong) NSCache *cache;
 @property(nonatomic, strong) id mockCache;
 
-#if TARGET_OS_OSX
-@property(nonatomic) GULTestKeychain *privateKeychain;
-#endif  // TARGET_OSX
+//#if TARGET_OS_OSX
+//@property(nonatomic) GULTestKeychain *privateKeychain;
+//#endif  // TARGET_OSX
 
 @end
 
@@ -54,10 +54,10 @@
   self.storage = [[GULKeychainStorage alloc] initWithService:@"com.tests.GULKeychainStorageTests"
                                                        cache:self.mockCache];
 
-#if TARGET_OS_OSX
-  self.privateKeychain = [[GULTestKeychain alloc] init];
-  self.storage.keychainRef = self.privateKeychain.testKeychainRef;
-#endif  // TARGET_OSX
+//#if TARGET_OS_OSX
+//  self.privateKeychain = [[GULTestKeychain alloc] init];
+//  self.storage.keychainRef = self.privateKeychain.testKeychainRef;
+//#endif  // TARGET_OSX
 }
 
 - (void)tearDown {
@@ -65,9 +65,9 @@
   self.mockCache = nil;
   self.cache = nil;
 
-#if TARGET_OS_OSX
-  self.privateKeychain = nil;
-#endif  // TARGET_OSX
+//#if TARGET_OS_OSX
+//  self.privateKeychain = nil;
+//#endif  // TARGET_OSX
 }
 
 - (void)testSetGetObjectForKey {

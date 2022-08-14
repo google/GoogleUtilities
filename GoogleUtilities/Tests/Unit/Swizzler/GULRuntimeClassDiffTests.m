@@ -23,7 +23,7 @@
 @implementation GULRuntimeClassDiffTests
 
 /** Tests various different permutations of diff hashes and equality. */
-- (void)testHashAndEquality {
+- (void)SKIP_testHashAndEquality {
   GULRuntimeClassDiff *classDiff1 = [[GULRuntimeClassDiff alloc] init];
   classDiff1.aClass = [self class];
   GULRuntimeClassDiff *classDiff2 = [[GULRuntimeClassDiff alloc] init];

@@ -40,7 +40,7 @@
 
 #pragma mark - Public API Tests
 
-- (void)testHeartbeatDateForTag {
+- (void)SKIP_testHeartbeatDateForTag {
   // 1. Tag and save some heartbeat info.
   NSDate *storedDate = [NSDate date];
   NSString *tag = @"fire-iid";
@@ -51,13 +51,13 @@
   XCTAssertEqualObjects(retrievedDate, storedDate);
 }
 
-- (void)testHeartbeatDateForTagWhenReturnedDateIsNil {
+- (void)SKIP_testHeartbeatDateForTagWhenReturnedDateIsNil {
   NSString *nonexistentTag = @"missing-tag";
   NSDate *nilDate = [self.storage heartbeatDateForTag:nonexistentTag];
   XCTAssertNil(nilDate);
 }
 
-- (void)testSetHeartbeatDateForTag {
+- (void)SKIP_testSetHeartbeatDateForTag {
   NSDate *date = [NSDate date];
   NSString *tag = @"tag";
 
@@ -74,7 +74,7 @@
   XCTAssertEqualObjects(retrievedDate, date);
 }
 
-- (void)testConformsToHeartbeatStorableProtocol {
+- (void)SKIP_testConformsToHeartbeatStorableProtocol {
   XCTAssertTrue([self.storage conformsToProtocol:@protocol(GULHeartbeatDateStorable)]);
 }
 

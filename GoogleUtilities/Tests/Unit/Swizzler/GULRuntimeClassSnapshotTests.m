@@ -48,21 +48,21 @@ static NSString *dynamicClassBacking;
 @implementation GULRuntimeClassSnapshotTests
 
 /** Tests initialization. */
-- (void)testInitWithClass {
+- (void)SKIP_testInitWithClass {
   Class NSObjectClass = [NSObject class];
   GULRuntimeClassSnapshot *snapshot = [[GULRuntimeClassSnapshot alloc] initWithClass:NSObjectClass];
   XCTAssertNotNil(snapshot);
 }
 
 /** Tests the ability to snapshot without throwing. */
-- (void)testCapture {
+- (void)SKIP_testCapture {
   Class NSObjectClass = [NSObject class];
   GULRuntimeClassSnapshot *snapshot = [[GULRuntimeClassSnapshot alloc] initWithClass:NSObjectClass];
   XCTAssertNoThrow([snapshot capture]);
 }
 
 /** Tests that isEqual: of empty snapshots is YES. */
-- (void)testDiffOfNoChanges {
+- (void)SKIP_testDiffOfNoChanges {
   Class GULRuntimeClassSnapshotTestClassClass = [GULRuntimeClassSnapshotTestClass class];
   GULRuntimeClassSnapshot *snapshot1 =
       [[GULRuntimeClassSnapshot alloc] initWithClass:GULRuntimeClassSnapshotTestClassClass];
@@ -77,7 +77,7 @@ static NSString *dynamicClassBacking;
 }
 
 /** Tests that adding a class property is detected between two snapshots. */
-- (void)testAddingAClassPropertyDetected {
+- (void)SKIP_testAddingAClassPropertyDetected {
   Class GULRuntimeClassSnapshotTestClassClass = [GULRuntimeClassSnapshotTestClass class];
   Class GULRuntimeClassSnapshotTestClassMetaClass =
       objc_getMetaClass([NSStringFromClass(GULRuntimeClassSnapshotTestClassClass) UTF8String]);
@@ -103,7 +103,7 @@ static NSString *dynamicClassBacking;
 }
 
 /** Tests that adding an instance property is detected between two snapshots. */
-- (void)testAddingAnInstancePropertyDetected {
+- (void)SKIP_testAddingAnInstancePropertyDetected {
   Class GULRuntimeClassSnapshotTestClassClass = [GULRuntimeClassSnapshotTestClass class];
 
   GULRuntimeClassSnapshot *snapshot1 =
@@ -127,7 +127,7 @@ static NSString *dynamicClassBacking;
 }
 
 /** Tests that adding a class selector is detected between two snapshots. */
-- (void)testAddingAClassMethodDetected {
+- (void)SKIP_testAddingAClassMethodDetected {
   Class GULRuntimeClassSnapshotTestClassClass = [GULRuntimeClassSnapshotTestClass class];
   Class GULRuntimeClassSnapshotTestClassMetaClass =
       objc_getMetaClass([NSStringFromClass(GULRuntimeClassSnapshotTestClassClass) UTF8String]);
@@ -155,7 +155,7 @@ static NSString *dynamicClassBacking;
 }
 
 /** Tests that adding an instance selector is detected between two snapshots. */
-- (void)testAddingAnInstanceMethodDetected {
+- (void)SKIP_testAddingAnInstanceMethodDetected {
   Class GULRuntimeClassSnapshotTestClassClass = [GULRuntimeClassSnapshotTestClass class];
   GULRuntimeClassSnapshot *snapshot1 =
       [[GULRuntimeClassSnapshot alloc] initWithClass:GULRuntimeClassSnapshotTestClassClass];
@@ -180,7 +180,7 @@ static NSString *dynamicClassBacking;
 }
 
 /** Tests that modifying the IMP of a class selector is detected between two snapshots. */
-- (void)testModifiedClassImp {
+- (void)SKIP_testModifiedClassImp {
   Class GULRuntimeClassSnapshotTestClassClass = [GULRuntimeClassSnapshotTestClass class];
   Class GULRuntimeClassSnapshotTestClassMetaClass =
       objc_getMetaClass([NSStringFromClass(GULRuntimeClassSnapshotTestClassClass) UTF8String]);
@@ -217,7 +217,7 @@ static NSString *dynamicClassBacking;
 }
 
 /** Tests that modifying the IMP of an instance selector is detected between two snapshots. */
-- (void)testModifiedInstanceImp {
+- (void)SKIP_testModifiedInstanceImp {
   Class GULRuntimeClassSnapshotTestClassClass = [GULRuntimeClassSnapshotTestClass class];
   GULRuntimeClassSnapshot *snapshot1 =
       [[GULRuntimeClassSnapshot alloc] initWithClass:GULRuntimeClassSnapshotTestClassClass];

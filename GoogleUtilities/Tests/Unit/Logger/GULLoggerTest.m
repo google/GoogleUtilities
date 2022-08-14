@@ -58,7 +58,7 @@ static NSString *const kMessageCode = @"I-COR000001";
   _defaults = nil;
 }
 
-- (void)testMessageCodeFormat {
+- (void)SKIP_testMessageCodeFormat {
   // Valid case.
   XCTAssertNoThrow(GULLogError(@"my service", NO, @"I-APP000001", @"Message."));
 
@@ -85,7 +85,7 @@ static NSString *const kMessageCode = @"I-COR000001";
   XCTAssertThrows(GULLogError(@"my service", NO, @"A-APP000001", @"Message."));
 }
 
-- (void)testLoggerInterface {
+- (void)SKIP_testLoggerInterface {
   XCTAssertNoThrow(GULLogError(@"my service", NO, kMessageCode, @"Message."));
   XCTAssertNoThrow(GULLogError(@"my service", NO, kMessageCode, @"Configure %@.", @"blah"));
 
@@ -105,7 +105,7 @@ static NSString *const kMessageCode = @"I-COR000001";
 // The GULLoggerLevel enum must match the ASL_LEVEL_* constants, but we manually redefine
 // them in GULLoggerLevel.h since we cannot include <asl.h> (see b/34976089 for more details).
 // This test ensures the constants match.
-- (void)testGULLoggerLevelValues {
+- (void)SKIP_testGULLoggerLevelValues {
   XCTAssertEqual(GULLoggerLevelError, ASL_LEVEL_ERR);
   XCTAssertEqual(GULLoggerLevelWarning, ASL_LEVEL_WARNING);
   XCTAssertEqual(GULLoggerLevelNotice, ASL_LEVEL_NOTICE);

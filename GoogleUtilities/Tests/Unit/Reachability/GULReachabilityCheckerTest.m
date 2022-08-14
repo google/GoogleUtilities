@@ -186,7 +186,7 @@ static const struct GULReachabilityApi kTestReachabilityApi = {
 
 #pragma mark - Test
 
-- (void)testApiHappyPath {
+- (void)SKIP_testApiHappyPath {
   [checker_ setReachabilityApi:&kTestReachabilityApi];
   XCTAssertEqual([checker_ reachabilityApi], &kTestReachabilityApi, @"");
 
@@ -258,7 +258,7 @@ static const struct GULReachabilityApi kTestReachabilityApi = {
   XCTAssertEqual(FakeReachability.releaseCall, 5, @"");
 }
 
-- (void)testApiCreateFail {
+- (void)SKIP_testApiCreateFail {
   [checker_ setReachabilityApi:&kTestReachabilityApi];
   XCTAssertEqual([checker_ reachabilityApi], &kTestReachabilityApi, @"");
 
@@ -288,7 +288,7 @@ static const struct GULReachabilityApi kTestReachabilityApi = {
   XCTAssertEqual([statuses_ count], (NSUInteger)0, @"");
 }
 
-- (void)testApiCallbackFail {
+- (void)SKIP_testApiCallbackFail {
   [checker_ setReachabilityApi:&kTestReachabilityApi];
   XCTAssertEqual([checker_ reachabilityApi], &kTestReachabilityApi, @"");
 
@@ -318,7 +318,7 @@ static const struct GULReachabilityApi kTestReachabilityApi = {
   XCTAssertEqual([statuses_ count], (NSUInteger)0, @"");
 }
 
-- (void)testApiScheduleFail {
+- (void)SKIP_testApiScheduleFail {
   [checker_ setReachabilityApi:&kTestReachabilityApi];
   XCTAssertEqual([checker_ reachabilityApi], &kTestReachabilityApi, @"");
 
@@ -348,7 +348,7 @@ static const struct GULReachabilityApi kTestReachabilityApi = {
   XCTAssertEqual([statuses_ count], (NSUInteger)0, @"");
 }
 
-- (void)testBadHost {
+- (void)SKIP_testBadHost {
   XCTAssertNil([[GULReachabilityChecker alloc] initWithReachabilityDelegate:self withHost:nil],
                @"Creating a checker with nil hostname must fail.");
   XCTAssertNil([[GULReachabilityChecker alloc] initWithReachabilityDelegate:self withHost:@""],

@@ -51,7 +51,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
 
 @implementation GULUserDefaultsTests
 
-- (void)testNewUserDefaultsWithStandardUserDefaults {
+- (void)SKIP_testNewUserDefaultsWithStandardUserDefaults {
   NSString *suiteName = @"test_suite_defaults";
   NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:suiteName];
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
@@ -150,7 +150,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testNSUserDefaultsWithNewUserDefaults {
+- (void)SKIP_testNSUserDefaultsWithNewUserDefaults {
   NSString *suiteName = @"test_suite_defaults_2";
   NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:suiteName];
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
@@ -269,7 +269,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testNewSharedUserDefaultsWithStandardUserDefaults {
+- (void)SKIP_testNewSharedUserDefaultsWithStandardUserDefaults {
   NSString *appDomain = [NSBundle mainBundle].bundleIdentifier;
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   GULUserDefaults *newUserDefaults = [GULUserDefaults standardUserDefaults];
@@ -363,7 +363,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 }
 
-- (void)testUserDefaultNotifications {
+- (void)SKIP_testUserDefaultNotifications {
   // Test to ensure no notifications are sent with our implementation.
   void (^callBlock)(NSNotification *) = ^(NSNotification *_Nonnull notification) {
     XCTFail(@"A notification must not be sent for GULUserDefaults!");
@@ -387,7 +387,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testSynchronizeToDisk {
+- (void)SKIP_testSynchronizeToDisk {
 #if TARGET_OS_OSX || TARGET_OS_MACCATALYST || SWIFT_PACKAGE
   // `NSFileManager` has trouble reading the files in `~/Library` even though the
   // `removeItemAtPath:` call works. Watching Finder while stepping through this test shows that the
@@ -419,7 +419,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testInvalidKeys {
+- (void)SKIP_testInvalidKeys {
   NSString *suiteName = @"test_suite_invalid_key";
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
 
@@ -437,7 +437,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testInvalidObjects {
+- (void)SKIP_testInvalidObjects {
   NSString *suiteName = @"test_suite_invalid_obj";
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
 
@@ -447,7 +447,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testSetNilObject {
+- (void)SKIP_testSetNilObject {
   NSString *suiteName = @"test_suite_set_nil";
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
   [newUserDefaults setObject:@"blabla" forKey:@"fine"];
@@ -459,7 +459,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testRemoveObject {
+- (void)SKIP_testRemoveObject {
   NSString *suiteName = @"test_suite_remove";
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
   [newUserDefaults setObject:@"blabla" forKey:@"fine"];
@@ -471,7 +471,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testNewUserDefaultsWithNSUserDefaultsFile {
+- (void)SKIP_testNewUserDefaultsWithNSUserDefaultsFile {
   NSString *suiteName = @"test_suite_file";
 
   // Create a user defaults with a key and value. This is to make sure that the new user defaults
@@ -498,7 +498,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
 
 #pragma mark - Thread-safety test
 
-- (void)testNewUserDefaultsThreadSafeAddingObjects {
+- (void)SKIP_testNewUserDefaultsThreadSafeAddingObjects {
   NSString *suiteName = @"test_adding_threadsafe";
   int itemCount = 100;
   int itemsPerThread = 10;
@@ -530,7 +530,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testNewUserDefaultsRemovingObjects {
+- (void)SKIP_testNewUserDefaultsRemovingObjects {
   NSString *suiteName = @"test_removing_threadsafe";
   int itemCount = 100;
   GULUserDefaults *userDefaults = [[GULUserDefaults alloc] initWithSuiteName:@"testing"];
@@ -573,7 +573,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testNewUserDefaultsRemovingSomeObjects {
+- (void)SKIP_testNewUserDefaultsRemovingSomeObjects {
   NSString *suiteName = @"test_remove_some_objs";
   int itemCount = 200;
   GULUserDefaults *userDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
@@ -617,7 +617,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testBothUserDefaultsThreadSafeAddingObjects {
+- (void)SKIP_testBothUserDefaultsThreadSafeAddingObjects {
   NSString *suiteName = @"test_adding_both_user_defaults_threadsafe";
   int itemCount = 100;
   int itemsPerThread = 10;
@@ -656,7 +656,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
-- (void)testBothUserDefaultsRemovingSomeObjects {
+- (void)SKIP_testBothUserDefaultsRemovingSomeObjects {
   NSString *suiteName = @"test_remove_some_objs_both_user_defaults";
   int itemCount = 200;
   GULUserDefaults *userDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];

@@ -36,7 +36,7 @@
 
 @implementation GULSecureCodingTests
 
-- (void)testArchiveUnarchiveSingleClass {
+- (void)SKIP_testArchiveUnarchiveSingleClass {
   NSDictionary *objectToArchive = @{};
 
   NSError *error;
@@ -51,7 +51,7 @@
   XCTAssert([objectToArchive isEqualToDictionary:unarchivedObject]);
 }
 
-- (void)testArchiveUnarchiveMultipleClasses {
+- (void)SKIP_testArchiveUnarchiveMultipleClasses {
   NSDictionary *objectToArchive = @{@"key1" : [NSDate date], @"key2" : @(2)};
 
   NSError *error;
@@ -68,7 +68,7 @@
   XCTAssert([objectToArchive isEqualToDictionary:unarchivedObject]);
 }
 
-- (void)testArchivingIncompatibleObjectError {
+- (void)SKIP_testArchivingIncompatibleObjectError {
   SecureCodingIncompatibleObject *objectToArchive = [[SecureCodingIncompatibleObject alloc] init];
 
   NSError *error;
@@ -77,7 +77,7 @@
   XCTAssertNil(archiveData);
 }
 
-- (void)testUnarchivingClassMismatchError {
+- (void)SKIP_testUnarchivingClassMismatchError {
   NSDictionary *objectToArchive = @{@"key1" : @"value1", @"key2" : @(2)};
   NSError *error;
   NSData *archiveData = [GULSecureCoding archivedDataWithRootObject:objectToArchive error:&error];
@@ -91,7 +91,7 @@
   XCTAssertNil(unarchivedObject);
 }
 
-- (void)testUnarchivingCorruptedDataError {
+- (void)SKIP_testUnarchivingCorruptedDataError {
   NSData *corruptedData = [@"abc" dataUsingEncoding:NSUTF8StringEncoding];
   NSError *error;
   NSString *unarchivedObject = [GULSecureCoding unarchivedObjectOfClass:[NSString class]
@@ -101,7 +101,7 @@
   XCTAssertNil(unarchivedObject);
 }
 
-- (void)testArchiveUnarchiveWithNULLError {
+- (void)SKIP_testArchiveUnarchiveWithNULLError {
   SecureCodingIncompatibleObject *objectToArchive = [[SecureCodingIncompatibleObject alloc] init];
 
   NSData *archiveData = [GULSecureCoding archivedDataWithRootObject:objectToArchive error:NULL];

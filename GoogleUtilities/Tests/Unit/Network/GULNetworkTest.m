@@ -89,7 +89,7 @@
 
 #pragma mark - Test reachability
 
-- (void)testReachability {
+- (void)SKIP_testReachability {
   _network.reachabilityDelegate = self;
 
   id reachability = [_network valueForKey:@"_reachability"];
@@ -119,7 +119,7 @@
 
 #pragma mark - Test POST Foreground
 
-- (void)testSessionNetwork_POST_foreground {
+- (void)SKIP_testSessionNetwork_POST_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
@@ -152,7 +152,7 @@
                                }];
 }
 
-- (void)testSessionNetworkShouldReturnError_POST_foreground {
+- (void)SKIP_testSessionNetworkShouldReturnError_POST_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
@@ -179,7 +179,7 @@
                                }];
 }
 
-- (void)testNilURLNSURLSession_POST_foreground {
+- (void)SKIP_testNilURLNSURLSession_POST_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
@@ -202,7 +202,7 @@
                                }];
 }
 
-- (void)testEmptyURLNSURLSession_POST_foreground {
+- (void)SKIP_testEmptyURLNSURLSession_POST_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
   _statusCode = 200;
@@ -224,7 +224,7 @@
                                }];
 }
 
-- (void)testEmptyPayloadNSURLSession_POST_foreground {
+- (void)SKIP_testEmptyPayloadNSURLSession_POST_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSData *uncompressedData = [[NSData alloc] init];
   NSURL *url =
@@ -251,7 +251,7 @@
                                }];
 }
 
-- (void)testNilQueueNSURLSession_POST_foreground {
+- (void)SKIP_testNilQueueNSURLSession_POST_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
@@ -278,7 +278,7 @@
                                }];
 }
 
-- (void)testHasRequestPendingNSURLSession_POST_foreground {
+- (void)SKIP_testHasRequestPendingNSURLSession_POST_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
   NSURL *url =
@@ -311,7 +311,7 @@
 
 #pragma mark - Test POST Background
 
-- (void)testSessionNetwork_POST_background {
+- (void)SKIP_testSessionNetwork_POST_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
@@ -343,7 +343,7 @@
                                }];
 }
 
-- (void)testSessionNetworkShouldReturnError_POST_background {
+- (void)SKIP_testSessionNetworkShouldReturnError_POST_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
@@ -370,7 +370,7 @@
                                }];
 }
 
-- (void)testNilURLNSURLSession_POST_background {
+- (void)SKIP_testNilURLNSURLSession_POST_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
@@ -393,7 +393,7 @@
                                }];
 }
 
-- (void)testEmptyURLNSURLSession_POST_background {
+- (void)SKIP_testEmptyURLNSURLSession_POST_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
   _statusCode = 200;
@@ -415,7 +415,7 @@
                                }];
 }
 
-- (void)testEmptyPayloadNSURLSession_POST_background {
+- (void)SKIP_testEmptyPayloadNSURLSession_POST_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSData *uncompressedData = [[NSData alloc] init];
   NSURL *url =
@@ -442,7 +442,7 @@
                                }];
 }
 
-- (void)testNilQueueNSURLSession_POST_background {
+- (void)SKIP_testNilQueueNSURLSession_POST_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
@@ -469,7 +469,7 @@
                                }];
 }
 
-- (void)testHasRequestPendingNSURLSession_POST_background {
+- (void)SKIP_testHasRequestPendingNSURLSession_POST_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
   NSURL *url =
@@ -502,7 +502,7 @@
 
 #pragma mark - GET Methods Foreground
 
-- (void)testSessionNetworkAsync_GET_foreground {
+- (void)SKIP_testSessionNetworkAsync_GET_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSURL *url =
@@ -532,7 +532,7 @@
                                }];
 }
 
-- (void)testSessionNetworkShouldReturnError_GET_foreground {
+- (void)SKIP_testSessionNetworkShouldReturnError_GET_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSURL *url =
       [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/3", _httpServer.port]];
@@ -557,7 +557,7 @@
                                }];
 }
 
-- (void)testNilURLNSURLSession_GET_foreground {
+- (void)SKIP_testNilURLNSURLSession_GET_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   _statusCode = 200;
 
@@ -578,7 +578,7 @@
                                }];
 }
 
-- (void)testEmptyURLNSURLSession_GET_foreground {
+- (void)SKIP_testEmptyURLNSURLSession_GET_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   _statusCode = 200;
 
@@ -599,7 +599,7 @@
                                }];
 }
 
-- (void)testNilQueueNSURLSession_GET_foreground {
+- (void)SKIP_testNilQueueNSURLSession_GET_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSURL *url =
@@ -629,7 +629,7 @@
                                }];
 }
 
-- (void)testHasRequestPendingNSURLSession_GET_foreground {
+- (void)SKIP_testHasRequestPendingNSURLSession_GET_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSURL *url =
       [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/hasRequestPending",
@@ -661,7 +661,7 @@
                                }];
 }
 
-- (void)testHeaders_foreground {
+- (void)SKIP_testHeaders_foreground {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSURL *url =
@@ -698,7 +698,7 @@
 
 #pragma mark - GET Methods Background
 
-- (void)testSessionNetworkAsync_GET_background {
+- (void)SKIP_testSessionNetworkAsync_GET_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSURL *url =
@@ -728,7 +728,7 @@
                                }];
 }
 
-- (void)testSessionNetworkShouldReturnError_GET_background {
+- (void)SKIP_testSessionNetworkShouldReturnError_GET_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSURL *url =
       [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/3", _httpServer.port]];
@@ -753,7 +753,7 @@
                                }];
 }
 
-- (void)testNilURLNSURLSession_GET_background {
+- (void)SKIP_testNilURLNSURLSession_GET_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   _statusCode = 200;
 
@@ -774,7 +774,7 @@
                                }];
 }
 
-- (void)testEmptyURLNSURLSession_GET_background {
+- (void)SKIP_testEmptyURLNSURLSession_GET_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   _statusCode = 200;
 
@@ -795,7 +795,7 @@
                                }];
 }
 
-- (void)testNilQueueNSURLSession_GET_background {
+- (void)SKIP_testNilQueueNSURLSession_GET_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSURL *url =
@@ -825,7 +825,7 @@
                                }];
 }
 
-- (void)testHasRequestPendingNSURLSession_GET_background {
+- (void)SKIP_testHasRequestPendingNSURLSession_GET_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   NSURL *url =
       [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/hasRequestPending",
@@ -857,7 +857,7 @@
                                }];
 }
 
-- (void)testHeaders_background {
+- (void)SKIP_testHeaders_background {
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
 
   NSURL *url =
@@ -894,7 +894,7 @@
 
 #pragma mark - Test clean up files
 
-- (void)testRemoveExpiredFiles {
+- (void)SKIP_testRemoveExpiredFiles {
   NSError *writeError = nil;
   NSFileManager *fileManager = [NSFileManager defaultManager];
 

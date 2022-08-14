@@ -41,21 +41,21 @@
 // Remove the #if when iOS can remove iOS 7 support and also use processInfo instead of UIKit.
 #if TARGET_OS_OSX || TARGET_OS_TV
 
-- (void)testSystemVersionInfoMajorOnly {
+- (void)SKIP_testSystemVersionInfoMajorOnly {
   NSOperatingSystemVersion osTen = {.majorVersion = 10, .minorVersion = 0, .patchVersion = 0};
   OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTen);
 
   XCTAssertTrue([[GULAppEnvironmentUtil systemVersion] isEqualToString:@"10.0"]);
 }
 
-- (void)testSystemVersionInfoMajorMinor {
+- (void)SKIP_testSystemVersionInfoMajorMinor {
   NSOperatingSystemVersion osTenTwo = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 0};
   OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwo);
 
   XCTAssertTrue([[GULAppEnvironmentUtil systemVersion] isEqualToString:@"10.2"]);
 }
 
-- (void)testSystemVersionInfoMajorMinorPatch {
+- (void)SKIP_testSystemVersionInfoMajorMinorPatch {
   NSOperatingSystemVersion osTenTwoOne = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 1};
   OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwoOne);
 
@@ -63,7 +63,7 @@
 }
 #endif
 
-- (void)testDeploymentType {
+- (void)SKIP_testDeploymentType {
 #if SWIFT_PACKAGE
   NSString *deploymentType = @"swiftpm";
 #elif FIREBASE_BUILD_CARTHAGE
@@ -77,7 +77,7 @@
   XCTAssertEqualObjects([GULAppEnvironmentUtil deploymentType], deploymentType);
 }
 
-- (void)testApplePlatform {
+- (void)SKIP_testApplePlatform {
   // When a Catalyst app is run on macOS then both `TARGET_OS_MACCATALYST` and `TARGET_OS_IOS` are
   // `true`.
 #if TARGET_OS_MACCATALYST

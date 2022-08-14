@@ -42,7 +42,7 @@
   self.URLSession = nil;
 }
 
-- (void)testDataTaskPromiseWithRequestSuccess {
+- (void)SKIP_testDataTaskPromiseWithRequestSuccess {
   NSURL *url = [NSURL URLWithString:@"https://localhost"];
   NSURLRequest *request = [NSURLRequest requestWithURL:url];
 
@@ -71,7 +71,7 @@
   XCTAssertEqualObjects(taskPromise.value.HTTPBody, expectedBody);
 }
 
-- (void)testDataTaskPromiseWithRequestError {
+- (void)SKIP_testDataTaskPromiseWithRequestError {
   NSURL *url = [NSURL URLWithString:@"https://localhost"];
   NSURLRequest *request = [NSURLRequest requestWithURL:url];
 

@@ -28,14 +28,14 @@
   [super tearDown];
 }
 
-- (void)testSharedInstanceCreatesSingleton {
+- (void)SKIP_testSharedInstanceCreatesSingleton {
   GULSwizzlingCache *firstCache = [GULSwizzlingCache sharedInstance];
   GULSwizzlingCache *secondCache = [GULSwizzlingCache sharedInstance];
   // Pointer equality to make sure they're the same instance.
   XCTAssertEqual(firstCache, secondCache);
 }
 
-- (void)testOriginalIMPOfCurrentIMPIsSameWhenNotPreviouslySwizzled {
+- (void)SKIP_testOriginalIMPOfCurrentIMPIsSameWhenNotPreviouslySwizzled {
   Class swizzledClass = [NSObject class];
   SEL swizzledSelector = @selector(description);
   IMP currentIMP = class_getMethodImplementation(swizzledClass, swizzledSelector);
@@ -44,7 +44,7 @@
   XCTAssertEqual(returnedOriginalIMP, currentIMP);
 }
 
-- (void)testOriginalIMPOfNewIMPIsActuallyOriginalIMPWhenPreviouslySwizzledManyTimes {
+- (void)SKIP_testOriginalIMPOfNewIMPIsActuallyOriginalIMPWhenPreviouslySwizzledManyTimes {
   Class swizzledClass = [NSObject class];
   SEL swizzledSelector = @selector(description);
   IMP originalIMP = class_getMethodImplementation(swizzledClass, swizzledSelector);
@@ -87,7 +87,7 @@
   XCTAssertEqual(returnedOriginalIMPWhenSwizzledThrice, originalIMP);
 }
 
-- (void)testGettingCachedIMPForClassAndSelector {
+- (void)SKIP_testGettingCachedIMPForClassAndSelector {
   Class swizzledClass = [NSObject class];
   SEL swizzledSelector = @selector(description);
   IMP originalIMP = class_getMethodImplementation(swizzledClass, swizzledSelector);
@@ -106,7 +106,7 @@
   XCTAssertEqual(returnedOriginalIMP, originalIMP);
 }
 
-- (void)testGettingCachedIMPForClassAndSelectorWhenLastImpWasPutThereByUs {
+- (void)SKIP_testGettingCachedIMPForClassAndSelectorWhenLastImpWasPutThereByUs {
   Class swizzledClass = [NSObject class];
   SEL swizzledSelector = @selector(description);
   IMP originalIMP = class_getMethodImplementation(swizzledClass, swizzledSelector);
@@ -134,7 +134,7 @@
   XCTAssertEqual(returnedOriginalIMP, originalIMP);
 }
 
-- (void)testClearingCacheActuallyClearsTheCache {
+- (void)SKIP_testClearingCacheActuallyClearsTheCache {
   Class swizzledClass = [NSObject class];
   SEL swizzledSelector = @selector(description);
   IMP originalIMP = class_getMethodImplementation(swizzledClass, swizzledSelector);
@@ -160,7 +160,7 @@
                  @"New to original IMP cache was not cleared.");
 }
 
-- (void)testClearingCacheForOneIMPDoesNotImpactOtherIMPs {
+- (void)SKIP_testClearingCacheForOneIMPDoesNotImpactOtherIMPs {
   Class swizzledClass = [NSObject class];
   SEL swizzledSelector = @selector(description);
   IMP originalIMP = class_getMethodImplementation(swizzledClass, swizzledSelector);
@@ -203,7 +203,7 @@
                  @"New to original IMP cache was cleared when it shouldn't have.");
 }
 
-- (void)testDeallocatingSwizzlingCacheWithoutClearingItDoesntCrash {
+- (void)SKIP_testDeallocatingSwizzlingCacheWithoutClearingItDoesntCrash {
   GULSwizzlingCache *cache = [[GULSwizzlingCache alloc] init];
 
   Class swizzledClass = [NSObject class];
@@ -224,7 +224,7 @@
   XCTAssertNil(weakCache);
 }
 
-- (void)testUnderlyingStoresAreDeallocatedWhenCacheIsDeallocated {
+- (void)SKIP_testUnderlyingStoresAreDeallocatedWhenCacheIsDeallocated {
   GULSwizzlingCache *cache = [[GULSwizzlingCache alloc] init];
   __weak NSMutableDictionary *originalImps = (__bridge NSMutableDictionary *)cache.originalImps;
   __weak NSMutableDictionary *newToOriginalIMPs =
@@ -238,7 +238,7 @@
   XCTAssertNil(newToOriginalIMPs);
 }
 
-- (void)testCFMutableDictionaryRetainsAndReleasesClassSELPairCorrectly {
+- (void)SKIP_testCFMutableDictionaryRetainsAndReleasesClassSELPairCorrectly {
   GULSwizzlingCache *cache = [[GULSwizzlingCache alloc] init];
   Class testClass = [NSObject class];
   SEL testSelector = @selector(description);

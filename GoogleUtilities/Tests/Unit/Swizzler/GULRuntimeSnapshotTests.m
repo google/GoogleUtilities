@@ -37,19 +37,19 @@
 @implementation GULRuntimeSnapshotTests
 
 /** Tests default init. */
-- (void)testInitDoesntThrow {
+- (void)SKIP_testInitDoesntThrow {
   XCTAssertNoThrow([[GULRuntimeSnapshot alloc] init]);
 }
 
 /** Tests the designated initializer. */
-- (void)testDesignatedInitializer {
+- (void)SKIP_testDesignatedInitializer {
   XCTAssertNoThrow([[GULRuntimeSnapshot alloc] initWithClasses:nil]);
   NSSet *classes = [NSSet setWithObjects:[NSString class], [NSObject class], [self class], nil];
   XCTAssertNoThrow([[GULRuntimeSnapshot alloc] initWithClasses:classes]);
 }
 
 /** Tests equality of snapshots. */
-- (void)testEquality {
+- (void)SKIP_testEquality {
   GULRuntimeSnapshot *snapshot1 = [[GULRuntimeSnapshot alloc] initWithClasses:nil];
   GULRuntimeSnapshot *snapshot2 = [[GULRuntimeSnapshot alloc] initWithClasses:nil];
   XCTAssertEqualObjects(snapshot1, snapshot2);
@@ -87,7 +87,7 @@
 }
 
 /** Tests capturing snapshots doesn't throw. */
-- (void)testCapture {
+- (void)SKIP_testCapture {
   GULRuntimeSnapshot *snapshot1 = [[GULRuntimeSnapshot alloc] initWithClasses:nil];
   XCTAssertNoThrow([snapshot1 capture]);
 
@@ -96,7 +96,7 @@
 }
 
 /** Tests detecting a new class works. */
-- (void)testNewClassDetected {
+- (void)SKIP_testNewClassDetected {
   GULRuntimeSnapshot *snapshot1 = [[GULRuntimeSnapshot alloc] initWithClasses:nil];
   [snapshot1 capture];
 
@@ -119,7 +119,7 @@
 }
 
 /** Tests detecting a class deletion works. */
-- (void)testClassRemovedDetected {
+- (void)SKIP_testClassRemovedDetected {
   Class newClass = objc_allocateClassPair([NSObject class], "GULNewClass2", 0);
   objc_registerClassPair(newClass);
 

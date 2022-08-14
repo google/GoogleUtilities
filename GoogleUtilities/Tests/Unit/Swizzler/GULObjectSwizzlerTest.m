@@ -39,7 +39,7 @@
 - (void)donorMethod {
 }
 
-- (void)testRetainedAssociatedObjects {
+- (void)SKIP_testRetainedAssociatedObjects {
   NSObject *object = [[NSObject alloc] init];
   NSObject *associatedObject = [[NSObject alloc] init];
   size_t addressOfAssociatedObject = (size_t)&associatedObject;
@@ -54,14 +54,14 @@
 }
 
 /** Tests that creating an object swizzler works. */
-- (void)testObjectSwizzlerInit {
+- (void)SKIP_testObjectSwizzlerInit {
   NSObject *object = [[NSObject alloc] init];
   GULObjectSwizzler *objectSwizzler = [[GULObjectSwizzler alloc] initWithObject:object];
   XCTAssertNotNil(objectSwizzler);
 }
 
 /** Tests that you're able to swizzle an object. */
-- (void)testSwizzle {
+- (void)SKIP_testSwizzle {
   NSObject *object = [[NSObject alloc] init];
   GULObjectSwizzler *objectSwizzler = [[GULObjectSwizzler alloc] initWithObject:object];
   XCTAssertEqual([object class], [NSObject class]);
@@ -72,7 +72,7 @@
 }
 
 /** Tests that swizzling a nil object fails. */
-- (void)testSwizzleNil {
+- (void)SKIP_testSwizzleNil {
   NSObject *object = [[NSObject alloc] init];
   GULObjectSwizzler *objectSwizzler = [[GULObjectSwizzler alloc] initWithObject:object];
   XCTAssertEqual([object class], [NSObject class]);
@@ -81,7 +81,7 @@
 }
 
 /** Tests the ability to copy a selector from one class to the swizzled object's generated class. */
-- (void)testCopySelectorFromClassIsClassSelectorAndSwizzle {
+- (void)SKIP_testCopySelectorFromClassIsClassSelectorAndSwizzle {
   NSObject *object = [[NSObject alloc] init];
   GULObjectSwizzler *objectSwizzler = [[GULObjectSwizzler alloc] initWithObject:object];
   [objectSwizzler copySelector:@selector(donorMethod) fromClass:[self class] isClassSelector:NO];
@@ -95,7 +95,7 @@
 }
 
 /** Tests that some helper methods are always added to swizzled objects. */
-- (void)testCommonSelectorsAddedUponSwizzling {
+- (void)SKIP_testCommonSelectorsAddedUponSwizzling {
   NSObject *object = [[NSObject alloc] init];
   GULObjectSwizzler *objectSwizzler = [[GULObjectSwizzler alloc] initWithObject:object];
   XCTAssertFalse([object respondsToSelector:@selector(gul_class)]);
@@ -104,7 +104,7 @@
 }
 
 /** Tests that there's no retain cycle and that -dealloc causes unswizzling. */
-- (void)testRetainCycleDoesntExistAndDeallocCausesUnswizzling {
+- (void)SKIP_testRetainCycleDoesntExistAndDeallocCausesUnswizzling {
   NSObject *object = [[NSObject alloc] init];
   GULObjectSwizzler *objectSwizzler = [[GULObjectSwizzler alloc] initWithObject:object];
   [objectSwizzler copySelector:@selector(donorMethod) fromClass:[self class] isClassSelector:NO];
@@ -119,7 +119,7 @@
 }
 
 /** Tests the class get/set associated object methods. */
-- (void)testClassSetAssociatedObjectCopy {
+- (void)SKIP_testClassSetAssociatedObjectCopy {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *objectToBeAssociated = [[NSDictionary alloc] init];
   [GULObjectSwizzler setAssociatedObject:object
@@ -131,7 +131,7 @@
 }
 
 /** Tests the class get/set associated object methods. */
-- (void)testClassSetAssociatedObjectAssign {
+- (void)SKIP_testClassSetAssociatedObjectAssign {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *objectToBeAssociated = [[NSDictionary alloc] init];
   [GULObjectSwizzler setAssociatedObject:object
@@ -143,7 +143,7 @@
 }
 
 /** Tests the class get/set associated object methods. */
-- (void)testClassSetAssociatedObjectRetain {
+- (void)SKIP_testClassSetAssociatedObjectRetain {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *objectToBeAssociated = [[NSDictionary alloc] init];
   [GULObjectSwizzler setAssociatedObject:object
@@ -155,7 +155,7 @@
 }
 
 /** Tests the class get/set associated object methods. */
-- (void)testClassSetAssociatedObjectCopyNonatomic {
+- (void)SKIP_testClassSetAssociatedObjectCopyNonatomic {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *objectToBeAssociated = [[NSDictionary alloc] init];
   [GULObjectSwizzler setAssociatedObject:object
@@ -167,7 +167,7 @@
 }
 
 /** Tests the class get/set associated object methods. */
-- (void)testClassSetAssociatedObjectRetainNonatomic {
+- (void)SKIP_testClassSetAssociatedObjectRetainNonatomic {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *objectToBeAssociated = [[NSDictionary alloc] init];
   [GULObjectSwizzler setAssociatedObject:object
@@ -179,7 +179,7 @@
 }
 
 /** Tests the swizzler get/set associated object methods. */
-- (void)testSetGetAssociatedObjectCopy {
+- (void)SKIP_testSetGetAssociatedObjectCopy {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *associatedObject = [[NSDictionary alloc] init];
   GULObjectSwizzler *swizzler = [[GULObjectSwizzler alloc] initWithObject:object];
@@ -191,7 +191,7 @@
 }
 
 /** Tests the swizzler get/set associated object methods. */
-- (void)testSetGetAssociatedObjectAssign {
+- (void)SKIP_testSetGetAssociatedObjectAssign {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *associatedObject = [[NSDictionary alloc] init];
   GULObjectSwizzler *swizzler = [[GULObjectSwizzler alloc] initWithObject:object];
@@ -203,7 +203,7 @@
 }
 
 /** Tests the swizzler get/set associated object methods. */
-- (void)testSetGetAssociatedObjectRetain {
+- (void)SKIP_testSetGetAssociatedObjectRetain {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *associatedObject = [[NSDictionary alloc] init];
   GULObjectSwizzler *swizzler = [[GULObjectSwizzler alloc] initWithObject:object];
@@ -215,7 +215,7 @@
 }
 
 /** Tests the swizzler get/set associated object methods. */
-- (void)testSetGetAssociatedObjectCopyNonatomic {
+- (void)SKIP_testSetGetAssociatedObjectCopyNonatomic {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *associatedObject = [[NSDictionary alloc] init];
   GULObjectSwizzler *swizzler = [[GULObjectSwizzler alloc] initWithObject:object];
@@ -227,7 +227,7 @@
 }
 
 /** Tests the swizzler get/set associated object methods. */
-- (void)testSetGetAssociatedObjectRetainNonatomic {
+- (void)SKIP_testSetGetAssociatedObjectRetainNonatomic {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *associatedObject = [[NSDictionary alloc] init];
   GULObjectSwizzler *swizzler = [[GULObjectSwizzler alloc] initWithObject:object];
@@ -239,7 +239,7 @@
 }
 
 /** Tests getting and setting an associated object with an invalid association type. */
-- (void)testSetGetAssociatedObjectWithoutProperAssociation {
+- (void)SKIP_testSetGetAssociatedObjectWithoutProperAssociation {
   NSObject *object = [[NSObject alloc] init];
   NSDictionary *associatedObject = [[NSDictionary alloc] init];
   GULObjectSwizzler *swizzler = [[GULObjectSwizzler alloc] initWithObject:object];
@@ -249,7 +249,7 @@
 }
 
 /** Tests using the GULObjectSwizzler to swizzle an object wrapped in an NSProxy. */
-- (void)testSwizzleProxiedObject {
+- (void)SKIP_testSwizzleProxiedObject {
   NSObject *object = [[NSObject alloc] init];
   GULProxy *proxyObject = [GULProxy proxyWithDelegate:object];
   GULObjectSwizzler *swizzler = [[GULObjectSwizzler alloc] initWithObject:proxyObject];
@@ -267,7 +267,7 @@
 }
 
 /** Tests overriding a method that already exists on a proxied object works as expected. */
-- (void)testSwizzleProxiedObjectInvokesInjectedMethodWhenOverridingMethod {
+- (void)SKIP_testSwizzleProxiedObjectInvokesInjectedMethodWhenOverridingMethod {
   NSObject *object = [[NSObject alloc] init];
   GULProxy *proxyObject = [GULProxy proxyWithDelegate:object];
 
@@ -281,7 +281,7 @@
 }
 
 /** Tests adding a method that doesn't exist on a proxied object works as expected. */
-- (void)testSwizzleProxiedObjectInvokesInjectedMethodWhenAddingMethod {
+- (void)SKIP_testSwizzleProxiedObjectInvokesInjectedMethodWhenAddingMethod {
   NSObject *object = [[NSObject alloc] init];
   GULProxy *proxyObject = [GULProxy proxyWithDelegate:object];
 
@@ -296,7 +296,7 @@
 }
 
 /** Tests KVOing a proxy object that we've ISA Swizzled works as expected. */
-- (void)testRespondsToSelectorWorksEvenIfSwizzledProxyIsKVOd {
+- (void)SKIP_testRespondsToSelectorWorksEvenIfSwizzledProxyIsKVOd {
   NSObject *object = [[NSObject alloc] init];
   GULProxy *proxyObject = [GULProxy proxyWithDelegate:object];
 
@@ -325,7 +325,7 @@
 /** Tests that -[NSObjectProtocol respondsToSelector:] works as expected after someone else ISA
  *  swizzles a proxy object that we've also ISA Swizzled.
  */
-- (void)testRespondsToSelectorWorksEvenIfSwizzledProxyISASwizzledBySomeoneElse {
+- (void)SKIP_testRespondsToSelectorWorksEvenIfSwizzledProxyISASwizzledBySomeoneElse {
   Class generatedClass = nil;
   __weak GULObjectSwizzler *weakSwizzler;
 
@@ -361,7 +361,7 @@
 #if !TARGET_OS_MACCATALYST
 // Test fails on Catalyst due to an interaction with GULSceneDelegateSwizzlerTests.
 
-- (void)testSwizzlerDoesntDisposeGeneratedClassWhenObjectIsISASwizzledBySomeoneElse {
+- (void)SKIP_testSwizzlerDoesntDisposeGeneratedClassWhenObjectIsISASwizzledBySomeoneElse {
   Class generatedClass = nil;
   __weak GULObjectSwizzler *weakSwizzler;
 
@@ -454,7 +454,7 @@
   }
 }
 
-- (void)testMultiSwizzling {
+- (void)SKIP_testMultiSwizzling {
   NSObject *object = [[NSObject alloc] init];
 
   __weak GULObjectSwizzler *existingSwizzler;
