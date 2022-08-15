@@ -1005,7 +1005,8 @@ static BOOL gRespondsToHandleBackgroundSession;
                                  expectedResult:UIBackgroundFetchResultFailed];
 }
 
-- (void)SKIP_testApplicationDidReceiveRemoteNotificationWithCompletionCompletionIsCalledOnce_NoData {
+- (void)
+    SKIP_testApplicationDidReceiveRemoteNotificationWithCompletionCompletionIsCalledOnce_NoData {
   [self verifyCompletionCalledForObserverResult:UIBackgroundFetchResultNoData
                           anotherObserverResult:UIBackgroundFetchResultFailed
                                  swizzledResult:UIBackgroundFetchResultFailed

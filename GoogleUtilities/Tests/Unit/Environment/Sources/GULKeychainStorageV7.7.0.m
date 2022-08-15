@@ -1,20 +1,21 @@
-/*
- * Copyright 2019 Google
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2022 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainStorage.h"
+// MARK: This file is strictly for version compatibility testing.
+
+#import "GoogleUtilities/Tests/Unit/Environment/Sources/GULKeychainStorageV7.7.0.h"
+
 #import <Security/Security.h>
 
 #if __has_include(<FBLPromises/FBLPromises.h>)
@@ -26,14 +27,14 @@
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainUtils.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
-@interface GULKeychainStorage ()
+@interface GULKeychainStorageV7_7_0 ()
 @property(nonatomic, readonly) dispatch_queue_t keychainQueue;
 @property(nonatomic, readonly) dispatch_queue_t inMemoryCacheQueue;
 @property(nonatomic, readonly) NSString *service;
 @property(nonatomic, readonly) NSCache<NSString *, id<NSSecureCoding>> *inMemoryCache;
 @end
 
-@implementation GULKeychainStorage
+@implementation GULKeychainStorageV7_7_0
 
 - (instancetype)initWithService:(NSString *)service {
   NSCache *cache = [[NSCache alloc] init];
@@ -177,10 +178,6 @@
 
   if (accessGroup) {
     query[(__bridge NSString *)kSecAttrAccessGroup] = accessGroup;
-  }
-
-  if (@available(iOS 13.0, macOS 10.15, macCatalyst 13.0, tvOS 13.0, watchOS 6.0, *)) {
-    query[(__bridge id)kSecUseDataProtectionKeychain] = (__bridge id)kCFBooleanTrue;
   }
 
 #if TARGET_OS_OSX

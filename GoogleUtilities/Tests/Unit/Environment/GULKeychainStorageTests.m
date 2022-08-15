@@ -29,77 +29,100 @@
 #import "GoogleUtilities/Tests/Unit/Utils/GULTestKeychain.h"
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainStorage.h"
+#import "GoogleUtilities/Tests/Unit/Environment/Sources/GULKeychainStorageV7.7.0.h"
+
+static NSString *const kKeychainServiceName = @"com.tests.GULKeychainStorageTests";
 
 @interface GULKeychainStorage (Tests)
 - (instancetype)initWithService:(NSString *)service cache:(NSCache *)cache;
 - (void)resetInMemoryCache;
 @end
 
-@interface GULKeychainStorageTests : XCTestCase
-@property(nonatomic, strong) GULKeychainStorage *storage;
-@property(nonatomic, strong) NSCache *cache;
-@property(nonatomic, strong) id mockCache;
+@interface GULKeychainStorageV7_7_0 (Tests)
+- (instancetype)initWithService:(NSString *)service cache:(NSCache *)cache;
+- (void)resetInMemoryCache;
+@end
 
-//#if TARGET_OS_OSX
-//@property(nonatomic) GULTestKeychain *privateKeychain;
-//#endif  // TARGET_OSX
+@interface GULKeychainStorageTests : XCTestCase
+@property(nonatomic) GULKeychainStorage *storage;
+@property(nonatomic) id mockCache;
+
+#if TARGET_OS_OSX
+@property(nonatomic) GULTestKeychain *privateKeychain;
+#endif  // TARGET_OS_OSX
 
 @end
 
 @implementation GULKeychainStorageTests
 
 - (void)setUp {
-  self.cache = [[NSCache alloc] init];
-  self.mockCache = OCMPartialMock(self.cache);
-  self.storage = [[GULKeychainStorage alloc] initWithService:@"com.tests.GULKeychainStorageTests"
+  self.mockCache = OCMPartialMock([[NSCache alloc] init]);
+  self.storage = [[GULKeychainStorage alloc] initWithService:kKeychainServiceName
                                                        cache:self.mockCache];
 
-//#if TARGET_OS_OSX
-//  self.privateKeychain = [[GULTestKeychain alloc] init];
-//  self.storage.keychainRef = self.privateKeychain.testKeychainRef;
-//#endif  // TARGET_OSX
+#if TARGET_OS_OSX
+  self.privateKeychain = [[GULTestKeychain alloc] init];
+  self.storage.keychainRef = self.privateKeychain.testKeychainRef;
+#endif  // TARGET_OS_OSX
 }
 
 - (void)tearDown {
   self.storage = nil;
   self.mockCache = nil;
-  self.cache = nil;
 
-//#if TARGET_OS_OSX
-//  self.privateKeychain = nil;
-//#endif  // TARGET_OSX
+#if TARGET_OS_OSX
+  self.privateKeychain = nil;
+#endif  // TARGET_OS_OSX
 }
 
 - (void)testSetGetObjectForKey {
   // 1. Write and read object initially.
-  [self assertSuccessWriteObject:@[ @1, @2 ] forKey:@"test-key1"];
+  [self assertSuccessWriteObject:@[ @1, @2 ]
+                          forKey:@"test-key1"
+                       toStorage:self.storage
+                   withMockCache:self.mockCache];
+
   [self assertSuccessReadObject:@[ @1, @2 ]
                          forKey:@"test-key1"
                           class:[NSArray class]
-                  existsInCache:YES];
+                  existsInCache:YES
+                    fromStorage:self.storage
+                  withMockCache:self.mockCache];
 
   //  // 2. Override existing object.
-  [self assertSuccessWriteObject:@{@"key" : @"value"} forKey:@"test-key1"];
+  [self assertSuccessWriteObject:@{@"key" : @"value"}
+                          forKey:@"test-key1"
+                       toStorage:self.storage
+                   withMockCache:self.mockCache];
   [self assertSuccessReadObject:@{@"key" : @"value"}
                          forKey:@"test-key1"
                           class:[NSDictionary class]
-                  existsInCache:YES];
+                  existsInCache:YES
+                    fromStorage:self.storage
+                  withMockCache:self.mockCache];
 
   // 3. Read existing object which is not present in in-memory cache.
-  [self.cache removeAllObjects];
+  [self.mockCache removeAllObjects];
   // TODO: Evaluate if GULKeychainStorage needs an API that takes set of classes. (#42)
   // The following method causes an NSKeyedUnarchiver-related runtime warning log.
   [self assertSuccessReadObject:@{@"key" : @"value"}
                          forKey:@"test-key1"
                           class:[NSDictionary class]
-                  existsInCache:NO];
+                  existsInCache:NO
+                    fromStorage:self.storage
+                  withMockCache:self.mockCache];
 
   // 4. Write and read an object for another key.
-  [self assertSuccessWriteObject:@{@"key" : @"value"} forKey:@"test-key2"];
+  [self assertSuccessWriteObject:@{@"key" : @"value"}
+                          forKey:@"test-key2"
+                       toStorage:self.storage
+                   withMockCache:self.mockCache];
   [self assertSuccessReadObject:@{@"key" : @"value"}
                          forKey:@"test-key2"
                           class:[NSDictionary class]
-                  existsInCache:YES];
+                  existsInCache:YES
+                    fromStorage:self.storage
+                  withMockCache:self.mockCache];
 }
 
 - (void)testGetNonExistingObject {
@@ -110,7 +133,10 @@
   NSString *key = [NSUUID UUID].UUIDString;
 
   // Write.
-  [self assertSuccessWriteObject:@[ @8 ] forKey:key];
+  [self assertSuccessWriteObject:@[ @8 ]
+                          forKey:key
+                       toStorage:self.storage
+                   withMockCache:self.mockCache];
 
   // Read.
   // Skip in-memory cache because the error is relevant only for Keychain.
@@ -131,7 +157,10 @@
 - (void)testRemoveExistingObject {
   NSString *key = @"testRemoveExistingObject";
   // Store the object.
-  [self assertSuccessWriteObject:@[ @5 ] forKey:(NSString *)key];
+  [self assertSuccessWriteObject:@[ @5 ]
+                          forKey:(NSString *)key
+                       toStorage:self.storage
+                   withMockCache:self.mockCache];
 
   // Remove object.
   [self assertRemoveObjectForKey:key];
@@ -146,43 +175,144 @@
   [self assertNonExistingObjectForKey:key class:[NSArray class]];
 }
 
+#pragma mark - Version Compatibility
+
+- (void)testVersionCompatibility_GetObject {
+  // Given
+  // - Object is set with old implementation.
+  id oldMockCache = OCMPartialMock([[NSCache alloc] init]);
+  GULKeychainStorageV7_7_0 *oldKeychainStorage =
+      [[GULKeychainStorageV7_7_0 alloc] initWithService:kKeychainServiceName cache:oldMockCache];
+
+  [self assertSuccessWriteObject:@100
+                          forKey:@"test-key1"
+                       toStorage:(GULKeychainStorage *)oldKeychainStorage
+                   withMockCache:oldMockCache];
+
+  // When
+  // - App is updated to include a Google Utilities version greater than 7.7.0.
+
+  // Then
+  // - Object is retrieved with new implementation.
+  [self.mockCache removeAllObjects];
+  [self assertSuccessReadObject:@100
+                         forKey:@"test-key1"
+                          class:[NSNumber class]
+                  existsInCache:YES
+                    fromStorage:self.storage
+                  withMockCache:self.mockCache];
+}
+
+- (void)testVersionCompatibility_SetObject {
+  // Given
+  // - Object is set with old implementation.
+  id oldMockCache = OCMPartialMock([[NSCache alloc] init]);
+  GULKeychainStorageV7_7_0 *oldKeychainStorage =
+      [[GULKeychainStorageV7_7_0 alloc] initWithService:kKeychainServiceName cache:oldMockCache];
+
+  [self assertSuccessWriteObject:@100
+                          forKey:@"test-key1"
+                       toStorage:(GULKeychainStorage *)oldKeychainStorage
+                   withMockCache:oldMockCache];
+
+  // When
+  // - App is updated to include a Google Utilities version greater than 7.7.0.
+
+  // Then
+  // - The same object is updated with new implementation.
+  [self assertSuccessWriteObject:@200
+                          forKey:@"test-key1"
+                       toStorage:self.storage
+                   withMockCache:self.mockCache];
+
+  [self assertSuccessReadObject:@200
+                         forKey:@"test-key1"
+                          class:[NSNumber class]
+                  existsInCache:YES
+                    fromStorage:self.storage
+                  withMockCache:self.mockCache];
+
+  [oldMockCache removeAllObjects];
+  [self assertSuccessReadObject:@200
+                         forKey:@"test-key1"
+                          class:[NSNumber class]
+                  existsInCache:NO
+                    fromStorage:(GULKeychainStorage *)oldKeychainStorage
+                  withMockCache:oldMockCache];
+}
+
+- (void)FAILS_testVersionCompatibility_RemoveObject {
+  // Given
+  // - Object is set with old implementation.
+  [self assertNonExistingObjectForKey:@"test-key1" class:[NSNumber class]];
+
+  id oldMockCache = OCMPartialMock([[NSCache alloc] init]);
+  GULKeychainStorageV7_7_0 *oldKeychainStorage =
+      [[GULKeychainStorageV7_7_0 alloc] initWithService:kKeychainServiceName cache:oldMockCache];
+
+  [self assertSuccessWriteObject:@100
+                          forKey:@"test-key1"
+                       toStorage:(GULKeychainStorage *)oldKeychainStorage
+                   withMockCache:oldMockCache];
+
+  // When
+  // - App is updated to include a Google Utilities version greater than 7.7.0.
+
+  // Then
+  // - The same object is removed with new implementation.
+  [self assertRemoveObjectForKey:@"test-key1"];
+
+  [oldMockCache removeAllObjects];
+  [self assertSuccessReadObject:@100
+                         forKey:@"test-key1"
+                          class:[NSNumber class]
+                  existsInCache:NO
+                    fromStorage:(GULKeychainStorage *)oldKeychainStorage
+                  withMockCache:oldMockCache];
+}
+
 #pragma mark - Common
 
-- (void)assertSuccessWriteObject:(id<NSSecureCoding>)object forKey:(NSString *)key {
-  OCMExpect([self.mockCache setObject:object forKey:key]).andForwardToRealObject();
+- (void)assertSuccessWriteObject:(id<NSSecureCoding>)object
+                          forKey:(NSString *)key
+                       toStorage:(GULKeychainStorage *)storage
+                   withMockCache:(id)mockCache {
+  OCMExpect([mockCache setObject:object forKey:key]).andForwardToRealObject();
 
-  FBLPromise<NSNull *> *setPromise = [self.storage setObject:object forKey:key accessGroup:nil];
+  FBLPromise<NSNull *> *setPromise = [storage setObject:object forKey:key accessGroup:nil];
 
   XCTAssert(FBLWaitForPromisesWithTimeout(1));
   XCTAssertNil(setPromise.error, @"%@", self.name);
 
-  OCMVerifyAll(self.mockCache);
+  OCMVerifyAll(mockCache);
 
   // Check in-memory cache.
-  XCTAssertEqualObjects([self.cache objectForKey:key], object);
+  XCTAssertEqualObjects([mockCache objectForKey:key], object);
 }
 
 - (void)assertSuccessReadObject:(id<NSSecureCoding>)object
                          forKey:(NSString *)key
                           class:(Class)class
-                  existsInCache:(BOOL)existisInCache {
-  OCMExpect([self.mockCache objectForKey:key]).andForwardToRealObject();
+                  existsInCache:(BOOL)existisInCache
+                    fromStorage:(GULKeychainStorage *)storage
+                  withMockCache:(id)mockCache {
+  OCMExpect([mockCache objectForKey:key]).andForwardToRealObject();
 
   if (!existisInCache) {
-    OCMExpect([self.mockCache setObject:object forKey:key]).andForwardToRealObject();
+    OCMExpect([mockCache setObject:object forKey:key]).andForwardToRealObject();
   }
 
   FBLPromise<id<NSSecureCoding>> *getPromise =
-      [self.storage getObjectForKey:key objectClass:class accessGroup:nil];
+      [storage getObjectForKey:key objectClass:class accessGroup:nil];
 
   XCTAssert(FBLWaitForPromisesWithTimeout(1), @"%@", self.name);
   XCTAssertEqualObjects(getPromise.value, object, @"%@", self.name);
   XCTAssertNil(getPromise.error, @"%@", self.name);
 
-  OCMVerifyAll(self.mockCache);
+  OCMVerifyAll(mockCache);
 
   // Check in-memory cache.
-  XCTAssertEqualObjects([self.cache objectForKey:key], object, @"%@", self.name);
+  XCTAssertEqualObjects([mockCache objectForKey:key], object, @"%@", self.name);
 }
 
 - (void)assertNonExistingObjectForKey:(NSString *)key class:(Class)class {
