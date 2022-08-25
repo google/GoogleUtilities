@@ -20,7 +20,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// The class provides a convenient abstraction on top of the iOS Keychain API to save data.
+/// The class provides a convenient, multiplatform abstraction of the Keychain.
+///
+/// When using this API on macOS, the corresponding target must be signed with a provisioning
+/// profile that has the Keychain Sharing capability enabled.
 @interface GULKeychainStorage : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
