@@ -62,4 +62,4 @@
 
 @end
 
-#endif  // TARGET_OSX
+#endif  // TARGET_OS_OSX

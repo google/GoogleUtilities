@@ -72,7 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// If not `nil`, then only this keychain will be used to save and read data (see
 /// `kSecMatchSearchList` and `kSecUseKeychain`. It is mostly intended to be used by unit tests.
 @property(nonatomic, nullable) SecKeychainRef keychainRef;
-#endif  // TARGET_OSX
+#endif  // TARGET_OS_OSX
 
 @end
 

@@ -190,7 +190,7 @@
     query[(__bridge NSString *)kSecUseKeychain] = (__bridge id)(self.keychainRef);
     query[(__bridge NSString *)kSecMatchSearchList] = @[ (__bridge id)(self.keychainRef) ];
   }
-#endif  // TARGET_OSX
+#endif  // TARGET_OS_OSX
 
   return query;
 }
