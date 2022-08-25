@@ -16,11 +16,11 @@
 
 #import <TargetConditionals.h>
 
-// Skip keychain tests on macOS. Tests are skipped because the implementation
-// used to interact with the keychain requires signing with a provisioning
-// profile that has the Keychain Sharing capability enabled.
+// Skip keychain tests on Catalyst and macOS. Tests are skipped because the
+// implementation used to interact with the keychain requires signing with
+// a provisioning profile that has the Keychain Sharing capability enabled.
 // See go/firebase-macos-keychain-popups for more details.
-#if !TARGET_OS_OSX
+#if !TARGET_OS_MACCATALYST && !TARGET_OS_OSX
 
 // Keychain tests require a host app and Swift Package Manager does not
 // support adding a host app to test targets.
@@ -215,4 +215,4 @@
 @end
 
 #endif  // SWIFT_PACKAGE
-#endif  // !TARGET_OS_OSX
+#endif  // !TARGET_OS_MACCATALYST && !TARGET_OS_OSX
