@@ -10,6 +10,10 @@ on:
 env:
   METRICS_SERVICE_SECRET: ${{ secrets.GHASecretsGPGPassphrase1 }}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pod_lib_lint:
     if: github.repository == 'google/GoogleUtilities' && (github.event.action == 'synchronize' || github.event.action == 'opened' || github.event.pull_request.merged)
