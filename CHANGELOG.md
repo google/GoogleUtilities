@@ -1,3 +1,6 @@
+# 7.8.0
+- Prevent keychain access from prompting user for permissions on macOS. (#75)
+
 # 7.7.1
 - Swift Package Manager only release. Unify OCMock dependency with Firebase
   repo. (https://github.com/firebase/firebase-ios-sdk/issues/9591)
