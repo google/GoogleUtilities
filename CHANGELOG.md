@@ -1,5 +1,8 @@
 # 7.8.0
-- Prevent keychain access from prompting user for permissions on macOS. (#75)
+- Prevent keychain access from prompting user for permissions on macOS. Using
+  GoogleUtilities's keychain wrapper API **on macOS** now requires that the
+  target be signed with a provisioning profile that has the Keychain Sharing
+  capability enabled. (#75)
 
 # 7.7.1
 - Swift Package Manager only release. Unify OCMock dependency with Firebase
