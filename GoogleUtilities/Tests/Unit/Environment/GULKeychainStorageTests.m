@@ -15,12 +15,16 @@
  */
 
 #import <TargetConditionals.h>
-#if !TARGET_OS_MACCATALYST
-// Skip keychain tests on Catalyst.
 
+// Skip keychain tests on Catalyst and macOS. Tests are skipped because the
+// implementation used to interact with the keychain requires signing with
+// a provisioning profile that has the Keychain Sharing capability enabled.
+// See go/firebase-macos-keychain-popups for more details.
+#if !TARGET_OS_MACCATALYST && !TARGET_OS_OSX
+
+// Keychain tests require a host app and Swift Package Manager does not
+// support adding a host app to test targets.
 #if !SWIFT_PACKAGE
-// TODO: Investigate why keychain tests fail on iOS with Swift Package Manager.
-// Keychain tests need a host app.
 
 #import <XCTest/XCTest.h>
 
@@ -42,7 +46,7 @@
 
 #if TARGET_OS_OSX
 @property(nonatomic) GULTestKeychain *privateKeychain;
-#endif  // TARGET_OSX
+#endif  // TARGET_OS_OSX
 
 @end
 
@@ -57,7 +61,7 @@
 #if TARGET_OS_OSX
   self.privateKeychain = [[GULTestKeychain alloc] init];
   self.storage.keychainRef = self.privateKeychain.testKeychainRef;
-#endif  // TARGET_OSX
+#endif  // TARGET_OS_OSX
 }
 
 - (void)tearDown {
@@ -67,7 +71,7 @@
 
 #if TARGET_OS_OSX
   self.privateKeychain = nil;
-#endif  // TARGET_OSX
+#endif  // TARGET_OS_OSX
 }
 
 - (void)testSetGetObjectForKey {
@@ -211,4 +215,4 @@
 @end
 
 #endif  // SWIFT_PACKAGE
-#endif  // TARGET_OS_MACCATALYST
+#endif  // !TARGET_OS_MACCATALYST && !TARGET_OS_OSX
