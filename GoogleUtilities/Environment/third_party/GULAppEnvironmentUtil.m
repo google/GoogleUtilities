@@ -323,8 +323,10 @@ static BOOL HasEmbeddedMobileProvision() {
   NSString *deploymentType = @"carthage";
 #elif FIREBASE_BUILD_ZIP_FILE
   NSString *deploymentType = @"zip";
-#else
+#elif COCOAPODS
   NSString *deploymentType = @"cocoapods";
+#else
+  NSString *deploymentType = @"unknown";
 #endif
 
   return deploymentType;
