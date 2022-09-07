@@ -1,4 +1,6 @@
 # 7.8.0
+- Update `+ [GULAppEnvironmentUtil deploymentType]` API to fall back to 
+  `unknown` instead of `cocoapods`. (#79)
 - Prevent keychain access from prompting user for permissions on macOS. Using
   GoogleUtilities's keychain wrapper API **on macOS** now requires that the
   target be signed with a provisioning profile that has the Keychain Sharing
