@@ -70,7 +70,6 @@ let package = Package(
       .revision("c5eeaa6dde7c308a5ce48ae4d4530462dd3a1110")
     ),
   ],
-  // TODO: Restructure directory structure to simplify the excludes here.
   targets: [
     .target(
       name: "GoogleUtilities_AppDelegateSwizzler",
@@ -79,17 +78,7 @@ let package = Package(
                      "GoogleUtilities_Network"],
       path: "GoogleUtilities",
       exclude: [
-        "AppDelegateSwizzler/README.md",
-        "Environment/",
-        "Network/",
-        "ISASwizzler/",
-        "Logger/",
-        "MethodSwizzler/",
-        "NSData+zlib/",
-        "Reachability",
-        "SwizzlerTestHelpers/",
-        "Tests",
-        "UserDefaults/",
+        "AppDelegateSwizzler/README.md"
       ],
       sources: [
         "AppDelegateSwizzler/",
