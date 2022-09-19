@@ -21,6 +21,10 @@
 #import <sys/utsname.h>
 #import <objc/runtime.h>
 
+#if TARGET_OS_IOS
+#import <UIKit/UIKit.h>
+#endif  // TARGET_OS_IOS
+
 /// The encryption info struct and constants are missing from the iPhoneSimulator SDK, but not from
 /// the iPhoneOS or Mac OS X SDKs. Since one doesn't ever ship a Simulator binary, we'll just
 /// provide the definitions here.
@@ -239,6 +243,9 @@ static BOOL HasEmbeddedMobileProvision() {
 }
 
 + (NSString *)systemVersion {
+#if TARGET_OS_IOS
+  return [UIDevice currentDevice].systemVersion;
+#elif TARGET_OS_OSX || TARGET_OS_TV || TARGET_OS_WATCH
   // Assemble the systemVersion, excluding the patch version if it's 0.
   NSOperatingSystemVersion osVersion = [NSProcessInfo processInfo].operatingSystemVersion;
   NSMutableString *versionString = [[NSMutableString alloc]
@@ -247,6 +254,7 @@ static BOOL HasEmbeddedMobileProvision() {
     [versionString appendFormat:@".%ld", (long)osVersion.patchVersion];
   }
   return versionString;
+#endif
 }
 
 + (BOOL)isAppExtension {
