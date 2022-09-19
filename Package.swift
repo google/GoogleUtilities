@@ -78,7 +78,7 @@ let package = Package(
                      "GoogleUtilities_Network"],
       path: "GoogleUtilities",
       exclude: [
-        "AppDelegateSwizzler/README.md"
+        "AppDelegateSwizzler/README.md",
       ],
       sources: [
         "AppDelegateSwizzler/",
