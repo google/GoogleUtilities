@@ -42,14 +42,16 @@ NS_ASSUME_NONNULL_BEGIN
 /// Indicates whether it is running inside an extension or an app.
 + (BOOL)isAppExtension;
 
+// TODO(v8): Remove this API.
 /// @return Returns @YES when is run on iOS version greater or equal to 7.0
 + (BOOL)isIOS7OrHigher DEPRECATED_MSG_ATTRIBUTE(
     "Always `YES` because only iOS 8 and higher supported. The method will be removed.");
 
+// TODO(v8): Remove this API.
 /// @return YES if Swift runtime detected in the app.
 + (BOOL)hasSwiftRuntime __deprecated;
 
-/// @return An Apple platform. Possible values "ios", "tvos", "macos", "watchos", "maccatalyst".
+/// @return An Apple platform. Possible values "ios", "tvos", "macos", "watchos", and "maccatalyst".
 + (NSString *)applePlatform;
 
 /// @return The way the library was added to the app, e.g. "swiftpm", "cocoapods", etc.

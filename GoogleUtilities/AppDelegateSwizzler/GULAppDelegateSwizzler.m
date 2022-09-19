@@ -763,7 +763,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
 - (void)application:(GULApplication *)application
     handleEventsForBackgroundURLSession:(NSString *)identifier
-                      completionHandler:(void (^)())completionHandler API_AVAILABLE(ios(7.0)) {
+                      completionHandler:(void (^)())completionHandler {
 #pragma clang diagnostic pop
   SEL methodSelector = @selector(application:
          handleEventsForBackgroundURLSession:completionHandler:);

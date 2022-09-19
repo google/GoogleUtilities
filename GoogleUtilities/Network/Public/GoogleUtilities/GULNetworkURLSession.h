@@ -29,7 +29,7 @@ typedef void (^GULNetworkURLSessionCompletionHandler)(NSHTTPURLResponse *_Nullab
                                                       NSError *_Nullable error);
 typedef void (^GULNetworkSystemCompletionHandler)(void);
 
-/// The protocol that uses NSURLSession for iOS >= 7.0 to handle requests and responses.
+/// The type that wraps `NSURLSession` to handle requests and responses.
 @interface GULNetworkURLSession : NSObject
 
 /// Indicates whether the background network is enabled. Default value is NO.
