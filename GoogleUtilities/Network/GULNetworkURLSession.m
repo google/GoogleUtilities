@@ -394,7 +394,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         trustError = SecTrustEvaluate(serverTrust, &trustEval);
-#pragma clang dianostic pop
+#pragma clang diagnostic pop
       }
 
       if (trustError != errSecSuccess) {
