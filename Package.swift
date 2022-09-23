@@ -23,43 +23,43 @@ let package = Package(
   products: [
     .library(
       name: "GULAppDelegateSwizzler",
-      targets: ["GoogleUtilities_AppDelegateSwizzler"]
+      targets: ["GoogleUtilities-AppDelegateSwizzler"]
     ),
     .library(
       name: "GULEnvironment",
-      targets: ["GoogleUtilities_Environment"]
+      targets: ["GoogleUtilities-Environment"]
     ),
     .library(
       name: "GULLogger",
-      targets: ["GoogleUtilities_Logger"]
+      targets: ["GoogleUtilities-Logger"]
     ),
     .library(
       name: "GULISASwizzler",
-      targets: ["GoogleUtilities_ISASwizzler"]
+      targets: ["GoogleUtilities-ISASwizzler"]
     ),
     .library(
       name: "GULMethodSwizzler",
-      targets: ["GoogleUtilities_MethodSwizzler"]
+      targets: ["GoogleUtilities-MethodSwizzler"]
     ),
     .library(
       name: "GULNetwork",
-      targets: ["GoogleUtilities_Network"]
+      targets: ["GoogleUtilities-Network"]
     ),
     .library(
       name: "GULNSData",
-      targets: ["GoogleUtilities_NSData"]
+      targets: ["GoogleUtilities-NSData"]
     ),
     .library(
       name: "GULReachability",
-      targets: ["GoogleUtilities_Reachability"]
+      targets: ["GoogleUtilities-Reachability"]
     ),
     .library(
       name: "GULSwizzlerTestHelpers",
-      targets: ["GoogleUtilities_SwizzlerTestHelpers"]
+      targets: ["GoogleUtilities-SwizzlerTestHelpers"]
     ),
     .library(
       name: "GULUserDefaults",
-      targets: ["GoogleUtilities_UserDefaults"]
+      targets: ["GoogleUtilities-UserDefaults"]
     ),
   ],
   dependencies: [
@@ -73,10 +73,10 @@ let package = Package(
   // TODO: Restructure directory structure to simplify the excludes here.
   targets: [
     .target(
-      name: "GoogleUtilities_AppDelegateSwizzler",
-      dependencies: ["GoogleUtilities_Environment",
-                     "GoogleUtilities_Logger",
-                     "GoogleUtilities_Network"],
+      name: "GoogleUtilities-AppDelegateSwizzler",
+      dependencies: ["GoogleUtilities-Environment",
+                     "GoogleUtilities-Logger",
+                     "GoogleUtilities-Network"],
       path: "GoogleUtilities",
       exclude: [
         "AppDelegateSwizzler/README.md",
@@ -101,7 +101,7 @@ let package = Package(
       ]
     ),
     .target(
-      name: "GoogleUtilities_Environment",
+      name: "GoogleUtilities-Environment",
       dependencies: [.product(name: "FBLPromises", package: "Promises")],
       path: "GoogleUtilities/Environment",
       exclude: ["third_party/LICENSE"],
@@ -112,8 +112,8 @@ let package = Package(
     ),
 
     .target(
-      name: "GoogleUtilities_Logger",
-      dependencies: ["GoogleUtilities_Environment"],
+      name: "GoogleUtilities-Logger",
+      dependencies: ["GoogleUtilities-Environment"],
       path: "GoogleUtilities/Logger",
       publicHeadersPath: "Public",
       cSettings: [
@@ -122,8 +122,8 @@ let package = Package(
     ),
 
     .target(
-      name: "GoogleUtilities_ISASwizzler",
-      dependencies: ["GoogleUtilities_Logger"],
+      name: "GoogleUtilities-ISASwizzler",
+      dependencies: ["GoogleUtilities-Logger"],
       path: "GoogleUtilities/ISASwizzler",
       publicHeadersPath: "Public",
       cSettings: [
@@ -132,8 +132,8 @@ let package = Package(
     ),
 
     .target(
-      name: "GoogleUtilities_MethodSwizzler",
-      dependencies: ["GoogleUtilities_Logger"],
+      name: "GoogleUtilities-MethodSwizzler",
+      dependencies: ["GoogleUtilities-Logger"],
       path: "GoogleUtilities/MethodSwizzler",
       publicHeadersPath: "Public",
       cSettings: [
@@ -141,10 +141,10 @@ let package = Package(
       ]
     ),
     .target(
-      name: "GoogleUtilities_Network",
-      dependencies: ["GoogleUtilities_Logger",
-                     "GoogleUtilities_NSData",
-                     "GoogleUtilities_Reachability"],
+      name: "GoogleUtilities-Network",
+      dependencies: ["GoogleUtilities-Logger",
+                     "GoogleUtilities-NSData",
+                     "GoogleUtilities-Reachability"],
       path: "GoogleUtilities/Network",
       publicHeadersPath: "Public",
       cSettings: [
@@ -152,7 +152,7 @@ let package = Package(
       ]
     ),
     .target(
-      name: "GoogleUtilities_NSData",
+      name: "GoogleUtilities-NSData",
       path: "GoogleUtilities/NSData+zlib",
       publicHeadersPath: "Public",
       cSettings: [
@@ -163,8 +163,8 @@ let package = Package(
       ]
     ),
     .target(
-      name: "GoogleUtilities_Reachability",
-      dependencies: ["GoogleUtilities_Logger"],
+      name: "GoogleUtilities-Reachability",
+      dependencies: ["GoogleUtilities-Logger"],
       path: "GoogleUtilities/Reachability",
       publicHeadersPath: "Public",
       cSettings: [
@@ -172,8 +172,8 @@ let package = Package(
       ]
     ),
     .target(
-      name: "GoogleUtilities_UserDefaults",
-      dependencies: ["GoogleUtilities_Logger"],
+      name: "GoogleUtilities-UserDefaults",
+      dependencies: ["GoogleUtilities-Logger"],
       path: "GoogleUtilities/UserDefaults",
       publicHeadersPath: "Public",
       cSettings: [
@@ -181,8 +181,8 @@ let package = Package(
       ]
     ),
     .target(
-      name: "GoogleUtilities_SwizzlerTestHelpers",
-      dependencies: ["GoogleUtilities_MethodSwizzler"],
+      name: "GoogleUtilities-SwizzlerTestHelpers",
+      dependencies: ["GoogleUtilities-MethodSwizzler"],
       path: "GoogleUtilities/SwizzlerTestHelpers",
       publicHeadersPath: "Public",
       cSettings: [
@@ -192,30 +192,30 @@ let package = Package(
     .testTarget(
       name: "swift-test",
       dependencies: [
-        "GoogleUtilities_AppDelegateSwizzler",
-        "GoogleUtilities_Environment",
-        "GoogleUtilities_ISASwizzler",
-        "GoogleUtilities_Logger",
-        "GoogleUtilities_MethodSwizzler",
-        "GoogleUtilities_Network",
-        "GoogleUtilities_NSData",
-        "GoogleUtilities_Reachability",
-        "GoogleUtilities_UserDefaults",
+        "GoogleUtilities-AppDelegateSwizzler",
+        "GoogleUtilities-Environment",
+        "GoogleUtilities-ISASwizzler",
+        "GoogleUtilities-Logger",
+        "GoogleUtilities-MethodSwizzler",
+        "GoogleUtilities-Network",
+        "GoogleUtilities-NSData",
+        "GoogleUtilities-Reachability",
+        "GoogleUtilities-UserDefaults",
       ],
       path: "SwiftPMTests/swift-test"
     ),
     .testTarget(
       name: "objc-import-test",
       dependencies: [
-        "GoogleUtilities_AppDelegateSwizzler",
-        "GoogleUtilities_Environment",
-        "GoogleUtilities_ISASwizzler",
-        "GoogleUtilities_Logger",
-        "GoogleUtilities_MethodSwizzler",
-        "GoogleUtilities_Network",
-        "GoogleUtilities_NSData",
-        "GoogleUtilities_Reachability",
-        "GoogleUtilities_UserDefaults",
+        "GoogleUtilities-AppDelegateSwizzler",
+        "GoogleUtilities-Environment",
+        "GoogleUtilities-ISASwizzler",
+        "GoogleUtilities-Logger",
+        "GoogleUtilities-MethodSwizzler",
+        "GoogleUtilities-Network",
+        "GoogleUtilities-NSData",
+        "GoogleUtilities-Reachability",
+        "GoogleUtilities-UserDefaults",
       ],
       path: "SwiftPMTests/objc-import-test"
     ),
@@ -224,16 +224,16 @@ let package = Package(
       name: "UtilitiesUnit",
       dependencies: [
         "OCMock",
-        "GoogleUtilities_AppDelegateSwizzler",
-        "GoogleUtilities_Environment",
-        "GoogleUtilities_ISASwizzler",
-        "GoogleUtilities_Logger",
-        "GoogleUtilities_MethodSwizzler",
-        "GoogleUtilities_Network",
-        "GoogleUtilities_NSData",
-        "GoogleUtilities_Reachability",
-        "GoogleUtilities_UserDefaults",
-        "GoogleUtilities_SwizzlerTestHelpers",
+        "GoogleUtilities-AppDelegateSwizzler",
+        "GoogleUtilities-Environment",
+        "GoogleUtilities-ISASwizzler",
+        "GoogleUtilities-Logger",
+        "GoogleUtilities-MethodSwizzler",
+        "GoogleUtilities-Network",
+        "GoogleUtilities-NSData",
+        "GoogleUtilities-Reachability",
+        "GoogleUtilities-UserDefaults",
+        "GoogleUtilities-SwizzlerTestHelpers",
       ],
       path: "GoogleUtilities/Tests/Unit",
       exclude: [
