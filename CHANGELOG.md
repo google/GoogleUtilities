@@ -1,3 +1,7 @@
+# 7.9.0 (Swift PM)
+- Don't use underscores in SPM target names. This fixes an App Store submission
+  issue for SPM builds that dynamically link (firebase-ios-sdk/#9912). (#83)
+
 # 7.8.0
 - Update `+ [GULAppEnvironmentUtil deploymentType]` API to fall back to
   `unknown` instead of `cocoapods`. (#79)
