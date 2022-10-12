@@ -357,6 +357,7 @@
                                      value:nil
                                association:GUL_ASSOCIATION_RETAIN];
   }
+  XCTAssertNil(weakSwizzler);
 
   // Clean up.
   objc_disposeClassPair(generatedClass);
