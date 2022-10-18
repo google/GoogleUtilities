@@ -103,4 +103,33 @@
   XCTAssertEqualObjects([GULAppEnvironmentUtil applePlatform], expectedPlatform);
 }
 
+- (void)testAppleDevicePlatform {
+  // When a Catalyst app is run on macOS then both `TARGET_OS_MACCATALYST` and `TARGET_OS_IOS` are
+  // `true`.
+#if TARGET_OS_MACCATALYST
+  NSString *expectedPlatform = @"maccatalyst";
+#elif TARGET_OS_IOS
+  NSString *expectedPlatform = @"ios";
+
+  if ([[UIDevice currentDevice].model.lowercaseString containsString:@"ipad"] ||
+      [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    expectedPlatform = @"ipados";
+  }
+#endif  // TARGET_OS_MACCATALYST
+
+#if TARGET_OS_TV
+  NSString *expectedPlatform = @"tvos";
+#endif  // TARGET_OS_TV
+
+#if TARGET_OS_OSX
+  NSString *expectedPlatform = @"macos";
+#endif  // TARGET_OS_OSX
+
+#if TARGET_OS_WATCH
+  NSString *expectedPlatform = @"watchos";
+#endif  // TARGET_OS_WATCH
+
+  XCTAssertEqualObjects([GULAppEnvironmentUtil appleDevicePlatform], expectedPlatform);
+}
+
 @end

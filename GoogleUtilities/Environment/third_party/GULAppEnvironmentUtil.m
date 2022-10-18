@@ -316,6 +316,22 @@ static BOOL HasEmbeddedMobileProvision() {
   return applePlatform;
 }
 
++ (NSString *)appleDevicePlatform {
+  NSString* firebasePlatform = [GULAppEnvironmentUtil applePlatform];
+#if TARGET_OS_IOS
+  // This check is necessary because iOS-only apps running on iPad
+  // will report UIUserInterfaceIdiomPhone via UI_USER_INTERFACE_IDIOM().
+  if ([firebasePlatform isEqualToString:@"ios"] &&
+      ([[UIDevice currentDevice].model.lowercaseString containsString:@"ipad"] ||
+       [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)) {
+    return @"ipados";
+  }
+#endif
+
+  return firebasePlatform;
+}
+
+
 + (NSString *)deploymentType {
 #if SWIFT_PACKAGE
   NSString *deploymentType = @"swiftpm";
