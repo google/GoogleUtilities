@@ -331,7 +331,6 @@ static BOOL HasEmbeddedMobileProvision() {
   return firebasePlatform;
 }
 
-
 + (NSString *)deploymentType {
 #if SWIFT_PACKAGE
   NSString *deploymentType = @"swiftpm";
