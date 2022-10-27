@@ -25,8 +25,6 @@
 #import <UIKit/UIKit.h>
 #endif
 
-#define FIRCLS_HOST_SYSCTL_BUFFER_SIZE (128)
-
 /// The encryption info struct and constants are missing from the iPhoneSimulator SDK, but not from
 /// the iPhoneOS or Mac OS X SDKs. Since one doesn't ever ship a Simulator binary, we'll just
 /// provide the definitions here.
@@ -254,31 +252,34 @@ static BOOL HasEmbeddedMobileProvision() {
 }
 
 + (NSString *)deviceSimulatorModel {
-  NSString *model = nil;
+  static dispatch_once_t once;
+  static NSString *model = nil;
 
+  dispatch_once(&once, ^{
 #if TARGET_OS_SIMULATOR
 #if TARGET_OS_WATCH
-  model = @"watchOS Simulator";
+    model = @"watchOS Simulator";
 #elif TARGET_OS_TV
-  model = @"tvOS Simulator";
+    model = @"tvOS Simulator";
 #elif TARGET_OS_IPHONE
-  switch ([[UIDevice currentDevice] userInterfaceIdiom]) {
-    case UIUserInterfaceIdiomPhone:
-      model = @"iOS Simulator (iPhone)";
-      break;
-    case UIUserInterfaceIdiomPad:
-      model = @"iOS Simulator (iPad)";
-      break;
-    default:
-      model = @"iOS Simulator (Unknown)";
-      break;
-  }
+    switch ([[UIDevice currentDevice] userInterfaceIdiom]) {
+      case UIUserInterfaceIdiomPhone:
+        model = @"iOS Simulator (iPhone)";
+        break;
+      case UIUserInterfaceIdiomPad:
+        model = @"iOS Simulator (iPad)";
+        break;
+      default:
+        model = @"iOS Simulator (Unknown)";
+        break;
+    }
 #endif
 #elif TARGET_OS_EMBEDDED
-  model = [GULAppEnvironmentUtil getSysctlEntry:"hw.machine"];
+    model = [GULAppEnvironmentUtil getSysctlEntry:"hw.machine"];
 #else
-  model = [GULAppEnvironmentUtil getSysctlEntry:"hw.model"];
+    model = [GULAppEnvironmentUtil getSysctlEntry:"hw.model"];
 #endif
+  });
 
   return model;
 }
