@@ -17,7 +17,7 @@ jobs:
       matrix:
         target: [ios, tvos, macos]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Setup Bundler
@@ -30,7 +30,7 @@ jobs:
   catalyst:
     runs-on: macOS-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Setup Bundler
@@ -51,7 +51,7 @@ jobs:
         ]
     needs: pod-lib-lint
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Setup Bundler
