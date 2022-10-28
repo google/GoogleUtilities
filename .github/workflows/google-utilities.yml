@@ -18,6 +18,8 @@ jobs:
         target: [ios, tvos, macos]
     steps:
     - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "2.7"
     - uses: actions/checkout@v3
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
