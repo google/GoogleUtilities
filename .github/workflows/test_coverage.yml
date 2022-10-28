@@ -22,6 +22,7 @@ jobs:
       matrix:
         target: [ios]
     steps:
+    - uses: ruby/setup-ruby@v1
     - uses: actions/checkout@v3
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
