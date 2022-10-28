@@ -32,8 +32,8 @@ jobs:
     runs-on: macOS-latest
     steps:
     - uses: ruby/setup-ruby@v1
-    with:
-      ruby-version: "2.7"
+      with:
+        ruby-version: "2.7"
     - uses: actions/checkout@v3
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
@@ -56,8 +56,8 @@ jobs:
     needs: pod-lib-lint
     steps:
     - uses: ruby/setup-ruby@v1
-    with:
-      ruby-version: "2.7"
+      with:
+        ruby-version: "2.7"
     - uses: actions/checkout@v3
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
