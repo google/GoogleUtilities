@@ -15,7 +15,6 @@ jobs:
     env:
       MINT_PATH: ${{ github.workspace }}/mint
     steps:
-    - uses: ruby/setup-ruby@v1
     - uses: actions/checkout@v3
 
     - uses: actions/setup-python@v2
