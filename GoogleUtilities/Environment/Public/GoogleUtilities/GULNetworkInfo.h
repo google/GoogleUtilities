@@ -42,7 +42,9 @@ typedef NS_ENUM(NSInteger, GULNetworkType) {
 + (NSString *_Nullable)formatMcc:(NSString *_Nullable)mcc andMNC:(NSString *_Nullable)mnc;
 
 /// Returns an enum indicating the network type. The enum values should be easily transferrable to
-/// the NetworkType value in android/play/playlog/proto/clientanalytics.proto
+/// the NetworkType value in android/play/playlog/proto/clientanalytics.proto. Right now this always
+/// returns None on platforms other than iOS. This should be updated in the future to return Wi-Fi
+/// values for the other platforms when applicable.
 + (GULNetworkType)getNetworkType;
 
 /// Returns a string indicating the radio access technology used by the app. The return value will

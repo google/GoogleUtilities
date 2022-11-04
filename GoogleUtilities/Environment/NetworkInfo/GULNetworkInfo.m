@@ -85,11 +85,16 @@
 + (GULNetworkType)getNetworkType {
   GULNetworkType networkType = GULNetworkTypeNone;
 
+#ifdef TARGET_HAS_MOBILE_CONNECTIVITY
   static SCNetworkReachabilityRef reachabilityRef = 0;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     reachabilityRef = SCNetworkReachabilityCreateWithName(kCFAllocatorSystemDefault, "google.com");
   });
+
+  if (!reachabilityRef) {
+    return GULNetworkTypeNone;
+  }
 
   SCNetworkReachabilityFlags reachabilityFlags = 0;
   SCNetworkReachabilityGetFlags(reachabilityRef, &reachabilityFlags);
@@ -102,13 +107,18 @@
       networkType = GULNetworkTypeWIFI;
     }
   }
+#endif
 
   return networkType;
 }
 
 + (NSString *)getNetworkRadioType {
+#ifdef TARGET_HAS_MOBILE_CONNECTIVITY
   CTTelephonyNetworkInfo *networkInfo = [GULNetworkInfo getNetworkInfo];
   return networkInfo.currentRadioAccessTechnology;
+#else
+  return @"";
+#endif
 }
 
 @end
