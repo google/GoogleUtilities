@@ -16,12 +16,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import <SystemConfiguration/SystemConfiguration.h>
-
 #import <TargetConditionals.h>
 #if __has_include("CoreTelephony/CTTelephonyNetworkInfo.h") && !TARGET_OS_MACCATALYST && \
-                  !TARGET_OS_OSX && !TARGET_OS_TV
+                  !TARGET_OS_OSX && !TARGET_OS_TV && !TARGET_OS_WATCH
 #define TARGET_HAS_MOBILE_CONNECTIVITY
+#import <SystemConfiguration/SystemConfiguration.h>
 #import <CoreTelephony/CTCarrier.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #endif
