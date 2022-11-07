@@ -42,6 +42,9 @@ other Google CocoaPods. They're not intended for direct public usage.
     es.frameworks = [
       'Security'
     ]
+    es.ios.frameworks = [
+      'CoreTelephony',
+    ]
   end
 
   s.subspec 'Logger' do |ls|
