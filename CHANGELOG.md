@@ -1,4 +1,4 @@
-# 7.10.0 (Swift PM)
+# 7.10.0
 - Added Network Utility. (#91)
 - Added a few utility functions for Firebase Performance and FirebaseSession SDKs. (#89, #90)
 
