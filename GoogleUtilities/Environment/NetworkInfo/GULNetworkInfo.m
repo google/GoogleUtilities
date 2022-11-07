@@ -57,6 +57,12 @@
   return nil;
 }
 
+/**
+ * Returns the formatted MccMnc if the inputs are valid, otherwise nil
+ * @param mcc The Mobile Country Code returned from `getNetworkMobileCountryCode`
+ * @param mnc The Mobile Network Code returned from `getNetworkMobileNetworkCode`
+ * @returns A string with the concatenated mccMnc if both inputs are valid, otherwise nil
+ */
 + (NSString *_Nullable)formatMcc:(NSString *)mcc andMNC:(NSString *)mnc {
   // These are both nil if the target does not support mobile connectivity
   if (mcc == nil && mnc == nil) {
