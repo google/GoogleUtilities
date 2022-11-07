@@ -43,7 +43,6 @@ other Google CocoaPods. They're not intended for direct public usage.
       'Security'
     ]
     es.ios.frameworks = [
-      'SCNetworkReachability',
       'CoreTelephony',
     ]
   end
