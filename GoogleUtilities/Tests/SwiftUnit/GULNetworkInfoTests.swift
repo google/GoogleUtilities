@@ -18,7 +18,6 @@ import XCTest
 @testable import GoogleUtilities
 
 class GULNetworkInfoTests: XCTestCase {
-
   func test_mccMNC_validatesCorrectly() {
     let expectations: [(mobileCountryCode: String, mobileNetworkCode: String, expected: String)] = [
       ("310", "004", "310004"),
