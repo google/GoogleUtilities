@@ -1,3 +1,7 @@
+# 7.10.0
+- Added Network Utility. (#91)
+- Added a few utility functions for Firebase Performance and FirebaseSession SDKs. (#89, #90)
+
 # 7.9.0 (Swift PM)
 - Don't use underscores in SPM target names. This fixes an App Store submission
   issue for SPM builds that dynamically link (firebase-ios-sdk/#9912). (#83)
