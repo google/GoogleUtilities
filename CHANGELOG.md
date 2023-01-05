@@ -1,3 +1,7 @@
+# 7.11.0
+- Add a new POST API in GULNetwork to support HTTP headers. (#99)
+- Fix iOS 12 deprecation warnings. (#98)
+
 # 7.10.0
 - Added Network Utility. (#91)
 - Added a few utility functions for Firebase Performance and FirebaseSession SDKs. (#89, #90)
