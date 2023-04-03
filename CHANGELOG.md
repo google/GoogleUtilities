@@ -1,3 +1,6 @@
+# 7.11.1
+- Fix Xcode 14.3 build warnings.
+
 # 7.11.0
 - Add a new POST API in GULNetwork to support HTTP headers. (#99)
 - Fix iOS 12 deprecation warnings. (#98)
