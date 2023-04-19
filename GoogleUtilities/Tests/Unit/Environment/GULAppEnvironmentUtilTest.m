@@ -38,30 +38,26 @@
   [_processInfoMock stopMocking];
 }
 
-// Remove the #if when iOS can remove iOS 7 support and also use processInfo instead of UIKit.
-#if TARGET_OS_OSX || TARGET_OS_TV
-
 - (void)testSystemVersionInfoMajorOnly {
   NSOperatingSystemVersion osTen = {.majorVersion = 10, .minorVersion = 0, .patchVersion = 0};
   OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTen);
 
-  XCTAssertTrue([[GULAppEnvironmentUtil systemVersion] isEqualToString:@"10.0"]);
+  XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.0");
 }
 
 - (void)testSystemVersionInfoMajorMinor {
   NSOperatingSystemVersion osTenTwo = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 0};
   OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwo);
 
-  XCTAssertTrue([[GULAppEnvironmentUtil systemVersion] isEqualToString:@"10.2"]);
+  XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2");
 }
 
 - (void)testSystemVersionInfoMajorMinorPatch {
   NSOperatingSystemVersion osTenTwoOne = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 1};
   OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwoOne);
 
-  XCTAssertTrue([[GULAppEnvironmentUtil systemVersion] isEqualToString:@"10.2.1"]);
+  XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2.1");
 }
-#endif
 
 - (void)testDeploymentType {
 #if SWIFT_PACKAGE
@@ -80,25 +76,19 @@
 }
 
 - (void)testApplePlatform {
-  // When a Catalyst app is run on macOS then both `TARGET_OS_MACCATALYST` and `TARGET_OS_IOS` are
-  // `true`.
+  // The below ordering is important. For example, both `TARGET_OS_MACCATALYST`
+  // and `TARGET_OS_IOS` are `true` when building a macCatalyst app.
 #if TARGET_OS_MACCATALYST
   NSString *expectedPlatform = @"maccatalyst";
 #elif TARGET_OS_IOS
   NSString *expectedPlatform = @"ios";
-#endif  // TARGET_OS_MACCATALYST
-
-#if TARGET_OS_TV
+#elif TARGET_OS_TV
   NSString *expectedPlatform = @"tvos";
-#endif  // TARGET_OS_TV
-
-#if TARGET_OS_OSX
+#elif TARGET_OS_OSX
   NSString *expectedPlatform = @"macos";
-#endif  // TARGET_OS_OSX
-
-#if TARGET_OS_WATCH
+#elif TARGET_OS_WATCH
   NSString *expectedPlatform = @"watchos";
-#endif  // TARGET_OS_WATCH
+#endif  // TARGET_OS_MACCATALYST
 
   XCTAssertEqualObjects([GULAppEnvironmentUtil applePlatform], expectedPlatform);
 }
