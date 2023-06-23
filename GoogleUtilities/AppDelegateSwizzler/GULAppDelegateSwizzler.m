@@ -720,7 +720,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 
 #endif  // TARGET_OS_IOS || TARGET_OS_TV
 
-#if TARGET_OS_IOS
+#if TARGET_OS_IOS && !TARGET_OS_XR
 
 - (BOOL)application:(GULApplication *)application
               openURL:(NSURL *)url
@@ -753,7 +753,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   return returnedValue;
 }
 
-#endif  // TARGET_OS_IOS
+#endif  // TARGET_OS_IOS && !TARGET_OS_XR
 
 #pragma mark - [Donor Methods] Network overridden handler methods
 
