@@ -1,3 +1,6 @@
+# 7.11.2 (SwiftPM Only)
+- Fix build errors on the visionOS platform. (#108)
+
 # 7.11.1
 - Fix Xcode 14.3 build warnings.
 

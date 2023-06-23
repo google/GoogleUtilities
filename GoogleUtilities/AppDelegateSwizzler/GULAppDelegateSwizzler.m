@@ -720,7 +720,9 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 
 #endif  // TARGET_OS_IOS || TARGET_OS_TV
 
-#if TARGET_OS_IOS
+// TODO(Xcode 15): When Xcode 15 is the minimum supported Xcode version,
+// it will be unnecessary to check if `TARGET_OS_XR` is defined.
+#if TARGET_OS_IOS && (!defined(TARGET_OS_XR) || !TARGET_OS_XR)
 
 - (BOOL)application:(GULApplication *)application
               openURL:(NSURL *)url
@@ -753,7 +755,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   return returnedValue;
 }
 
-#endif  // TARGET_OS_IOS
+#endif  // TARGET_OS_IOS && (!defined(TARGET_OS_XR) || !TARGET_OS_XR)
 
 #pragma mark - [Donor Methods] Network overridden handler methods
 
