@@ -871,8 +871,8 @@ static BOOL gRespondsToHandleBackgroundSession;
   XCTAssertEqual(testAppDelegate.failToRegisterForRemoteNotificationsError, error);
 }
 
-// TODO(Xcode 15): When Xcode 15 is the minimum supported Xcode version,
-// it will be unnecessary to check if `TARGET_OS_XR` is defined.
+// TODO: Re-enable and adjust accordingly after answering API availability
+// questions outlined in issue #109.
 #if TARGET_OS_IOS && (!defined(TARGET_OS_XR) || !TARGET_OS_XR)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
