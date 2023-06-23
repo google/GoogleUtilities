@@ -35,15 +35,24 @@ class importTest: XCTestCase {
     #endif
     XCTAssertFalse(GULAppEnvironmentUtil.isAppExtension())
 
-    #if os(macOS) || targetEnvironment(macCatalyst)
-      // Device model should now return the appropriate hardware model on macOS.
-      XCTAssertNotEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
-    #else
-      // Device model should show up as x86_64 for iOS, tvOS, and watchOS
-      // simulators.
-      XCTAssertEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
-    #endif
+    XCTAssertEqual(GULAppEnvironmentUtil.deviceModel(), buildArchitecture())
 
     print("System version? Answer: \(GULAppEnvironmentUtil.systemVersion())")
+  }
+
+  func buildArchitecture() -> String {
+    #if arch(arm)
+      return "arm"
+    #elseif arch(arm64)
+      return "arm64"
+    #elseif arch(x86_64)
+      return "x86_64"
+    #else
+      throw TestError(errorDescription: "Unexpected build architecture.")
+    #endif
+  }
+
+  struct TestError: Error {
+    var errorDescription: String?
   }
 }
