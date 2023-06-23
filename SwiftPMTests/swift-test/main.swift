@@ -35,7 +35,14 @@ class importTest: XCTestCase {
     #endif
     XCTAssertFalse(GULAppEnvironmentUtil.isAppExtension())
 
-    XCTAssertEqual(GULAppEnvironmentUtil.deviceModel(), buildArchitecture())
+    #if os(macOS) || targetEnvironment(macCatalyst)
+      // Device model should now return the appropriate hardware model on macOS.
+      XCTAssertNotEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
+    #else
+      // Device model should show up as the host architecture (x86_64 or arm64) for iOS, tvOS,
+      // watchOS, and visionOS simulators.
+      XCTAssertEqual(GULAppEnvironmentUtil.deviceModel(), buildArchitecture())
+    #endif
 
     print("System version? Answer: \(GULAppEnvironmentUtil.systemVersion())")
   }
