@@ -30,27 +30,22 @@ class importTest: XCTestCase {
     XCTAssertFalse(GULAppEnvironmentUtil.isFromAppStore())
     #if targetEnvironment(simulator)
       XCTAssertTrue(GULAppEnvironmentUtil.isSimulator())
-    #else
-      XCTAssertFalse(GULAppEnvironmentUtil.isSimulator())
-    #endif
-    XCTAssertFalse(GULAppEnvironmentUtil.isAppExtension())
-
-    #if os(macOS) || targetEnvironment(macCatalyst)
-      // Device model should now return the appropriate hardware model on macOS.
-      XCTAssertNotEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
-    #else
-      // Device model should show up as the host architecture (x86_64 or arm64) for iOS, tvOS,
+      // Device model should return the host's build architecture (x86_64 or arm64) for iOS, tvOS
       // watchOS, and visionOS simulators.
       XCTAssertEqual(GULAppEnvironmentUtil.deviceModel(), buildArchitecture())
+    #else
+      XCTAssertFalse(GULAppEnvironmentUtil.isSimulator())
+      // Device model should return the appropriate hardware model (e.g., "iPhone12,3" or
+      // "MacBookPro18,2") on real devices.
+      XCTAssertNotEqual(GULAppEnvironmentUtil.deviceModel(), buildArchitecture())
     #endif
+    XCTAssertFalse(GULAppEnvironmentUtil.isAppExtension())
 
     print("System version? Answer: \(GULAppEnvironmentUtil.systemVersion())")
   }
 
   func buildArchitecture() -> String {
-    #if arch(arm)
-      return "arm"
-    #elseif arch(arm64)
+    #if arch(arm64)
       return "arm64"
     #elseif arch(x86_64)
       return "x86_64"
