@@ -1,3 +1,7 @@
+# 7.11.3 (SwiftPM Only)
+- Calling `+[GULAppEnvironmentUtil applePlatform]` now returns 'visionos' when
+  running on visionOS.
+
 # 7.11.2 (SwiftPM Only)
 - Fix build errors on the visionOS platform. (#108)
 
