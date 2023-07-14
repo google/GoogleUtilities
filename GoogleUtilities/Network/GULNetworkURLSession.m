@@ -158,6 +158,12 @@
                                             delegate:self
                                        delegateQueue:[NSOperationQueue mainQueue]];
     postRequestTask = [session uploadTaskWithRequest:request fromData:request.HTTPBody];
+
+    // Xcode 15 Beta 4: A URLRequest should not have a non-nil `HTTPBody`.
+    NSData *data = [request.HTTPBody copy];
+    NSMutableURLRequest *compliantRequest = [request mutableCopy];
+    compliantRequest.HTTPBody = nil;
+    postRequestTask = [session uploadTaskWithRequest:compliantRequest.copy fromData:data];
   }
 
   if (!session || !postRequestTask) {
