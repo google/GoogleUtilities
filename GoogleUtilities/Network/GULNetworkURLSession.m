@@ -164,7 +164,7 @@
     NSMutableURLRequest *requestWithoutHTTPBody = [request mutableCopy];
     requestWithoutHTTPBody.HTTPBody = nil;
 
-    postRequestTask = [session uploadTaskWithRequest:requestWithoutHTTPBody.copy
+    postRequestTask = [session uploadTaskWithRequest:requestWithoutHTTPBody
                                             fromData:givenRequestHTTPBody];
   }
 
