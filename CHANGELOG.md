@@ -1,5 +1,5 @@
 # 7.11.4
-- Fix Xcode 15 Beta 4 runtime warning (#114).
+- Fix Xcode 15 Beta 4 runtime warning. (#114)
 
 # 7.11.3 (SwiftPM Only)
 - Calling `+[GULAppEnvironmentUtil applePlatform]` now returns 'visionos' when
