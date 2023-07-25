@@ -872,8 +872,8 @@ static BOOL gRespondsToHandleBackgroundSession;
 }
 
 // TODO(Xcode 15): When Xcode 15 is the minimum supported Xcode version,
-// it will be unnecessary to check if `TARGET_OS_XR` is defined.
-#if TARGET_OS_IOS && (!defined(TARGET_OS_XR) || !TARGET_OS_XR)
+// it will be unnecessary to check if `TARGET_OS_VISION` is defined.
+#if TARGET_OS_IOS && (!defined(TARGET_OS_VISION) || !TARGET_OS_VISION)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (void)testApplicationDidReceiveRemoteNotificationIsInvokedOnInterceptors {
@@ -901,7 +901,7 @@ static BOOL gRespondsToHandleBackgroundSession;
   XCTAssertEqual(testAppDelegate.remoteNotification, notification);
 }
 #pragma clang diagnostic pop
-#endif  // TARGET_OS_IOS && (!defined(TARGET_OS_XR) || !TARGET_OS_XR)
+#endif  // TARGET_OS_IOS && (!defined(TARGET_OS_VISION) || !TARGET_OS_VISION)
 
 #if (TARGET_OS_IOS || TARGET_OS_TV) && !TARGET_OS_MACCATALYST
 - (void)testApplicationDidReceiveRemoteNotificationWithCompletionIsInvokedOnInterceptors {

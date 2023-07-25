@@ -84,7 +84,7 @@
   // `true`.
 #if TARGET_OS_MACCATALYST
   NSString *expectedPlatform = @"maccatalyst";
-#elif TARGET_OS_IOS && (!defined(TARGET_OS_XR) || !TARGET_OS_XR)
+#elif TARGET_OS_IOS && (!defined(TARGET_OS_VISION) || !TARGET_OS_VISION)
   NSString *expectedPlatform = @"ios";
 #endif  // TARGET_OS_MACCATALYST
 
@@ -100,9 +100,9 @@
   NSString *expectedPlatform = @"watchos";
 #endif  // TARGET_OS_WATCH
 
-#if defined(TARGET_OS_XR) && TARGET_OS_XR
+#if defined(TARGET_OS_VISION) && TARGET_OS_VISION
   NSString *expectedPlatform = @"visionos";
-#endif  // defined(TARGET_OS_XR) && TARGET_OS_XR
+#endif  // defined(TARGET_OS_VISION) && TARGET_OS_VISION
 
   XCTAssertEqualObjects([GULAppEnvironmentUtil applePlatform], expectedPlatform);
 }
@@ -112,7 +112,7 @@
   // `true`.
 #if TARGET_OS_MACCATALYST
   NSString *expectedPlatform = @"maccatalyst";
-#elif TARGET_OS_IOS && (!defined(TARGET_OS_XR) || !TARGET_OS_XR)
+#elif TARGET_OS_IOS && (!defined(TARGET_OS_VISION) || !TARGET_OS_VISION)
   NSString *expectedPlatform = @"ios";
 
   if ([[UIDevice currentDevice].model.lowercaseString containsString:@"ipad"] ||
@@ -133,9 +133,9 @@
   NSString *expectedPlatform = @"watchos";
 #endif  // TARGET_OS_WATCH
 
-#if defined(TARGET_OS_XR) && TARGET_OS_XR
+#if defined(TARGET_OS_VISION) && TARGET_OS_VISION
   NSString *expectedPlatform = @"visionos";
-#endif  // defined(TARGET_OS_XR) && TARGET_OS_XR
+#endif  // defined(TARGET_OS_VISION) && TARGET_OS_VISION
 
   XCTAssertEqualObjects([GULAppEnvironmentUtil appleDevicePlatform], expectedPlatform);
 }
