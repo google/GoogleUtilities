@@ -1,3 +1,7 @@
+# 7.11.5
+- Replace 'TARGET_OS_XR' with 'TARGET_OS_VISION' for compatibility with
+  Xcode 15 Beta 5.
+
 # 7.11.4
 - Fix Xcode 15 Beta 4 runtime warning. (#114)
 
