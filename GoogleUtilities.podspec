@@ -37,7 +37,7 @@ other Google CocoaPods. They're not intended for direct public usage.
 
   s.subspec 'Environment' do |es|
     es.source_files = [
-      'GoogleUtilities/Environment/**/*.[mh]'
+      'GoogleUtilities/Environment/**/*.[mh]',
       'third_party/Environment/**/*.[mh]'
     ]
     es.public_header_files = 'GoogleUtilities/Environment/Public/GoogleUtilities/*.h'
