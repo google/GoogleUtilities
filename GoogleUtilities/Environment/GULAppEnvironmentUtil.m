@@ -262,13 +262,13 @@ static BOOL HasEmbeddedMobileProvision(void) {
   applePlatform = @"watchos";
 #elif defined(TARGET_OS_VISION) && TARGET_OS_VISION
   applePlatform = @"visionos";
-#endif // TARGET_OS_MACCATALYST
+#endif  // TARGET_OS_MACCATALYST
 
   return applePlatform;
 }
 
 + (NSString *)appleDevicePlatform {
-  NSString* firebasePlatform = [GULAppEnvironmentUtil applePlatform];
+  NSString *firebasePlatform = [GULAppEnvironmentUtil applePlatform];
 #if TARGET_OS_IOS
   // This check is necessary because iOS-only apps running on iPad
   // will report UIUserInterfaceIdiomPhone via UI_USER_INTERFACE_IDIOM().
