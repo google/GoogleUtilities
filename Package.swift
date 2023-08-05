@@ -101,7 +101,7 @@ let package = Package(
       ]
     ),
     .target(
-      name: "GoogleUtilities_Environment",
+      name: "GoogleUtilities-Environment",
       dependencies: [
         .product(name: "FBLPromises", package: "Promises"),
         .target(name: "third_party_Environment"),
