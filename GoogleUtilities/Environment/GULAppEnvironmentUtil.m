@@ -18,7 +18,7 @@
 #import <objc/runtime.h>
 #import <sys/utsname.h>
 
-#import "GoogleUtilities/third_party/Environment/Public/IsAppEncrypted.h"
+#import "third_party/Environment/Public/IsAppEncrypted.h"
 
 #if TARGET_OS_IOS
 #import <UIKit/UIKit.h>

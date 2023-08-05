@@ -115,11 +115,11 @@ let package = Package(
 
     .target(
       name: "third_party_Environment",
-      path: "GoogleUtilities/third_party/Environment",
+      path: "third_party/Environment",
       exclude: ["LICENSE"],
       publicHeadersPath: "Public",
       cSettings: [
-        .headerSearchPath("../../../"),
+        .headerSearchPath("../../"),
       ]
     ),
 
