@@ -67,7 +67,7 @@ struct encryption_info_command {
 /// AppSync or similar to disable codesignature checks.
 ///
 /// More information at <a href="http://landonf.org/2009/02/index.html">Landon Fuller's blog</a>
-BOOL IsAppEncrypted() {
+BOOL IsAppEncrypted(void) {
   const struct mach_header *executableHeader = NULL;
   for (uint32_t i = 0; i < _dyld_image_count(); i++) {
     const struct mach_header *header = _dyld_get_image_header(i);

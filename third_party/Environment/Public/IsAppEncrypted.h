@@ -14,4 +14,4 @@
 
 #import <objc/objc.h>
 
-BOOL IsAppEncrypted();
+BOOL IsAppEncrypted(void);
