@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import <dlfcn.h>
+#import "third_party/Environment/Public/IsAppEncrypted.h"
+
 #import <mach-o/dyld.h>
 #import <objc/objc.h>
-
-#import "third_party/Environment/Public/IsAppEncrypted.h"
 
 /// The encryption info struct and constants are missing from the iPhoneSimulator SDK, but not from
 /// the iPhoneOS or Mac OS X SDKs. Since one doesn't ever ship a Simulator binary, we'll just
