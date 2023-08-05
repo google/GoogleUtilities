@@ -101,10 +101,12 @@ let package = Package(
       ]
     ),
     .target(
-      name: "GoogleUtilities-Environment",
-      dependencies: [.product(name: "FBLPromises", package: "Promises")],
+      name: "GoogleUtilities_Environment",
+      dependencies: [
+        .product(name: "FBLPromises", package: "Promises"),
+        .target(name: "third_party_Environment"),
+      ],
       path: "GoogleUtilities/Environment",
-      exclude: ["third_party/LICENSE"],
       publicHeadersPath: "Public",
       cSettings: [
         .headerSearchPath("../../"),
@@ -112,8 +114,18 @@ let package = Package(
     ),
 
     .target(
-      name: "GoogleUtilities-Logger",
-      dependencies: ["GoogleUtilities-Environment"],
+      name: "third_party_Environment",
+      path: "GoogleUtilities/third_party/Environment",
+      exclude: ["LICENSE"],
+      publicHeadersPath: "Public",
+      cSettings: [
+        .headerSearchPath("../../../"),
+      ]
+    ),
+
+    .target(
+      name: "GoogleUtilities_Logger",
+      dependencies: ["GoogleUtilities_Environment"],
       path: "GoogleUtilities/Logger",
       publicHeadersPath: "Public",
       cSettings: [
