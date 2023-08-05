@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 #import <sys/utsname.h>
+#import <sys/sysctl.h>
 
 #import "third_party/Environment/Public/IsAppEncrypted.h"
 
