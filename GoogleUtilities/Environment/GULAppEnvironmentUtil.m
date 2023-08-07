@@ -36,7 +36,7 @@ static NSString *const kFIRAppStoreReceiptURLCheckEnabledKey =
 /// The file name of the sandbox receipt. This is available on iOS >= 8.0
 static NSString *const kFIRAIdentitySandboxReceiptFileName = @"sandboxReceipt";
 
-static BOOL HasSCInfoFolder() {
+static BOOL HasSCInfoFolder(void) {
 #if TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH
   NSString *bundlePath = [NSBundle mainBundle].bundlePath;
   NSString *scInfoPath = [bundlePath stringByAppendingPathComponent:@"SC_Info"];
