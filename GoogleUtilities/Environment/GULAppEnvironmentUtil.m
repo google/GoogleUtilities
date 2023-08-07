@@ -19,7 +19,7 @@
 #import <sys/sysctl.h>
 #import <sys/utsname.h>
 
-#import "third_party/Environment/Public/IsAppEncrypted.h"
+#import "third_party/IsAppEncrypted/Public/IsAppEncrypted.h"
 
 #if TARGET_OS_IOS
 #import <UIKit/UIKit.h>

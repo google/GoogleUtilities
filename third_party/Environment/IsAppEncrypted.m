@@ -40,7 +40,7 @@
 // More information at
 // <a href="http://landonf.org/2009/02/index.html">Landon Fuller's blog</a>
 
-#import "third_party/Environment/Public/IsAppEncrypted.h"
+#import "third_party/IsAppEncrypted/Public/IsAppEncrypted.h"
 
 #import <mach-o/dyld.h>
 #import <objc/objc.h>
