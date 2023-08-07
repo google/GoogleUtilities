@@ -23,7 +23,6 @@
 
 @interface NSURLSession_GULPromisesTests : XCTestCase
 @property(nonatomic) NSURLSession *URLSession;
-@property(nonatomic) NSString *tmpDirectoryPath;
 @end
 
 @implementation NSURLSession_GULPromisesTests
@@ -31,14 +30,12 @@
 - (void)setUp {
   self.URLSession = [NSURLSession
       sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration]];
-
-  self.tmpDirectoryPath = NSTemporaryDirectory();
-  [[NSFileManager defaultManager] removeItemAtPath:self.tmpDirectoryPath error:nil];
 }
 
 - (void)testDataTaskPromiseWithRequestSuccess {
   // Given
-  NSString *tempPath = [self.tmpDirectoryPath stringByAppendingPathComponent:@"success.txt"];
+  NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"success.txt"];
+  [[NSFileManager defaultManager] removeItemAtPath:tempPath error:nil];
   NSData *expectedData = [@"Hello, world!" dataUsingEncoding:NSUTF8StringEncoding];
   BOOL success = [[NSFileManager defaultManager] createFileAtPath:tempPath
                                                          contents:expectedData
@@ -60,7 +57,9 @@
 
 - (void)testDataTaskPromiseWithRequestError {
   // Given
-  NSString *tempPath = [self.tmpDirectoryPath stringByAppendingPathComponent:@"does_not_exist.txt"];
+  NSString *tempPath =
+      [NSTemporaryDirectory() stringByAppendingPathComponent:@"does_not_exist.txt"];
+  XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:tempPath]);
 
   // When
   NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
