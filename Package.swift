@@ -102,9 +102,21 @@ let package = Package(
     ),
     .target(
       name: "GoogleUtilities-Environment",
-      dependencies: [.product(name: "FBLPromises", package: "Promises")],
+      dependencies: [
+        .product(name: "FBLPromises", package: "Promises"),
+        .target(name: "third_party-IsAppEncrypted"),
+      ],
       path: "GoogleUtilities/Environment",
-      exclude: ["third_party/LICENSE"],
+      publicHeadersPath: "Public",
+      cSettings: [
+        .headerSearchPath("../../"),
+      ]
+    ),
+
+    .target(
+      name: "third_party-IsAppEncrypted",
+      path: "third_party/IsAppEncrypted",
+      exclude: ["LICENSE"],
       publicHeadersPath: "Public",
       cSettings: [
         .headerSearchPath("../../"),
