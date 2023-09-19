@@ -121,8 +121,8 @@
 
   NSString * (^newImplementationPollutedTestObjectSubclassSubclass)(NSString *) =
       ^NSString *(id _self) {
-    return swizzledPollutedTestObjectSubclassSubclassDescription;
-  };
+        return swizzledPollutedTestObjectSubclassSubclassDescription;
+      };
 
   SEL swizzledSelector = @selector(description);
 
