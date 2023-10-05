@@ -21,7 +21,7 @@
 
 #import "third_party/IsAppEncrypted/Public/IsAppEncrypted.h"
 
-#if TARGET_OS_IOS || TARGET_OS_VISION
+#if TARGET_OS_IOS || (defined(TARGET_OS_VISION) && TARGET_OS_VISION)
 #import <UIKit/UIKit.h>
 #endif
 
