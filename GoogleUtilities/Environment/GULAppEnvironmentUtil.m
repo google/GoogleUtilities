@@ -21,7 +21,7 @@
 
 #import "third_party/IsAppEncrypted/Public/IsAppEncrypted.h"
 
-#if TARGET_OS_IOS
+#if TARGET_OS_IOS || TARGET_OS_VISION
 #import <UIKit/UIKit.h>
 #endif
 
@@ -191,7 +191,7 @@ static BOOL HasEmbeddedMobileProvision(void) {
 }
 
 + (NSString *)systemVersion {
-#if TARGET_OS_IOS
+#if TARGET_OS_IOS || TARGET_OS_VISION
   return [UIDevice currentDevice].systemVersion;
 #elif TARGET_OS_OSX || TARGET_OS_TV || TARGET_OS_WATCH
   // Assemble the systemVersion, excluding the patch version if it's 0.
