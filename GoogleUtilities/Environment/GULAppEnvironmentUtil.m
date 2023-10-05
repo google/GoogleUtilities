@@ -179,6 +179,8 @@ static BOOL HasEmbeddedMobileProvision(void) {
         model = @"iOS Simulator (Unknown)";
         break;
     }
+#elif TARGET_OS_VISION
+    model = @"visionOS Simulator";
 #endif
 #elif TARGET_OS_EMBEDDED
     model = [GULAppEnvironmentUtil getSysctlEntry:"hw.machine"];
