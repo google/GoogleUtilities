@@ -21,7 +21,7 @@
 
 #import "third_party/IsAppEncrypted/Public/IsAppEncrypted.h"
 
-#if TARGET_OS_IOS || (defined(TARGET_OS_VISION) && TARGET_OS_VISION)
+#if TARGET_OS_IOS
 #import <UIKit/UIKit.h>
 #endif
 
@@ -167,7 +167,9 @@ static BOOL HasEmbeddedMobileProvision(void) {
     model = @"watchOS Simulator";
 #elif TARGET_OS_TV
     model = @"tvOS Simulator";
-#elif TARGET_OS_IPHONE
+#elif defined(TARGET_OS_VISION) && TARGET_OS_VISION
+    model = @"visionOS Simulator";
+#elif TARGET_OS_IOS
     switch ([[UIDevice currentDevice] userInterfaceIdiom]) {
       case UIUserInterfaceIdiomPhone:
         model = @"iOS Simulator (iPhone)";
@@ -191,9 +193,10 @@ static BOOL HasEmbeddedMobileProvision(void) {
 }
 
 + (NSString *)systemVersion {
-#if TARGET_OS_IOS || TARGET_OS_VISION
+#if TARGET_OS_IOS
   return [UIDevice currentDevice].systemVersion;
-#elif TARGET_OS_OSX || TARGET_OS_TV || TARGET_OS_WATCH
+#elif TARGET_OS_OSX || TARGET_OS_TV || TARGET_OS_WATCH || \
+    (defined(TARGET_OS_VISION) && TARGET_OS_VISION)
   // Assemble the systemVersion, excluding the patch version if it's 0.
   NSOperatingSystemVersion osVersion = [NSProcessInfo processInfo].operatingSystemVersion;
   NSMutableString *versionString = [[NSMutableString alloc]
