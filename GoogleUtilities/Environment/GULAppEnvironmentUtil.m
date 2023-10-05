@@ -167,7 +167,7 @@ static BOOL HasEmbeddedMobileProvision(void) {
     model = @"watchOS Simulator";
 #elif TARGET_OS_TV
     model = @"tvOS Simulator";
-#elif TARGET_OS_IPHONE
+#elif TARGET_OS_IOS
     switch ([[UIDevice currentDevice] userInterfaceIdiom]) {
       case UIUserInterfaceIdiomPhone:
         model = @"iOS Simulator (iPhone)";
