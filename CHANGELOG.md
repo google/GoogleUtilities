@@ -1,3 +1,6 @@
+# 7.11.6
+- Fix visionOS build on Xcode 15.1 Beta 1.
+
 # 7.11.5
 - Replace 'TARGET_OS_XR' with 'TARGET_OS_VISION' for compatibility with
   Xcode 15 Beta 5.
