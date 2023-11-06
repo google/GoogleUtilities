@@ -1,4 +1,4 @@
-# 7.11.7
+# 7.12.0
 - Added a logging level getter, `GULGetLoggerLevel`. (#138)
 
 # 7.11.6
