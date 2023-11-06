@@ -1,3 +1,6 @@
+# 7.11.7
+- Added a logging level getter, `GULGetLoggerLevel`. (#138)
+
 # 7.11.6
 - Fix visionOS build on Xcode 15.1 Beta 1.
 
