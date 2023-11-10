@@ -1,3 +1,6 @@
+# 7.12.1 (SwiftPM Only)
+- Fix improperly formatted target name that blocks App Store submission. (#140)
+
 # 7.12.0
 - Added a logging level getter, `GULGetLoggerLevel`. (#138)
 
