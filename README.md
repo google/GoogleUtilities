@@ -161,7 +161,7 @@ Alternatively disable signing in each target:
 ### Code Formatting
 
 To ensure that the code is formatted consistently, run the script
-[./scripts/check.sh](https://github.com/firebase/firebase-ios-sdk/blob/master/scripts/check.sh)
+[./scripts/check.sh](https://github.com/firebase/firebase-ios-sdk/blob/main/scripts/check.sh)
 before creating a PR.
 
 GitHub Actions will verify that any code changes are done in a style compliant
