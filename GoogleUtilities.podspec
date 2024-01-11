@@ -35,6 +35,10 @@ other Google CocoaPods. They're not intended for direct public usage.
     'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}"',
   }
 
+  s.resource_bundles = {
+    "GoogleUtilities_Privacy" => 'GoogleUtilities/Resources/PrivacyInfo.xcprivacy'
+  }
+
   s.subspec 'Environment' do |es|
     es.source_files = [
       'GoogleUtilities/Environment/**/*.[mh]',
