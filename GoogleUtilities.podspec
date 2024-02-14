@@ -35,9 +35,9 @@ other Google CocoaPods. They're not intended for direct public usage.
     'HEADER_SEARCH_PATHS' => '"${PODS_TARGET_SRCROOT}"',
   }
 
-  s.subspec 'Core' do |cs|
+  s.subspec 'Privacy' do |cs|
     cs.resource_bundles = {
-      "GoogleUtilities_Privacy" => 'GoogleUtilities/Resources/PrivacyInfo.xcprivacy'
+      "GoogleUtilities_Privacy" => 'GoogleUtilities/Privacy/Resources/PrivacyInfo.xcprivacy'
   }
 
   end
@@ -49,7 +49,7 @@ other Google CocoaPods. They're not intended for direct public usage.
     ]
     es.public_header_files = 'GoogleUtilities/Environment/Public/GoogleUtilities/*.h'
     es.dependency 'PromisesObjC', '>= 1.2', '< 3.0'
-    es.dependency 'GoogleUtilities/Core'
+    es.dependency 'GoogleUtilities/Privacy'
     es.frameworks = [
       'Security'
     ]
@@ -59,7 +59,7 @@ other Google CocoaPods. They're not intended for direct public usage.
     ls.source_files = 'GoogleUtilities/Logger/**/*.[mh]'
     ls.public_header_files = 'GoogleUtilities/Logger/Public/GoogleUtilities/*.h'
     ls.dependency 'GoogleUtilities/Environment'
-    ls.dependency 'GoogleUtilities/Core'
+    ls.dependency 'GoogleUtilities/Privacy'
   end
 
 
@@ -69,7 +69,7 @@ other Google CocoaPods. They're not intended for direct public usage.
     ns.dependency 'GoogleUtilities/NSData+zlib'
     ns.dependency 'GoogleUtilities/Logger'
     ns.dependency 'GoogleUtilities/Reachability'
-    ns.dependency 'GoogleUtilities/Core'
+    ns.dependency 'GoogleUtilities/Privacy'
     ns.frameworks = [
       'Security'
     ]
@@ -78,7 +78,7 @@ other Google CocoaPods. They're not intended for direct public usage.
   s.subspec 'NSData+zlib' do |ns|
     ns.source_files = 'GoogleUtilities/NSData+zlib/**/*.[mh]'
     ns.public_header_files = 'GoogleUtilities/NSData+zlib/Public/GoogleUtilities/*.h'
-    ns.dependency 'GoogleUtilities/Core'
+    ns.dependency 'GoogleUtilities/Privacy'
     ns.libraries = [
       'z'
     ]
@@ -87,7 +87,7 @@ other Google CocoaPods. They're not intended for direct public usage.
   s.subspec 'Reachability' do |rs|
     rs.source_files = 'GoogleUtilities/Reachability/**/*.[mh]'
     rs.public_header_files = 'GoogleUtilities/Reachability/Public/GoogleUtilities/*.h'
-    rs.dependency 'GoogleUtilities/Core'
+    rs.dependency 'GoogleUtilities/Privacy'
     rs.ios.frameworks = [
       'SystemConfiguration'
     ]
@@ -110,7 +110,7 @@ other Google CocoaPods. They're not intended for direct public usage.
     adss.public_header_files = [
       'GoogleUtilities/AppDelegateSwizzler/Public/GoogleUtilities/*.h',
     ]
-    adss.dependency 'GoogleUtilities/Core'
+    adss.dependency 'GoogleUtilities/Privacy'
     adss.dependency 'GoogleUtilities/Logger'
     adss.dependency 'GoogleUtilities/Network'
     adss.dependency 'GoogleUtilities/Environment'
@@ -119,14 +119,14 @@ other Google CocoaPods. They're not intended for direct public usage.
   s.subspec 'ISASwizzler' do |iss|
     iss.source_files = 'GoogleUtilities/ISASwizzler/**/*.[mh]', 'GoogleUtilities/Common/*.h'
     iss.public_header_files = 'GoogleUtilities/ISASwizzler/Public/GoogleUtilities/*.h'
-    iss.dependency 'GoogleUtilities/Core'
+    iss.dependency 'GoogleUtilities/Privacy'
   end
 
   s.subspec 'MethodSwizzler' do |mss|
     mss.source_files = 'GoogleUtilities/MethodSwizzler/**/*.[mh]', 'GoogleUtilities/Common/*.h'
     mss.public_header_files = 'GoogleUtilities/MethodSwizzler/Public/GoogleUtilities/*.h'
     mss.dependency 'GoogleUtilities/Logger'
-    mss.dependency 'GoogleUtilities/Core'
+    mss.dependency 'GoogleUtilities/Privacy'
   end
 
   s.subspec 'SwizzlerTestHelpers' do |sths|
@@ -139,7 +139,7 @@ other Google CocoaPods. They're not intended for direct public usage.
     ud.source_files = 'GoogleUtilities/UserDefaults/**/*.[hm]'
     ud.public_header_files = 'GoogleUtilities/UserDefaults/Public/GoogleUtilities/*.h'
     ud.dependency 'GoogleUtilities/Logger'
-    ud.dependency 'GoogleUtilities/Core'
+    ud.dependency 'GoogleUtilities/Privacy'
   end
 
   s.test_spec 'unit' do |unit_tests|
