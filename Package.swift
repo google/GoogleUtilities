@@ -121,7 +121,7 @@ let package = Package(
     ),
 
     .target(
-      name: "third_party-IsAppEncrypted",
+      name: "third-party-IsAppEncrypted",
       path: "third_party/IsAppEncrypted",
       exclude: ["LICENSE"],
       publicHeadersPath: "Public",
