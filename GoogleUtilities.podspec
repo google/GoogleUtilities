@@ -38,8 +38,7 @@ other Google CocoaPods. They're not intended for direct public usage.
   s.subspec 'Privacy' do |cs|
     cs.resource_bundles = {
       "GoogleUtilities_Privacy" => 'GoogleUtilities/Privacy/Resources/PrivacyInfo.xcprivacy'
-  }
-
+    }
   end
 
   s.subspec 'Environment' do |es|
