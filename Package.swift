@@ -111,7 +111,7 @@ let package = Package(
       dependencies: [
         .product(name: "FBLPromises", package: "Promises"),
         "third-party-IsAppEncrypted",
-        "GoogleUtilities-Privacy"
+        "GoogleUtilities-Privacy",
       ],
       path: "GoogleUtilities/Environment",
       publicHeadersPath: "Public",
