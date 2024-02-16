@@ -1,3 +1,6 @@
+# 7.13.0
+- Add privacy manifest. (#128)
+
 # 7.12.1 (SwiftPM Only)
 - Fix improperly formatted target name that blocks App Store submission. (#140)
 
