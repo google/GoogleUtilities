@@ -110,7 +110,7 @@ let package = Package(
       name: "GoogleUtilities-Environment",
       dependencies: [
         .product(name: "FBLPromises", package: "Promises"),
-        "third_party-IsAppEncrypted",
+        "third-party-IsAppEncrypted",
         "GoogleUtilities-Privacy"
       ],
       path: "GoogleUtilities/Environment",
