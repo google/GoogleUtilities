@@ -73,7 +73,7 @@ let package = Package(
   // TODO: Restructure directory structure to simplify the excludes here.
   targets: [
     .target(
-      name: "GoogleUtilities-Privacy",
+      name: "GoogleUtilitiesPrivacy",
       path: "GoogleUtilities/Privacy",
       resources: [.process("Resources/PrivacyInfo.xcprivacy")]
     ),
@@ -82,7 +82,7 @@ let package = Package(
       dependencies: ["GoogleUtilities-Environment",
                      "GoogleUtilities-Logger",
                      "GoogleUtilities-Network",
-                     "GoogleUtilities-Privacy"],
+                     "GoogleUtilitiesPrivacy"],
       path: "GoogleUtilities",
       exclude: [
         "AppDelegateSwizzler/README.md",
@@ -111,7 +111,7 @@ let package = Package(
       dependencies: [
         .product(name: "FBLPromises", package: "Promises"),
         "third-party-IsAppEncrypted",
-        "GoogleUtilities-Privacy",
+        "GoogleUtilitiesPrivacy",
       ],
       path: "GoogleUtilities/Environment",
       publicHeadersPath: "Public",
@@ -132,7 +132,7 @@ let package = Package(
 
     .target(
       name: "GoogleUtilities-Logger",
-      dependencies: ["GoogleUtilities-Environment", "GoogleUtilities-Privacy"],
+      dependencies: ["GoogleUtilities-Environment", "GoogleUtilitiesPrivacy"],
       path: "GoogleUtilities/Logger",
       publicHeadersPath: "Public",
       cSettings: [
@@ -142,7 +142,7 @@ let package = Package(
 
     .target(
       name: "GoogleUtilities-ISASwizzler",
-      dependencies: ["GoogleUtilities-Logger", "GoogleUtilities-Privacy"],
+      dependencies: ["GoogleUtilities-Logger", "GoogleUtilitiesPrivacy"],
       path: "GoogleUtilities/ISASwizzler",
       publicHeadersPath: "Public",
       cSettings: [
@@ -152,7 +152,7 @@ let package = Package(
 
     .target(
       name: "GoogleUtilities-MethodSwizzler",
-      dependencies: ["GoogleUtilities-Logger", "GoogleUtilities-Privacy"],
+      dependencies: ["GoogleUtilities-Logger", "GoogleUtilitiesPrivacy"],
       path: "GoogleUtilities/MethodSwizzler",
       publicHeadersPath: "Public",
       cSettings: [
@@ -164,7 +164,7 @@ let package = Package(
       dependencies: ["GoogleUtilities-Logger",
                      "GoogleUtilities-NSData",
                      "GoogleUtilities-Reachability",
-                     "GoogleUtilities-Privacy"],
+                     "GoogleUtilitiesPrivacy"],
       path: "GoogleUtilities/Network",
       publicHeadersPath: "Public",
       cSettings: [
@@ -173,7 +173,7 @@ let package = Package(
     ),
     .target(
       name: "GoogleUtilities-NSData",
-      dependencies: ["GoogleUtilities-Privacy"],
+      dependencies: ["GoogleUtilitiesPrivacy"],
       path: "GoogleUtilities/NSData+zlib",
       publicHeadersPath: "Public",
       cSettings: [
@@ -185,7 +185,7 @@ let package = Package(
     ),
     .target(
       name: "GoogleUtilities-Reachability",
-      dependencies: ["GoogleUtilities-Logger", "GoogleUtilities-Privacy"],
+      dependencies: ["GoogleUtilities-Logger", "GoogleUtilitiesPrivacy"],
       path: "GoogleUtilities/Reachability",
       publicHeadersPath: "Public",
       cSettings: [
@@ -194,7 +194,7 @@ let package = Package(
     ),
     .target(
       name: "GoogleUtilities-UserDefaults",
-      dependencies: ["GoogleUtilities-Logger", "GoogleUtilities-Privacy"],
+      dependencies: ["GoogleUtilities-Logger", "GoogleUtilitiesPrivacy"],
       path: "GoogleUtilities/UserDefaults",
       publicHeadersPath: "Public",
       cSettings: [

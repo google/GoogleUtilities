@@ -1,3 +1,6 @@
+# 7.13.1 (SwiftPM Only)
+- Attempt to fix validation error due to invalid module name. (#146)
+
 # 7.13.0
 - Add privacy manifest. (#128)
 
