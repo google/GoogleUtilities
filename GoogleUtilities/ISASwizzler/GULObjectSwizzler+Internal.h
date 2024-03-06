@@ -14,7 +14,7 @@
 
 #import "GoogleUtilities/ISASwizzler/Public/GoogleUtilities/GULObjectSwizzler.h"
 
-FOUNDATION_EXPORT NSString *kGULSwizzlerAssociatedObjectKey;
+FOUNDATION_EXPORT const NSString *const kGULSwizzlerAssociatedObjectKey;
 
 @interface GULObjectSwizzler (Internal)
 

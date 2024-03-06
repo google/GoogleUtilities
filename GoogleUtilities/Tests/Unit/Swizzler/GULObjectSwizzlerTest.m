@@ -353,7 +353,7 @@
 
     // Release GULObjectSwizzler
     [GULObjectSwizzler setAssociatedObject:proxyObject
-                                       key:kGULSwizzlerAssociatedObjectKey
+                                       key:&kGULSwizzlerAssociatedObjectKey
                                      value:nil
                                association:GUL_ASSOCIATION_RETAIN];
   }
@@ -395,7 +395,7 @@
 
     // Release GULObjectSwizzler
     [GULObjectSwizzler setAssociatedObject:object
-                                       key:kGULSwizzlerAssociatedObjectKey
+                                       key:&kGULSwizzlerAssociatedObjectKey
                                      value:nil
                                association:GUL_ASSOCIATION_RETAIN];
 
@@ -439,7 +439,7 @@
 
     // Release GULObjectSwizzler
     [GULObjectSwizzler setAssociatedObject:object
-                                       key:kGULSwizzlerAssociatedObjectKey
+                                       key:&kGULSwizzlerAssociatedObjectKey
                                      value:nil
                                association:GUL_ASSOCIATION_RETAIN];
 
