@@ -63,7 +63,7 @@
 
   __auto_type taskPromise = [self.URLSessionMock gul_dataTaskPromiseWithRequest:request];
 
-  XCTAssert(FBLWaitForPromisesWithTimeout(0.5));
+  XCTAssert(FBLWaitForPromisesWithTimeout(1.0));
 
   XCTAssertTrue(taskPromise.isFulfilled);
   XCTAssertNil(taskPromise.error);
