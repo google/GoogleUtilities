@@ -1,0 +1,10 @@
+
+use_frameworks!
+
+pod 'GoogleMulticastAppDelegate', :path=>'../../../'
+
+target 'AppDelegateSample' do
+end
+
+target 'SwiftUI-iOS' do
+end
