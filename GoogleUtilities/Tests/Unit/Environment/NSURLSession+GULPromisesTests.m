@@ -16,16 +16,13 @@
 
 #import <XCTest/XCTest.h>
 
-#import <OCMock/OCMock.h>
 #import "FBLPromise+Testing.h"
-#import "GoogleUtilities/Tests/Unit/Shared/URLSession/FIRURLSessionOCMockStub.h"
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULURLSessionDataResponse.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/NSURLSession+GULPromises.h"
 
 @interface NSURLSession_GULPromisesTests : XCTestCase
 @property(nonatomic) NSURLSession *URLSession;
-@property(nonatomic) id URLSessionMock;
 @end
 
 @implementation NSURLSession_GULPromisesTests
@@ -33,68 +30,48 @@
 - (void)setUp {
   self.URLSession = [NSURLSession
       sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration]];
-  self.URLSessionMock = OCMPartialMock(self.URLSession);
-}
-
-- (void)tearDown {
-  [self.URLSessionMock stopMocking];
-  self.URLSessionMock = nil;
-  self.URLSession = nil;
 }
 
 - (void)testDataTaskPromiseWithRequestSuccess {
-  NSURL *url = [NSURL URLWithString:@"https://localhost"];
-  NSURLRequest *request = [NSURLRequest requestWithURL:url];
+  // Given
+  NSString *tempPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"success.txt"];
+  [[NSFileManager defaultManager] removeItemAtPath:tempPath error:nil];
+  NSData *expectedData = [@"Hello, world!" dataUsingEncoding:NSUTF8StringEncoding];
+  BOOL success = [[NSFileManager defaultManager] createFileAtPath:tempPath
+                                                         contents:expectedData
+                                                       attributes:nil];
+  XCTAssert(success);
 
-  NSHTTPURLResponse *expectedResponse = [[NSHTTPURLResponse alloc] initWithURL:url
-                                                                    statusCode:200
-                                                                   HTTPVersion:@"1.1"
-                                                                  headerFields:nil];
-  NSData *expectedBody = [@"body" dataUsingEncoding:NSUTF8StringEncoding];
+  // When
+  NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
+  NSURLRequest *request = [NSURLRequest requestWithURL:tempURL];
+  __auto_type taskPromise = [self.URLSession gul_dataTaskPromiseWithRequest:request];
 
-  [FIRURLSessionOCMockStub
-      stubURLSessionDataTaskWithResponse:expectedResponse
-                                    body:expectedBody
-                                   error:nil
-                          URLSessionMock:self.URLSessionMock
-                  requestValidationBlock:^BOOL(NSURLRequest *_Nonnull sentRequest) {
-                    return [sentRequest isEqual:request];
-                  }];
-
-  __auto_type taskPromise = [self.URLSessionMock gul_dataTaskPromiseWithRequest:request];
-
-  XCTAssert(FBLWaitForPromisesWithTimeout(0.5));
-
-  XCTAssertTrue(taskPromise.isFulfilled);
+  // Then
+  XCTAssert(FBLWaitForPromisesWithTimeout(1.0));
+  XCTAssert(taskPromise.isFulfilled);
   XCTAssertNil(taskPromise.error);
-  XCTAssertEqualObjects(taskPromise.value.HTTPResponse, expectedResponse);
-  XCTAssertEqualObjects(taskPromise.value.HTTPBody, expectedBody);
+  XCTAssertEqualObjects(expectedData, taskPromise.value.HTTPBody);
+  XCTAssertEqual(taskPromise.value.HTTPResponse.statusCode, 200);
 }
 
 - (void)testDataTaskPromiseWithRequestError {
-  NSURL *url = [NSURL URLWithString:@"https://localhost"];
-  NSURLRequest *request = [NSURLRequest requestWithURL:url];
+  // Given
+  NSString *tempPath =
+      [NSTemporaryDirectory() stringByAppendingPathComponent:@"does_not_exist.txt"];
+  XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:tempPath]);
 
-  NSError *expectedError = [NSError errorWithDomain:@"testDataTaskPromiseWithRequestError"
-                                               code:-1
-                                           userInfo:nil];
+  // When
+  NSURL *tempURL = [NSURL fileURLWithPath:tempPath];
+  NSURLRequest *request = [NSURLRequest requestWithURL:tempURL];
+  __auto_type taskPromise = [self.URLSession gul_dataTaskPromiseWithRequest:request];
 
-  [FIRURLSessionOCMockStub
-      stubURLSessionDataTaskWithResponse:nil
-                                    body:nil
-                                   error:expectedError
-                          URLSessionMock:self.URLSessionMock
-                  requestValidationBlock:^BOOL(NSURLRequest *_Nonnull sentRequest) {
-                    return [sentRequest isEqual:request];
-                  }];
-
-  __auto_type taskPromise = [self.URLSessionMock gul_dataTaskPromiseWithRequest:request];
-
-  XCTAssert(FBLWaitForPromisesWithTimeout(0.5));
-
-  XCTAssertTrue(taskPromise.isRejected);
-  XCTAssertEqualObjects(taskPromise.error, expectedError);
-  XCTAssertNil(taskPromise.value);
+  // Then
+  XCTAssert(FBLWaitForPromisesWithTimeout(1.0));
+  XCTAssert(taskPromise.isRejected);
+  XCTAssertNotNil(taskPromise.error);
+  XCTAssertNil(taskPromise.value.HTTPBody);
+  XCTAssertEqual(taskPromise.value.HTTPResponse.statusCode, 0);
 }
 
 @end
