@@ -1,3 +1,7 @@
+# 7.13.2
+- Remove synchronization delay for `GULUserDefaults` to better match
+  `NSUserDefaults` behavior. (#148)
+
 # 7.13.1 (SwiftPM Only)
 - Attempt to fix validation error due to invalid module name. (#146)
 
