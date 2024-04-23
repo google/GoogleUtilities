@@ -18,8 +18,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSTimeInterval const kGULSynchronizeInterval = 1.0;
-
 static NSString *const kGULLogFormat = @"I-GUL%06ld";
 
 static GULLoggerService kGULLogUserDefaultsService = @"[GoogleUtilities/UserDefaults]";
