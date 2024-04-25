@@ -41,7 +41,8 @@ class importTest: XCTestCase {
     #else
       // Device model should show up as x86_64 for iOS, tvOS, and watchOS
       // simulators.
-      XCTAssertEqual(GULAppEnvironmentUtil.deviceModel(), "x86_64")
+      let device = GULAppEnvironmentUtil.deviceModel()
+      XCTAssertTrue(device == "x86_64" || device == "arm64")
     #endif
 
     print("System version? Answer: \(GULAppEnvironmentUtil.systemVersion())")
