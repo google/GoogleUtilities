@@ -1,3 +1,10 @@
+# 7.13.3
+- Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
+  conflict with keyword. (#152)
+- Reorganize privacy manifests for SwiftPM so that each library target has its
+  own privacy manifest, as opposed to transitively depending on a common one.
+  (#150)
+
 # 7.13.2
 - Remove synchronization delay for `GULUserDefaults` to better match
   `NSUserDefaults` behavior. (#148)
