@@ -1,4 +1,4 @@
-# Unreleased
+# 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
   conflict with keyword. (#152)
 - Reorganize privacy manifests for SwiftPM so that each library target has its
