@@ -82,9 +82,7 @@ jobs:
       run: scripts/third_party/travis/retry.sh scripts/build.sh GoogleUtilities-Package ${{ matrix.target }} spm
 
   utilities-cocoapods-option-matrix:
-    needs: changed_today, pod_lib_lint
-    if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
-
+    needs: pod_lib_lint
     runs-on: macos-latest
     strategy:
       matrix:
