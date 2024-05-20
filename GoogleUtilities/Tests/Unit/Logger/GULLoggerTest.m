@@ -20,17 +20,17 @@
 
 #import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLogger.h"
 
-#import <asl.h>
+#import <OSLog/OSLog.h>
 
 extern const char *kGULLoggerASLClientFacilityName;
 
 extern void GULResetLogger(void);
 
-extern aslclient getGULLoggerClient(void);
-
 extern dispatch_queue_t getGULClientQueue(void);
 
 extern BOOL getGULLoggerDebugMode(void);
+
+extern os_log_type_t convertLoggerLevel(GULLoggerLevel);
 
 static NSString *const kMessageCode = @"I-COR000001";
 
@@ -110,11 +110,11 @@ static NSString *const kMessageCode = @"I-COR000001";
 // them in GULLoggerLevel.h since we cannot include <asl.h> (see b/34976089 for more details).
 // This test ensures the constants match.
 - (void)testGULLoggerLevelValues {
-  XCTAssertEqual(GULLoggerLevelError, ASL_LEVEL_ERR);
-  XCTAssertEqual(GULLoggerLevelWarning, ASL_LEVEL_WARNING);
-  XCTAssertEqual(GULLoggerLevelNotice, ASL_LEVEL_NOTICE);
-  XCTAssertEqual(GULLoggerLevelInfo, ASL_LEVEL_INFO);
-  XCTAssertEqual(GULLoggerLevelDebug, ASL_LEVEL_DEBUG);
+  XCTAssertEqual(convertLoggerLevel(GULLoggerLevelError), OS_LOG_TYPE_ERROR);
+  XCTAssertEqual(convertLoggerLevel(GULLoggerLevelWarning), OS_LOG_TYPE_DEFAULT);
+  XCTAssertEqual(convertLoggerLevel(GULLoggerLevelNotice), OS_LOG_TYPE_DEFAULT);
+  XCTAssertEqual(convertLoggerLevel(GULLoggerLevelInfo), OS_LOG_TYPE_INFO);
+  XCTAssertEqual(convertLoggerLevel(GULLoggerLevelDebug), OS_LOG_TYPE_DEBUG);
 }
 
 - (void)testGULGetLoggerLevel {
