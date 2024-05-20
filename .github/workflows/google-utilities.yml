@@ -11,7 +11,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changed_today:
+    runs-on: ubuntu-latest
+    name: Check if the repo was updated today
+    outputs:
+      WAS_CHANGED: ${{ steps.changed_today.outputs.WAS_CHANGED }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check_date
+        name: Check
+        if: ${{ github.event_name == 'schedule' }}
+        run: echo '::set-output name=WAS_CHANGED::'$(test -n "$(git log --format=%H --since='24 hours ago')" && echo 'true' || echo 'false')
+
   pod-lib-lint:
+    needs: changed_today
+    if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
+
     runs-on: macOS-latest
     strategy:
       matrix:
@@ -31,6 +46,9 @@ jobs:
           --platforms=${{ matrix.target }}
 
   catalyst:
+    needs: changed_today
+    if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
+
     runs-on: macOS-latest
     steps:
     - uses: ruby/setup-ruby@v1
@@ -46,7 +64,25 @@ jobs:
         scripts/third_party/travis/retry.sh scripts/test_catalyst.sh GoogleUtilities test \
           GoogleUtilities-Unit-unit
 
+  spm:
+    needs: changed_today
+    if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
+
+    runs-on: macOS-latest
+    strategy:
+      matrix:
+        target: [iOS, tvOS, macOS, catalyst]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Scripts Directory
+      run: ./setup-scripts.sh
+    - name: Initialize xcodebuild
+      run: xcodebuild -list
+    - name: iOS Unit Tests
+      run: scripts/third_party/travis/retry.sh scripts/build.sh GoogleUtilities-Package ${{ matrix.target }} spm
+
   utilities-cocoapods-option-matrix:
+    needs: pod-lib-lint
     runs-on: macos-latest
     strategy:
       matrix:
@@ -55,7 +91,6 @@ jobs:
           '--use-static-frameworks',
           '--use-libraries --skip-tests'
         ]
-    needs: pod-lib-lint
     steps:
     - uses: ruby/setup-ruby@v1
       with:
