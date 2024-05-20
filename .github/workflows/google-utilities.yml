@@ -82,7 +82,7 @@ jobs:
       run: scripts/third_party/travis/retry.sh scripts/build.sh GoogleUtilities-Package ${{ matrix.target }} spm
 
   utilities-cocoapods-option-matrix:
-    needs: pod_lib_lint
+    needs: pod-lib-lint
     runs-on: macos-latest
     strategy:
       matrix:
