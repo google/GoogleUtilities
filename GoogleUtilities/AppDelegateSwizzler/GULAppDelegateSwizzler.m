@@ -499,38 +499,18 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
                               realClass:realClass
        storeDestinationImplementationTo:realImplementationsBySelector];
 
-  // For application:didReceiveRemoteNotification:
-  SEL didReceiveRemoteNotificationSEL = NSSelectorFromString(kGULDidReceiveRemoteNotificationSEL);
-  SEL didReceiveRemoteNotificationDonorSEL = @selector(application:
-                                donor_didReceiveRemoteNotification:);
-
-  [self proxyDestinationSelector:didReceiveRemoteNotificationSEL
-      implementationsFromSourceSelector:didReceiveRemoteNotificationDonorSEL
-                              fromClass:[GULAppDelegateSwizzler class]
-                                toClass:appDelegateSubClass
-                              realClass:realClass
-       storeDestinationImplementationTo:realImplementationsBySelector];
-
   // For application:didReceiveRemoteNotification:fetchCompletionHandler:
 #if !TARGET_OS_WATCH && !TARGET_OS_OSX
   SEL didReceiveRemoteNotificationWithCompletionSEL =
       NSSelectorFromString(kGULDidReceiveRemoteNotificationWithCompletionSEL);
   SEL didReceiveRemoteNotificationWithCompletionDonorSEL =
       @selector(application:donor_didReceiveRemoteNotification:fetchCompletionHandler:);
-  if ([appDelegate respondsToSelector:didReceiveRemoteNotificationWithCompletionSEL]) {
-    // Only add the application:didReceiveRemoteNotification:fetchCompletionHandler: method if
-    // the original AppDelegate implements it.
-    // This fixes a bug if an app only implements application:didReceiveRemoteNotification:
-    // (if we add the method with completion, iOS sees that one exists and does not call
-    // the method without the completion, which in this case is the only one the app implements).
-
-    [self proxyDestinationSelector:didReceiveRemoteNotificationWithCompletionSEL
-        implementationsFromSourceSelector:didReceiveRemoteNotificationWithCompletionDonorSEL
-                                fromClass:[GULAppDelegateSwizzler class]
-                                  toClass:appDelegateSubClass
-                                realClass:realClass
-         storeDestinationImplementationTo:realImplementationsBySelector];
-  }
+  [self proxyDestinationSelector:didReceiveRemoteNotificationWithCompletionSEL
+      implementationsFromSourceSelector:didReceiveRemoteNotificationWithCompletionDonorSEL
+                              fromClass:[GULAppDelegateSwizzler class]
+                                toClass:appDelegateSubClass
+                              realClass:realClass
+       storeDestinationImplementationTo:realImplementationsBySelector];
 #endif  // !TARGET_OS_WATCH && !TARGET_OS_OSX
 }
 
