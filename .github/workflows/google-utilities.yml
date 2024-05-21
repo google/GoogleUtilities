@@ -15,18 +15,18 @@ jobs:
     runs-on: ubuntu-latest
     name: Check if the repo was updated today
     outputs:
-      WAS_CHANGED: ${{ steps.changed_today.outputs.WAS_CHANGED }}
+      WAS_CHANGED: ${{ steps.check_changed.outputs.WAS_CHANGED }}
     steps:
       - uses: actions/checkout@v4
-      - id: check_date
+      - id: check_changed
         name: Check
         if: ${{ github.event_name == 'schedule' }}
         run: echo '::set-output name=WAS_CHANGED::'$(test -n "$(git log --format=%H --since='24 hours ago')" && echo 'true' || echo 'false')
 
   pod-lib-lint:
     needs: changed_today
-    if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
-
+#    if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
+    if: ${{ needs.changed_today.outputs.WAS_CHANGED == 'true' }}
     runs-on: macOS-latest
     strategy:
       matrix:
