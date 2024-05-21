@@ -218,10 +218,6 @@ static BOOL HasEmbeddedMobileProvision(void) {
 #endif
 }
 
-+ (BOOL)isIOS7OrHigher {
-  return YES;
-}
-
 + (BOOL)hasSwiftRuntime {
   // The class
   // [Swift._SwiftObject](https://github.com/apple/swift/blob/5eac3e2818eb340b11232aff83edfbd1c307fa03/stdlib/public/runtime/SwiftObject.h#L35)

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2017 Google
  *
@@ -45,10 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Indicates whether it is running inside an extension or an app.
 + (BOOL)isAppExtension;
-
-/// @return Returns @YES when is run on iOS version greater or equal to 7.0
-+ (BOOL)isIOS7OrHigher DEPRECATED_MSG_ATTRIBUTE(
-    "Always `YES` because only iOS 8 and higher supported. The method will be removed.");
 
 /// @return YES if Swift runtime detected in the app.
 + (BOOL)hasSwiftRuntime __deprecated;
