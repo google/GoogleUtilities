@@ -46,9 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// Indicates whether it is running inside an extension or an app.
 + (BOOL)isAppExtension;
 
-/// @return YES if Swift runtime detected in the app.
-+ (BOOL)hasSwiftRuntime __deprecated;
-
 /// @return An Apple platform. Possible values "ios", "tvos", "macos", "watchos", "maccatalyst", and
 /// "visionos".
 + (NSString *)applePlatform;
