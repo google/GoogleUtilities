@@ -934,35 +934,6 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 }
 #endif  // !TARGET_OS_WATCH && !TARGET_OS_OSX
 
-- (void)application:(GULApplication *)application
-    donor_didReceiveRemoteNotification:(NSDictionary *)userInfo {
-  SEL methodSelector = NSSelectorFromString(kGULDidReceiveRemoteNotificationSEL);
-  NSValue *didReceiveRemoteNotificationIMPPointer =
-      [GULAppDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
-  GULRealDidReceiveRemoteNotificationIMP didReceiveRemoteNotificationIMP =
-      [didReceiveRemoteNotificationIMPPointer pointerValue];
-
-  // Notify interceptors.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  [GULAppDelegateSwizzler
-      notifyInterceptorsWithMethodSelector:methodSelector
-                                  callback:^(id<GULApplicationDelegate> interceptor) {
-                                    NSInvocation *invocation = [GULAppDelegateSwizzler
-                                        appDelegateInvocationForSelector:methodSelector];
-                                    [invocation setTarget:interceptor];
-                                    [invocation setSelector:methodSelector];
-                                    [invocation setArgument:(void *)(&application) atIndex:2];
-                                    [invocation setArgument:(void *)(&userInfo) atIndex:3];
-                                    [invocation invoke];
-                                  }];
-#pragma clang diagnostic pop
-  // Call the real implementation if the real App Delegate has any.
-  if (didReceiveRemoteNotificationIMP) {
-    didReceiveRemoteNotificationIMP(self, methodSelector, application, userInfo);
-  }
-}
-
 + (nullable NSInvocation *)appDelegateInvocationForSelector:(SEL)selector {
   struct objc_method_description methodDescription =
       protocol_getMethodDescription(@protocol(GULApplicationDelegate), selector, NO, YES);
