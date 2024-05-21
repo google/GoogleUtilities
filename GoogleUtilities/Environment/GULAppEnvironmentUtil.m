@@ -218,10 +218,6 @@ static BOOL HasEmbeddedMobileProvision(void) {
 #endif
 }
 
-+ (BOOL)isIOS7OrHigher {
-  return YES;
-}
-
 + (NSString *)applePlatform {
   NSString *applePlatform = @"unknown";
 
