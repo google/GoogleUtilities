@@ -106,8 +106,6 @@ static NSString *const kGULDidRegisterForRemoteNotificationsSEL =
     @"application:didRegisterForRemoteNotificationsWithDeviceToken:";
 static NSString *const kGULDidFailToRegisterForRemoteNotificationsSEL =
     @"application:didFailToRegisterForRemoteNotificationsWithError:";
-static NSString *const kGULDidReceiveRemoteNotificationSEL =
-    @"application:didReceiveRemoteNotification:";
 static NSString *const kGULDidReceiveRemoteNotificationWithCompletionSEL =
     @"application:didReceiveRemoteNotification:fetchCompletionHandler:";
 
