@@ -25,8 +25,8 @@ jobs:
 
   pod-lib-lint:
     needs: changed_today
-#    if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
-    if: ${{ needs.changed_today.outputs.WAS_CHANGED == 'true' }}
+    if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
+
     runs-on: macOS-latest
     strategy:
       matrix:
