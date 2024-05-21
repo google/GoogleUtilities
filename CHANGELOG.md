@@ -1,3 +1,7 @@
+# 8.0.0
+- Remove swizzling support for `application:didReceiveRemoteNotification:`.
+  Use `application:didReceiveRemoteNotification:fetchCompletionHandler:` instead. (#162)
+
 # 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
   conflict with keyword. (#152)
