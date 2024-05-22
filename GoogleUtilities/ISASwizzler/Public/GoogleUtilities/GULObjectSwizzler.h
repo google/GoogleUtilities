@@ -55,7 +55,7 @@ typedef OBJC_ENUM(uintptr_t, GUL_ASSOCIATION){
  *  @param association The mechanism to use when associating the objects.
  */
 + (void)setAssociatedObject:(id)object
-                        key:(NSString *)key
+                        key:(const void *)key
                       value:(nullable id)value
                 association:(GUL_ASSOCIATION)association;
 
@@ -65,7 +65,7 @@ typedef OBJC_ENUM(uintptr_t, GUL_ASSOCIATION){
  *  @param object The object that will be queried for the associated object.
  *  @param key The key of the associated object.
  */
-+ (nullable id)getAssociatedObject:(id)object key:(NSString *)key;
++ (nullable id)getAssociatedObject:(id)object key:(const void *)key;
 
 /** Please use the designated initializer. */
 - (instancetype)init NS_UNAVAILABLE;
@@ -88,7 +88,7 @@ typedef OBJC_ENUM(uintptr_t, GUL_ASSOCIATION){
  *  @param value The value to associate to the swizzled object.
  *  @param association The mechanism to use when associating the objects.
  */
-- (void)setAssociatedObjectWithKey:(NSString *)key
+- (void)setAssociatedObjectWithKey:(const void *)key
                              value:(id)value
                        association:(GUL_ASSOCIATION)association;
 
@@ -97,7 +97,7 @@ typedef OBJC_ENUM(uintptr_t, GUL_ASSOCIATION){
  *
  *  @param key The key of the associated object.
  */
-- (nullable id)getAssociatedObjectForKey:(NSString *)key;
+- (nullable id)getAssociatedObjectForKey:(const void *)key;
 
 /** Copies a selector from an existing class onto the generated dynamic subclass
  *  that this object will adopt. This mechanism can be used to add methods to

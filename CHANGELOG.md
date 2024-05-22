@@ -5,6 +5,8 @@
   `GULHeartbeatDateStorageUserDefaults` APIs. (#164)
 - Remove '+ [GULAppEnvironmentUtil isIOS7OrHigher]' API. (#165)
 - Remove '+ [GULAppEnvironmentUtil hasSwiftRuntime]' API. (#166)
+- Fix an issue where ObjC associated objects were sometimes set with a
+  non-const key, potentially resulting in undefined behavior. (#141)
 
 # 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
