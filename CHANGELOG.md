@@ -1,6 +1,10 @@
 # 8.0.0
 - Remove swizzling support for `application:didReceiveRemoteNotification:`.
   Use `application:didReceiveRemoteNotification:fetchCompletionHandler:` instead. (#162)
+- Remove `GULHeartbeatDateStorable`, `GULHeartbeatDateStorage`,
+  `GULHeartbeatDateStorageUserDefaults` APIs. (#164)
+- Remove '+ [GULAppEnvironmentUtil isIOS7OrHigher]' API. (#165)
+- Remove '+ [GULAppEnvironmentUtil hasSwiftRuntime]' API. (#166)
 
 # 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
