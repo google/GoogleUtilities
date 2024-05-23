@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Compresses and sends a POST request with the provided data to the URL. The session will be
 /// background session if usingBackgroundSession is YES. Otherwise, the POST session is default
 /// session. Returns a session ID or nil if an error occurs.
-- (NSString *)postURL:(NSURL *)url
+- (nullable NSString *)postURL:(NSURL *)url
                    payload:(NSData *)payload
                      queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
@@ -80,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Compresses and sends a POST request with the provided headers and data to the URL. The session
 /// will be background session if usingBackgroundSession is YES. Otherwise, the POST session is
 /// default session. Returns a session ID or nil if an error occurs.
-- (NSString *)postURL:(NSURL *)url
+- (nullable NSString *)postURL:(NSURL *)url
                    headers:(nullable NSDictionary *)headers
                    payload:(NSData *)payload
                      queue:(nullable dispatch_queue_t)queue
@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Sends a GET request with the provided data to the URL. The session will be background session
 /// if usingBackgroundSession is YES. Otherwise, the GET session is default session. Returns a
 /// session ID or nil if an error occurs.
-- (NSString *)getURL:(NSURL *)url
+- (nullable NSString *)getURL:(NSURL *)url
                    headers:(nullable NSDictionary *)headers
                      queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
