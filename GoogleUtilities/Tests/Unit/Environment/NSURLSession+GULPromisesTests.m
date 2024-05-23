@@ -23,6 +23,8 @@
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULURLSessionDataResponse.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/NSURLSession+GULPromises.h"
 
+#if !TARGET_OS_MACCATALYST
+
 @interface NSURLSession_GULPromisesTests : XCTestCase
 @property(nonatomic) NSURLSession *URLSession;
 @property(nonatomic) id URLSessionMock;
@@ -98,3 +100,5 @@
 }
 
 @end
+
+#endif  // !TARGET_OS_MACCATALYST
