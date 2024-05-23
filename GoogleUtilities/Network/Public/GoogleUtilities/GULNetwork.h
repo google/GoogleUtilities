@@ -72,29 +72,29 @@ NS_ASSUME_NONNULL_BEGIN
 /// background session if usingBackgroundSession is YES. Otherwise, the POST session is default
 /// session. Returns a session ID or nil if an error occurs.
 - (nullable NSString *)postURL:(NSURL *)url
-                   payload:(NSData *)payload
-                     queue:(nullable dispatch_queue_t)queue
-    usingBackgroundSession:(BOOL)usingBackgroundSession
-         completionHandler:(GULNetworkCompletionHandler)handler;
+                       payload:(NSData *)payload
+                         queue:(nullable dispatch_queue_t)queue
+        usingBackgroundSession:(BOOL)usingBackgroundSession
+             completionHandler:(GULNetworkCompletionHandler)handler;
 
 /// Compresses and sends a POST request with the provided headers and data to the URL. The session
 /// will be background session if usingBackgroundSession is YES. Otherwise, the POST session is
 /// default session. Returns a session ID or nil if an error occurs.
 - (nullable NSString *)postURL:(NSURL *)url
-                   headers:(nullable NSDictionary *)headers
-                   payload:(NSData *)payload
-                     queue:(nullable dispatch_queue_t)queue
-    usingBackgroundSession:(BOOL)usingBackgroundSession
-         completionHandler:(GULNetworkCompletionHandler)handler;
+                       headers:(nullable NSDictionary *)headers
+                       payload:(NSData *)payload
+                         queue:(nullable dispatch_queue_t)queue
+        usingBackgroundSession:(BOOL)usingBackgroundSession
+             completionHandler:(GULNetworkCompletionHandler)handler;
 
 /// Sends a GET request with the provided data to the URL. The session will be background session
 /// if usingBackgroundSession is YES. Otherwise, the GET session is default session. Returns a
 /// session ID or nil if an error occurs.
 - (nullable NSString *)getURL:(NSURL *)url
-                   headers:(nullable NSDictionary *)headers
-                     queue:(nullable dispatch_queue_t)queue
-    usingBackgroundSession:(BOOL)usingBackgroundSession
-         completionHandler:(GULNetworkCompletionHandler)handler;
+                      headers:(nullable NSDictionary *)headers
+                        queue:(nullable dispatch_queue_t)queue
+       usingBackgroundSession:(BOOL)usingBackgroundSession
+            completionHandler:(GULNetworkCompletionHandler)handler;
 
 @end
 
