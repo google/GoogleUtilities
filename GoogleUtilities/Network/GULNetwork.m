@@ -90,9 +90,9 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
                                             completionHandler:completionHandler];
 }
 
-- (NSString *)postURL:(NSURL *)url
+- (nullable NSString *)postURL:(NSURL *)url
                    payload:(NSData *)payload
-                     queue:(dispatch_queue_t)queue
+                     queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
          completionHandler:(GULNetworkCompletionHandler)handler {
   return [self postURL:url
@@ -103,10 +103,10 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
            completionHandler:handler];
 }
 
-- (NSString *)postURL:(NSURL *)url
+- (nullable NSString *)postURL:(NSURL *)url
                    headers:(NSDictionary *)headers
                    payload:(NSData *)payload
-                     queue:(dispatch_queue_t)queue
+                     queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
          completionHandler:(GULNetworkCompletionHandler)handler {
   if (!url.absoluteString.length) {
@@ -189,9 +189,9 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
   return requestID;
 }
 
-- (NSString *)getURL:(NSURL *)url
-                   headers:(NSDictionary *)headers
-                     queue:(dispatch_queue_t)queue
+- (nullable NSString *)getURL:(NSURL *)url
+                   headers:(nullable NSDictionary *)headers
+                     queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
          completionHandler:(GULNetworkCompletionHandler)handler {
   if (!url.absoluteString.length) {
