@@ -104,7 +104,7 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
 }
 
 - (nullable NSString *)postURL:(NSURL *)url
-                   headers:(NSDictionary *)headers
+                   headers:(nullable NSDictionary *)headers
                    payload:(NSData *)payload
                      queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
