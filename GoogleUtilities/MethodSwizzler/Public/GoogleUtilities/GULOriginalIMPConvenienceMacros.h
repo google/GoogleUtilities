@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+#import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * GULOriginalIMPConvenienceMacros.h
  *
@@ -205,3 +209,5 @@
                     __typeof__(__arg7), __typeof__(__arg8), __typeof__(__arg9)))__originalIMP)(  \
       __receivingObject, __swizzledSEL, __arg1, __arg2, __arg3, __arg4, __arg5, __arg6, __arg7,  \
       __arg8, __arg9)
+
+NS_ASSUME_NONNULL_END

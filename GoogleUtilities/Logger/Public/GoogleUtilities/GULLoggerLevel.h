@@ -16,6 +16,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * The log levels used by internal logging.
  */
@@ -35,3 +37,5 @@ typedef NS_ENUM(NSInteger, GULLoggerLevel) {
   /** Maximum log level. */
   GULLoggerLevelMax = GULLoggerLevelDebug
 } NS_SWIFT_NAME(GoogleLoggerLevel);
+
+NS_ASSUME_NONNULL_END

@@ -20,6 +20,8 @@
 #import "GULNetworkLoggerProtocol.h"
 #import "GULNetworkURLSession.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /// Delegate protocol for GULNetwork events.
 @protocol GULNetworkReachabilityDelegate
 
@@ -79,7 +81,7 @@
 /// will be background session if usingBackgroundSession is YES. Otherwise, the POST session is
 /// default session. Returns a session ID or nil if an error occurs.
 - (NSString *)postURL:(NSURL *)url
-                   headers:(NSDictionary *)headers
+                   headers:(nullable NSDictionary *)headers
                    payload:(NSData *)payload
                      queue:(dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
@@ -95,3 +97,5 @@
          completionHandler:(GULNetworkCompletionHandler)handler;
 
 @end
+
+NS_ASSUME_NONNULL_END

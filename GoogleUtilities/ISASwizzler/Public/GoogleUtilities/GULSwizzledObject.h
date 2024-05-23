@@ -16,6 +16,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class GULObjectSwizzler;
 
 /** This class exists as a method donor. These methods will be added to all objects that are
@@ -40,3 +42,5 @@
 - (GULObjectSwizzler *)gul_objectSwizzler;
 
 @end
+
+NS_ASSUME_NONNULL_END
