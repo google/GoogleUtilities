@@ -185,7 +185,8 @@
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
   _statusCode = 200;
 
-  [_network postURL:nil
+  NSURL *nilURL = nil;
+  [_network postURL:nilURL
                      payload:uncompressedData
                        queue:_backgroundQueue
       usingBackgroundSession:NO
@@ -415,7 +416,8 @@
   NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
   _statusCode = 200;
 
-  [_network postURL:nil
+  NSURL *nilURL = nil;
+  [_network postURL:nilURL
                      payload:uncompressedData
                        queue:_backgroundQueue
       usingBackgroundSession:YES
@@ -638,7 +640,8 @@
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   _statusCode = 200;
 
-  [_network getURL:nil
+  NSURL *nilURL = nil;
+  [_network getURL:nilURL
                      headers:nil
                        queue:_backgroundQueue
       usingBackgroundSession:NO
@@ -834,7 +837,8 @@
   XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
   _statusCode = 200;
 
-  [_network getURL:nil
+  NSURL *nilURL = nil;
+  [_network getURL:nilURL
                      headers:nil
                        queue:_backgroundQueue
       usingBackgroundSession:YES

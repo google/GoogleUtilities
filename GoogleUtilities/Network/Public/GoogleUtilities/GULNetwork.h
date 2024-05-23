@@ -73,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// session. Returns a session ID or nil if an error occurs.
 - (NSString *)postURL:(NSURL *)url
                    payload:(NSData *)payload
-                     queue:(dispatch_queue_t)queue
+                     queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
          completionHandler:(GULNetworkCompletionHandler)handler;
 
@@ -83,7 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)postURL:(NSURL *)url
                    headers:(nullable NSDictionary *)headers
                    payload:(NSData *)payload
-                     queue:(dispatch_queue_t)queue
+                     queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
          completionHandler:(GULNetworkCompletionHandler)handler;
 
@@ -91,8 +91,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// if usingBackgroundSession is YES. Otherwise, the GET session is default session. Returns a
 /// session ID or nil if an error occurs.
 - (NSString *)getURL:(NSURL *)url
-                   headers:(NSDictionary *)headers
-                     queue:(dispatch_queue_t)queue
+                   headers:(nullable NSDictionary *)headers
+                     queue:(nullable dispatch_queue_t)queue
     usingBackgroundSession:(BOOL)usingBackgroundSession
          completionHandler:(GULNetworkCompletionHandler)handler;
 
