@@ -309,6 +309,45 @@
                                }];
 }
 
+- (void)testHeaders_POST_foreground {
+  XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
+
+  NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
+
+  NSURL *url =
+      [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/2", _httpServer.port]];
+  _statusCode = 200;
+
+  NSDictionary *headers = @{@"Version" : @"123"};
+
+  [_network postURL:url
+                     headers:headers
+                     payload:uncompressedData
+                       queue:_backgroundQueue
+      usingBackgroundSession:NO
+           completionHandler:^(NSHTTPURLResponse *response, NSData *data, NSError *error) {
+             XCTAssertNotNil(data);
+             NSString *responseBody = [[NSString alloc] initWithData:data
+                                                            encoding:NSUTF8StringEncoding];
+             XCTAssertEqualObjects(responseBody, @"<html><body>Hello, World!</body></html>");
+             [self verifyResponse:response error:error];
+             [self verifyRequest];
+
+             NSString *version = [self->_request.allHeaderFieldValues valueForKey:@"Version"];
+             XCTAssertEqualObjects(version, @"123");
+
+             [expectation fulfill];
+           }];
+
+  // Wait a little bit so the server has enough time to respond.
+  [self waitForExpectationsWithTimeout:10
+                               handler:^(NSError *error) {
+                                 if (error) {
+                                   XCTFail(@"Timeout Error: %@", error);
+                                 }
+                               }];
+}
+
 #pragma mark - Test POST Background
 
 - (void)testSessionNetwork_POST_background {
@@ -491,6 +530,44 @@
            }];
 
   XCTAssertTrue(self->_network.hasUploadInProgress, @"hasUploadInProgress must be true");
+  // Wait a little bit so the server has enough time to respond.
+  [self waitForExpectationsWithTimeout:10
+                               handler:^(NSError *error) {
+                                 if (error) {
+                                   XCTFail(@"Timeout Error: %@", error);
+                                 }
+                               }];
+}
+
+- (void)testHeaders_POST_background {
+  XCTestExpectation *expectation = [self expectationWithDescription:@"Expect block is called"];
+
+  NSData *uncompressedData = [@"Google" dataUsingEncoding:NSUTF8StringEncoding];
+  NSURL *url =
+      [NSURL URLWithString:[NSString stringWithFormat:@"http://localhost:%d/2", _httpServer.port]];
+  _statusCode = 200;
+
+  NSDictionary *headers = @{@"Version" : @"123"};
+
+  [_network postURL:url
+                     headers:headers
+                     payload:uncompressedData
+                       queue:_backgroundQueue
+      usingBackgroundSession:YES
+           completionHandler:^(NSHTTPURLResponse *response, NSData *data, NSError *error) {
+             XCTAssertNotNil(data);
+             NSString *responseBody = [[NSString alloc] initWithData:data
+                                                            encoding:NSUTF8StringEncoding];
+             XCTAssertEqualObjects(responseBody, @"<html><body>Hello, World!</body></html>");
+             [self verifyResponse:response error:error];
+             [self verifyRequest];
+
+             NSString *version = [self->_request.allHeaderFieldValues valueForKey:@"Version"];
+             XCTAssertEqualObjects(version, @"123");
+
+             [expectation fulfill];
+           }];
+
   // Wait a little bit so the server has enough time to respond.
   [self waitForExpectationsWithTimeout:10
                                handler:^(NSError *error) {

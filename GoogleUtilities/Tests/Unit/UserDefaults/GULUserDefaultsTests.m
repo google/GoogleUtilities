@@ -395,8 +395,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   // correct return value of `YES` is returned, but in this test it returns `NO`. Best guess is the
   // test app is sandboxed and `NSFileManager` is refusing to read the directory.
   // TODO: Investigate the failure and re-enable this test.
-  return;
-#endif  // TARGET_OS_OSX
+#else
   NSString *suiteName = [NSString stringWithFormat:@"another_test_suite"];
   NSString *filePath = [self filePathForPreferencesName:suiteName];
   NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -417,6 +416,7 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [newUserDefaults synchronize];
 
   [self removePreferenceFileWithSuiteName:suiteName];
+#endif  // TARGET_OS_OSX || TARGET_OS_MACCATALYST || SWIFT_PACKAGE
 }
 
 - (void)testInvalidKeys {

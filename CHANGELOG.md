@@ -1,3 +1,58 @@
+# 7.13.3
+- Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
+  conflict with keyword. (#152)
+- Reorganize privacy manifests for SwiftPM so that each library target has its
+  own privacy manifest, as opposed to transitively depending on a common one.
+  (#150)
+
+# 7.13.2
+- Remove synchronization delay for `GULUserDefaults` to better match
+  `NSUserDefaults` behavior. (#148)
+
+# 7.13.1 (SwiftPM Only)
+- Attempt to fix validation error due to invalid module name. (#146)
+
+# 7.13.0
+- Add privacy manifest. (#128)
+
+# 7.12.1 (SwiftPM Only)
+- Fix improperly formatted target name that blocks App Store submission. (#140)
+
+# 7.12.0
+- Added a logging level getter, `GULGetLoggerLevel`. (#138)
+
+# 7.11.6
+- Fix visionOS build on Xcode 15.1 Beta 1.
+
+# 7.11.5
+- Replace 'TARGET_OS_XR' with 'TARGET_OS_VISION' for compatibility with
+  Xcode 15 Beta 5.
+
+# 7.11.4
+- Fix Xcode 15 Beta 4 runtime warning. (#114)
+
+# 7.11.3 (SwiftPM Only)
+- Calling `+[GULAppEnvironmentUtil applePlatform]` now returns 'visionos' when
+  running on visionOS.
+
+# 7.11.2 (SwiftPM Only)
+- Fix build errors on the visionOS platform. (#108)
+
+# 7.11.1
+- Fix Xcode 14.3 build warnings.
+
+# 7.11.0
+- Add a new POST API in GULNetwork to support HTTP headers. (#99)
+- Fix iOS 12 deprecation warnings. (#98)
+
+# 7.10.0
+- Added Network Utility. (#91)
+- Added a few utility functions for Firebase Performance and FirebaseSession SDKs. (#89, #90)
+
+# 7.9.0 (Swift PM)
+- Don't use underscores in SPM target names. This fixes an App Store submission
+  issue for SPM builds that dynamically link (firebase-ios-sdk/#9912). (#83)
+
 # 7.8.0
 - Update `+ [GULAppEnvironmentUtil deploymentType]` API to fall back to
   `unknown` instead of `cocoapods`. (#79)

@@ -44,6 +44,10 @@ static NSString *const kMessageCode = @"I-COR000001";
 
 @implementation GULLoggerTest
 
++ (void)setUp {
+  GULLoggerInitializeASL();
+}
+
 - (void)setUp {
   [super setUp];
   GULResetLogger();
@@ -111,6 +115,32 @@ static NSString *const kMessageCode = @"I-COR000001";
   XCTAssertEqual(GULLoggerLevelNotice, ASL_LEVEL_NOTICE);
   XCTAssertEqual(GULLoggerLevelInfo, ASL_LEVEL_INFO);
   XCTAssertEqual(GULLoggerLevelDebug, ASL_LEVEL_DEBUG);
+}
+
+- (void)testGULGetLoggerLevel {
+  GULLoggerLevel loggerLevel = GULGetLoggerLevel();
+
+  // The default logger level is GULLoggerLevelNotice.
+  XCTAssertEqual(loggerLevel, GULLoggerLevelNotice);
+}
+
+- (void)testGULSetLoggerLevel {
+  GULSetLoggerLevel(GULLoggerLevelDebug);
+
+  GULLoggerLevel loggerLevel = GULGetLoggerLevel();
+
+  // The default logger level is GULLoggerLevelNotice.
+  XCTAssertEqual(loggerLevel, GULLoggerLevelDebug);
+}
+
+- (void)testGULResetLogger_ResetsLoggerLevel {
+  GULSetLoggerLevel(GULLoggerLevelDebug);
+
+  GULResetLogger();
+  GULLoggerLevel loggerLevel = GULGetLoggerLevel();
+
+  // The default logger level is GULLoggerLevelNotice.
+  XCTAssertEqual(loggerLevel, GULLoggerLevelNotice);
 }
 
 @end

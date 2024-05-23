@@ -426,8 +426,8 @@
   };
   NSString * (^newImplementationDescriptionThatSays)(TestObject *, NSString *) =
       ^NSString *(TestObject *_self, NSString *something) {
-    return [something stringByAppendingString:@"SWIZZLED!"];
-  };
+        return [something stringByAppendingString:@"SWIZZLED!"];
+      };
   [GULSwizzler swizzleClass:testClass
                    selector:selectorOne
             isClassSelector:NO
@@ -455,8 +455,8 @@
   };
   NSString * (^newImplementationDescriptionThatSays)(TestObject *, NSString *) =
       ^NSString *(TestObject *_self, NSString *something) {
-    return [something stringByAppendingString:@"SWIZZLED!"];
-  };
+        return [something stringByAppendingString:@"SWIZZLED!"];
+      };
   [GULSwizzler swizzleClass:testClass
                    selector:selectorOne
             isClassSelector:YES
@@ -611,8 +611,8 @@
   TestObject *testObject = [[TestObject alloc] init];
   NSString * (^replacingBlock)(TestObject *, NSString *) =
       ^NSString *(TestObject *_self, NSString *something) {
-    return [something stringByAppendingString:@"SWIZZLED!"];
-  };
+        return [something stringByAppendingString:@"SWIZZLED!"];
+      };
 
   SEL swizzledSelector = @selector(descriptionThatSays:);
   [GULSwizzler swizzleClass:[TestObject class]

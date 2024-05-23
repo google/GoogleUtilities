@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
                                 fromData:(NSData *)data
                                    error:(NSError **)outError;
 
-+ (nullable id)unarchivedObjectOfClass:(Class)class
++ (nullable id)unarchivedObjectOfClass:(Class)aClass
                               fromData:(NSData *)data
                                  error:(NSError **)outError;
 

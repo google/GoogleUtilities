@@ -141,19 +141,27 @@
     [self excludeFromBackupForURL:_uploadingFileURL];
 
     _sessionConfig = [self backgroundSessionConfigWithSessionID:_sessionID];
-    [self populateSessionConfig:_sessionConfig withRequest:request];
-    session = [NSURLSession sessionWithConfiguration:_sessionConfig
-                                            delegate:self
-                                       delegateQueue:[NSOperationQueue mainQueue]];
-    postRequestTask = [session uploadTaskWithRequest:request fromFile:_uploadingFileURL];
   } else {
     // If we cannot write to file, just send it in the foreground.
     _sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
-    [self populateSessionConfig:_sessionConfig withRequest:request];
-    session = [NSURLSession sessionWithConfiguration:_sessionConfig
-                                            delegate:self
-                                       delegateQueue:[NSOperationQueue mainQueue]];
-    postRequestTask = [session uploadTaskWithRequest:request fromData:request.HTTPBody];
+  }
+  [self populateSessionConfig:_sessionConfig withRequest:request];
+  session = [NSURLSession sessionWithConfiguration:_sessionConfig
+                                          delegate:self
+                                     delegateQueue:[NSOperationQueue mainQueue]];
+  // To avoid a runtime warning in Xcode 15 Beta 4, the given `URLRequest`
+  // should have a nil `HTTPBody`. To workaround this, the given `URLRequest`
+  // is copied and the `HTTPBody` data is removed.
+  NSData *givenRequestHTTPBody = [request.HTTPBody copy];
+  NSMutableURLRequest *requestWithoutHTTPBody = [request mutableCopy];
+  requestWithoutHTTPBody.HTTPBody = nil;
+
+  if (didWriteFile) {
+    postRequestTask = [session uploadTaskWithRequest:requestWithoutHTTPBody
+                                            fromFile:_uploadingFileURL];
+  } else {
+    postRequestTask = [session uploadTaskWithRequest:requestWithoutHTTPBody
+                                            fromData:givenRequestHTTPBody];
   }
 
   if (!session || !postRequestTask) {
@@ -387,7 +395,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         trustError = SecTrustEvaluate(serverTrust, &trustEval);
-#pragma clang dianostic pop
+#pragma clang diagnostic pop
       }
 
       if (trustError != errSecSuccess) {
