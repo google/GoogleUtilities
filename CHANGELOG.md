@@ -7,6 +7,8 @@
 - Remove '+ [GULAppEnvironmentUtil hasSwiftRuntime]' API. (#166)
 - Fix an issue where ObjC associated objects were sometimes set with a
   non-const key, potentially resulting in undefined behavior. (#141)
+- Add nullabilty annotations to public headers. (#169)
+- Remove references to deprecated CTCarrier. (#106)
 
 # 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
