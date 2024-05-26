@@ -38,7 +38,7 @@ After the CI is green:
     <summary>Push to <b>SpecsStaging</b></summary>
 
     ```console
-    pod repo push --skip-tests staging GoogleUtilities.podspec
+    pod repo push --skip-tests --use-json staging GoogleUtilities.podspec
     ```
 
     If the command fails with `Unable to find the 'staging' repo.`, add the staging repo with:
@@ -51,7 +51,7 @@ After the CI is green:
     <summary>Push to <b>SpecsDev</b></summary>
 
     ```console
-    pod repo push --skip-tests dev GoogleUtilities.podspec
+    pod repo push --skip-tests --use-json dev GoogleUtilities.podspec
     ```
 
     If the command fails with `Unable to find the 'dev' repo.`, add the dev repo with:
