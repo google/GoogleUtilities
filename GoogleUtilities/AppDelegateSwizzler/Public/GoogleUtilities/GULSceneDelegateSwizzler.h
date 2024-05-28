@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString *const GULSceneDelegateInterceptorID;
 
-// TODO(v8): Update API availability so this class is only available on iOS/tvOS 13.0+
 /** This class contains methods that isa swizzle the scene delegate. */
 @interface GULSceneDelegateSwizzler : NSProxy
 
