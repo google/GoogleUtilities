@@ -168,7 +168,7 @@ void GULLogBasic(GULLoggerLevel level,
   }
   logMsg = [NSString stringWithFormat:@"%@ - %@[%@] %@", sVersion, service, messageCode, logMsg];
   dispatch_async(sGULClientQueue, ^{
-    os_log_with_type(sLogObject, convertLoggerLevel(level), "%@", logMsg);
+    os_log_with_type(sLogObject, convertLoggerLevel(level), "%{public}@", logMsg);
   });
 }
 
