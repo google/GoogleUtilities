@@ -59,7 +59,7 @@
                         [UIDevice currentDevice].systemVersion);
 #else
   NSOperatingSystemVersion osTenTwo = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 0};
-  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTen);
+  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwo);
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2");
 #endif
 }
@@ -70,7 +70,7 @@
                         [UIDevice currentDevice].systemVersion);
 #else
   NSOperatingSystemVersion osTenTwoOne = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 1};
-  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTen);
+  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwo);
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2.1");
 #endif
 }
