@@ -23,7 +23,7 @@
 
 #if TARGET_OS_IOS
 #import <UIKit/UIKit.h>
-#endif
+#endif  // TARGET_OS_IOS
 
 @implementation GULAppEnvironmentUtil
 
@@ -244,7 +244,6 @@ static BOOL HasEmbeddedMobileProvision(void) {
 #if TARGET_OS_MACCATALYST
   applePlatform = @"maccatalyst";
 #elif TARGET_OS_IOS && (!defined(TARGET_OS_VISION) || !TARGET_OS_VISION)
-#if defined(__IPHONE_14_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000
   if (@available(iOS 14.0, *)) {
     // Early iOS 14 betas do not include isiOSAppOnMac (#6969)
     applePlatform = ([[NSProcessInfo processInfo] respondsToSelector:@selector(isiOSAppOnMac)] &&
@@ -254,10 +253,6 @@ static BOOL HasEmbeddedMobileProvision(void) {
   } else {
     applePlatform = @"ios";
   }
-#else   // defined(__IPHONE_14_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000
-  applePlatform = @"ios";
-#endif  // defined(__IPHONE_14_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140000
-
 #elif TARGET_OS_TV
   applePlatform = @"tvos";
 #elif TARGET_OS_OSX
