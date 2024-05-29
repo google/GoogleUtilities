@@ -16,6 +16,10 @@
 #import <OCMock/OCMock.h>
 #import <XCTest/XCTest.h>
 
+#if __has_include(<UIKit/UIKit.h>)
+#import <UIKit/UIKit.h>
+#endif
+
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULAppEnvironmentUtil.h"
 
 @interface GULAppEnvironmentUtilTest : XCTestCase
@@ -39,24 +43,36 @@
 }
 
 - (void)testSystemVersionInfoMajorOnly {
+#if TARGET_OS_IOS
+  XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion],
+                        [UIDevice currentDevice].systemVersion);
+#else
   NSOperatingSystemVersion osTen = {.majorVersion = 10, .minorVersion = 0, .patchVersion = 0};
   OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTen);
-
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.0");
+#endif
 }
 
 - (void)testSystemVersionInfoMajorMinor {
+#if TARGET_OS_IOS
+  XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion],
+                        [UIDevice currentDevice].systemVersion);
+#else
   NSOperatingSystemVersion osTenTwo = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 0};
-  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwo);
-
+  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTen);
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2");
+#endif
 }
 
 - (void)testSystemVersionInfoMajorMinorPatch {
+#if TARGET_OS_IOS
+  XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion],
+                        [UIDevice currentDevice].systemVersion);
+#else
   NSOperatingSystemVersion osTenTwoOne = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 1};
-  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwoOne);
-
+  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTen);
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2.1");
+#endif
 }
 
 - (void)testDeploymentType {
