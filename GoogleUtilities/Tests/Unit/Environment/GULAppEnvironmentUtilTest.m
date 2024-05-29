@@ -70,7 +70,7 @@
                         [UIDevice currentDevice].systemVersion);
 #else
   NSOperatingSystemVersion osTenTwoOne = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 1};
-  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwo);
+  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwoOne);
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2.1");
 #endif
 }
