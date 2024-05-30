@@ -38,7 +38,7 @@ After the CI is green:
     <summary>Push to <b>SpecsStaging</b></summary>
 
     ```console
-    pod repo push --skip-tests staging GoogleUtilities.podspec
+    pod repo push --skip-tests --use-json staging GoogleUtilities.podspec
     ```
 
     If the command fails with `Unable to find the 'staging' repo.`, add the staging repo with:
@@ -51,7 +51,7 @@ After the CI is green:
     <summary>Push to <b>SpecsDev</b></summary>
 
     ```console
-    pod repo push --skip-tests dev GoogleUtilities.podspec
+    pod repo push --skip-tests --use-json dev GoogleUtilities.podspec
     ```
 
     If the command fails with `Unable to find the 'dev' repo.`, add the dev repo with:
@@ -89,7 +89,7 @@ The release process is as follows:
 
   It's recommended to point to the `GoogleUtilities.podspec` in `staging` to make sure the correct spec is being published.
   ```console
-  pod trunk push ~/.cocoapods/repos/staging/GoogleUtilities/{version}/GoogleUtilities.podspec
+  pod trunk push ~/.cocoapods/repos/staging/GoogleUtilities/{version}/GoogleUtilities.podspec.json
   ```
   *Note: In some cases, it may be acceptable to `pod trunk push` with the `--skip-tests` flag. Please double check with
   the maintainers before doing so.*
