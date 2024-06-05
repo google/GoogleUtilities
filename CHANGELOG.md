@@ -9,6 +9,14 @@
   non-const key, potentially resulting in undefined behavior. (#141)
 - Add nullabilty annotations to public headers. (#169)
 - Remove references to deprecated CTCarrier. (#106)
+- [changed] **Breaking change**: Minimum supported versions have
+  updated for the following platforms:
+    - | Platform  | GoogleUtilities 8.0|
+      | ------------- | ------------- |
+      | iOS  | **12.0**  |
+      | tvOS  | **13.0**  |
+      | macOS  | **10.15**  |
+      | watchOS  | 7.0  |
 
 # 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid

@@ -19,7 +19,7 @@ import PackageDescription
 
 let package = Package(
   name: "GoogleUtilities",
-  platforms: [.iOS(.v9), .macOS(.v10_12), .tvOS(.v10), .watchOS(.v6)],
+  platforms: [.iOS(.v12), .macOS(.v10_15), .tvOS(.v13), .watchOS(.v7)],
   products: [
     .library(
       name: "GULAppDelegateSwizzler",
@@ -63,11 +63,12 @@ let package = Package(
     ),
   ],
   dependencies: [
-    .package(name: "Promises", url: "https://github.com/google/promises.git", "1.2.8" ..< "3.0.0"),
+    .package(url: "https://github.com/google/promises.git", "1.2.8" ..< "3.0.0"),
+    // TODO: restore OCMock when https://github.com/erikdoe/ocmock/pull/537
+    // gets merged to fix Xcode 15.3 builds.
     .package(
-      name: "OCMock",
-      url: "https://github.com/erikdoe/ocmock.git",
-      .revision("c5eeaa6dde7c308a5ce48ae4d4530462dd3a1110")
+      url: "https://github.com/paulb777/ocmock.git",
+      revision: "173955e93e6ee6999a10729ab67e4b4efdd1db6d"
     ),
   ],
   targets: [
@@ -228,7 +229,7 @@ let package = Package(
     .testTarget(
       name: "UtilitiesUnit",
       dependencies: [
-        "OCMock",
+        .product(name: "OCMock", package: "OCMock"),
         "GoogleUtilities-AppDelegateSwizzler",
         "GoogleUtilities-Environment",
         "GoogleUtilities-ISASwizzler",
