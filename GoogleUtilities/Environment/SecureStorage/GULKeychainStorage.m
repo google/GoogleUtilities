@@ -24,7 +24,6 @@
 #endif
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainUtils.h"
-#import "GoogleUtilities/Environment/Public/GoogleUtilities/GULSecureCoding.h"
 
 @interface GULKeychainStorage ()
 @property(nonatomic, readonly) dispatch_queue_t keychainQueue;
@@ -91,7 +90,9 @@
         // Then store the object to the keychain.
         NSDictionary *query = [self keychainQueryWithKey:key accessGroup:accessGroup];
         NSError *error;
-        NSData *encodedObject = [GULSecureCoding archivedDataWithRootObject:object error:&error];
+        NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:object
+                                                      requiringSecureCoding:YES
+                                                                      error:&error];
         if (!encodedObject) {
           return error;
         }
@@ -142,9 +143,9 @@
                     if (!encodedObject) {
                       return nil;
                     }
-                    id object = [GULSecureCoding unarchivedObjectOfClass:objectClass
-                                                                fromData:encodedObject
-                                                                   error:&error];
+                    id object = [NSKeyedUnarchiver unarchivedObjectOfClass:objectClass
+                                                                  fromData:encodedObject
+                                                                     error:&error];
                     if (error) {
                       return error;
                     }
