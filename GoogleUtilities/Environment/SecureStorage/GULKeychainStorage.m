@@ -75,32 +75,34 @@
     });
 }
 
-- (FBLPromise<NSNull *> *)setObject:(id<NSSecureCoding>)object
-                             forKey:(NSString *)key
-                        accessGroup:(nullable NSString *)accessGroup {
-  return [FBLPromise onQueue:self.inMemoryCacheQueue
-                          do:^id _Nullable {
-                            // Save to the in-memory cache first.
-                            [self.inMemoryCache setObject:object forKey:[key copy]];
-                            return [NSNull null];
-                          }]
-      .thenOn(self.keychainQueue, ^id(id result) {
-        // Then store the object to the keychain.
-        NSDictionary *query = [self keychainQueryWithKey:key accessGroup:accessGroup];
-        NSError *error;
-        NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:object
-                                                      requiringSecureCoding:YES
-                                                                      error:&error];
-        if (!encodedObject) {
-          return error;
-        }
+- (void)setObject:(id<NSSecureCoding>)object
+           forKey:(NSString *)key
+      accessGroup:(nullable NSString *)accessGroup
+completionHandler:(void (^)(id<NSSecureCoding> _Nullable obj, NSError * _Nullable error))completionHandler {
+    dispatch_async(self.inMemoryCacheQueue, ^{
+        // Save to the in-memory cache first.
+        [self.inMemoryCache setObject:object forKey:[key copy]];
 
-        if (![GULKeychainUtils setItem:encodedObject withQuery:query error:&error]) {
-          return error;
-        }
+        dispatch_async(self.keychainQueue, ^{
+            // Then store the object to the keychain.
+            NSDictionary *query = [self keychainQueryWithKey:key accessGroup:accessGroup];
+            NSError *error;
+            NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:object
+                                                          requiringSecureCoding:YES
+                                                                          error:&error];
+            if (!encodedObject) {
+              completionHandler(nil, error);
+              return;
+            }
 
-        return [NSNull null];
-      });
+            if (![GULKeychainUtils setItem:encodedObject withQuery:query error:&error]) {
+              completionHandler(nil, error);
+              return;
+            }
+
+            completionHandler(object, nil);
+        });
+    });
 }
 
 - (FBLPromise<NSNull *> *)removeObjectForKey:(NSString *)key
@@ -136,15 +138,18 @@
 
         if (error) {
           completionHandler(nil, error);
+            return;
         }
         if (!encodedObject) {
           completionHandler(nil, nil);
+          return;
         }
         id object = [NSKeyedUnarchiver unarchivedObjectOfClass:objectClass
                                                       fromData:encodedObject
                                                          error:&error];
         if (error) {
           completionHandler(nil, error);
+          return;
         }
 
         dispatch_async(self.inMemoryCacheQueue, ^{
