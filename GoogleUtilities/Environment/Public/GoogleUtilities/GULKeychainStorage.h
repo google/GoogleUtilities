@@ -34,18 +34,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithService:(NSString *)service;
 
-/**
- * Get an object by key.
- * @param key The key.
- * @param objectClass The expected object class required by `NSSecureCoding`.
- * @param accessGroup The Keychain Access Group.
- *
- * @return Returns a promise. It is resolved with an object stored by key if exists. It is resolved
- * with `nil` when the object not found. It fails on a Keychain error.
- */
-- (FBLPromise<id<NSSecureCoding>> *)getObjectForKey:(NSString *)key
-                                        objectClass:(Class)objectClass
-                                        accessGroup:(nullable NSString *)accessGroup;
+/// Get an object by key.
+/// @param key The key.
+/// @param objectClass The expected object class required by `NSSecureCoding`.
+/// @param accessGroup The Keychain Access Group.
+/// @param completionHandler The completion handler to call when the
+/// synchronized keychain read is complete. An error is passed to the
+/// completion handler if the keychain read fails. Else, the object stored in
+/// the keychain, or `nil` if it does not exist, is passed to the completion
+/// handler.
+- (void)getObjectForKey:(NSString *)key
+            objectClass:(Class)objectClass
+            accessGroup:(nullable NSString *)accessGroup
+      completionHandler:(void (^)(id<NSSecureCoding> _Nullable obj, NSError * _Nullable error))completionHandler;
 
 /**
  * Saves the given object by the given key.
