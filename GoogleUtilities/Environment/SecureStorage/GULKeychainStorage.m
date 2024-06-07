@@ -103,23 +103,23 @@
       });
 }
 
-- (FBLPromise<NSNull *> *)removeObjectForKey:(NSString *)key
-                                 accessGroup:(nullable NSString *)accessGroup {
-  return [FBLPromise onQueue:self.inMemoryCacheQueue
-                          do:^id _Nullable {
-                            [self.inMemoryCache removeObjectForKey:key];
-                            return nil;
-                          }]
-      .thenOn(self.keychainQueue, ^id(id result) {
-        NSDictionary *query = [self keychainQueryWithKey:key accessGroup:accessGroup];
+- (void)removeObjectForKey:(NSString *)key
+            accessGroup:(nullable NSString *)accessGroup
+         completionHandler:(void (^)(BOOL success, NSError * _Nullable error))completionHandler {
+    dispatch_async(self.inMemoryCacheQueue, ^{
+        [self.inMemoryCache removeObjectForKey:key];
+        dispatch_async(self.keychainQueue, ^{
+            NSDictionary *query = [self keychainQueryWithKey:key accessGroup:accessGroup];
 
-        NSError *error;
-        if (![GULKeychainUtils removeItemWithQuery:query error:&error]) {
-          return error;
-        }
-
-        return [NSNull null];
-      });
+            NSError *error;
+            BOOL success = [GULKeychainUtils removeItemWithQuery:query error:&error];
+            if (!success) {
+              completionHandler(success, error);
+              return;
+            }
+            completionHandler(success, nil);
+        });
+    });
 }
 
 #pragma mark - Private
