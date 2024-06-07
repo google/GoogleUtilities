@@ -48,18 +48,15 @@ NS_ASSUME_NONNULL_BEGIN
             accessGroup:(nullable NSString *)accessGroup
       completionHandler:(void (^)(id<NSSecureCoding> _Nullable obj, NSError * _Nullable error))completionHandler;
 
-/**
- * Saves the given object by the given key.
- * @param object The object to store.
- * @param key The key to store the object. If there is an existing object by the key, it will be
- * overridden.
- * @param accessGroup The Keychain Access Group.
- *
- * @return Returns which is resolved with `[NSNull null]` on success.
- */
-- (FBLPromise<NSNull *> *)setObject:(id<NSSecureCoding>)object
-                             forKey:(NSString *)key
-                        accessGroup:(nullable NSString *)accessGroup;
+/// Saves the given object by the given key.
+/// @param object The object to store.
+/// @param key The key to store the object. If there is an existing object by the key, it will be overridden.
+/// @param accessGroup The Keychain Access Group.
+/// @param completionHandler Returns the object that was successfully stored, or an error if one occurred.
+- (void)setObject:(id<NSSecureCoding>)object
+           forKey:(NSString *)key
+      accessGroup:(nullable NSString *)accessGroup
+completionHandler:(void (^)(id<NSSecureCoding> _Nullable obj, NSError * _Nullable error))completionHandler;
 
 /**
  * Removes the object by the given key.
