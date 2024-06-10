@@ -52,7 +52,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param object The object to store.
 /// @param key The key to store the object. If there is an existing object by the key, it will be overridden.
 /// @param accessGroup The Keychain Access Group.
-/// @param completionHandler Returns the object that was successfully stored, or an error if one occurred.
+/// @param completionHandler  The completion handler to call when the
+/// synchronized keychain write is complete. An error is passed to the
+/// completion handler if the keychain read fails. Else, the object written to
+/// the keychain is passed to the completion handler.
 - (void)setObject:(id<NSSecureCoding>)object
            forKey:(NSString *)key
       accessGroup:(nullable NSString *)accessGroup

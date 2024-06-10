@@ -119,17 +119,19 @@
   // Read.
   // Skip in-memory cache because the error is relevant only for Keychain.
   OCMExpect([self.mockCache objectForKey:key]).andReturn(nil);
-
-  FBLPromise<id<NSSecureCoding>> *getPromise = [self.storage getObjectForKey:key
-                                                                 objectClass:[NSString class]
-                                                                 accessGroup:nil];
-
-  XCTAssert(FBLWaitForPromisesWithTimeout(1));
-  XCTAssertNil(getPromise.value);
-  XCTAssertNotNil(getPromise.error);
-  // TODO: Test for particular error.
-
-  OCMVerifyAll(self.mockCache);
+    
+  XCTestExpectation *expectation = [self expectationWithDescription:@""];
+  [self.storage getObjectForKey:key
+                    objectClass:[NSString class]
+                    accessGroup:nil
+              completionHandler:^(id<NSSecureCoding>  _Nullable obj, NSError * _Nullable error) {
+    XCTAssertNil(obj);
+    XCTAssertNotNil(error);
+    OCMVerifyAll(self.mockCache);
+    [expectation fulfill];
+    // TODO: Test for particular error.
+  }];
+  [self waitForExpectations:@[expectation] timeout:1.0];
 }
 
 - (void)testRemoveExistingObject {
@@ -154,16 +156,23 @@
 
 - (void)assertSuccessWriteObject:(id<NSSecureCoding>)object forKey:(NSString *)key {
   OCMExpect([self.mockCache setObject:object forKey:key]).andForwardToRealObject();
+  
+  XCTestExpectation *expectation = [self expectationWithDescription:@""];
+  [self.storage setObject:object 
+                   forKey:key 
+              accessGroup:nil
+        completionHandler:^(id<NSSecureCoding>  _Nullable obj, NSError * _Nullable error) {
+    XCTAssertNil(error, @"%@", self.name);
 
-  FBLPromise<NSNull *> *setPromise = [self.storage setObject:object forKey:key accessGroup:nil];
+    OCMVerifyAll(self.mockCache);
 
-  XCTAssert(FBLWaitForPromisesWithTimeout(1));
-  XCTAssertNil(setPromise.error, @"%@", self.name);
+    // Check in-memory cache.
+    XCTAssertEqualObjects([self.cache objectForKey:key], object);
 
-  OCMVerifyAll(self.mockCache);
+    [expectation fulfill];
+  }];
 
-  // Check in-memory cache.
-  XCTAssertEqualObjects([self.cache objectForKey:key], object);
+  [self waitForExpectations:@[expectation] timeout:1.0];
 }
 
 - (void)assertSuccessReadObject:(id<NSSecureCoding>)object
@@ -175,41 +184,53 @@
   if (!existisInCache) {
     OCMExpect([self.mockCache setObject:object forKey:key]).andForwardToRealObject();
   }
-
-  FBLPromise<id<NSSecureCoding>> *getPromise =
-      [self.storage getObjectForKey:key objectClass:class accessGroup:nil];
-
-  XCTAssert(FBLWaitForPromisesWithTimeout(1), @"%@", self.name);
-  XCTAssertEqualObjects(getPromise.value, object, @"%@", self.name);
-  XCTAssertNil(getPromise.error, @"%@", self.name);
-
-  OCMVerifyAll(self.mockCache);
-
-  // Check in-memory cache.
-  XCTAssertEqualObjects([self.cache objectForKey:key], object, @"%@", self.name);
+  
+  XCTestExpectation *expectation = [self expectationWithDescription:@""];
+  [self.storage getObjectForKey:key 
+                    objectClass:class
+                    accessGroup:nil
+              completionHandler:^(id<NSSecureCoding>  _Nullable obj, NSError * _Nullable error) {
+    XCTAssertEqualObjects(obj, object, @"%@", self.name);
+    XCTAssertNil(error, @"%@", self.name);
+    
+    OCMVerifyAll(self.mockCache);
+    // Check in-memory cache.
+    XCTAssertEqualObjects([self.cache objectForKey:key], object, @"%@", self.name);
+    [expectation fulfill];
+  }];
+  
+  [self waitForExpectations:@[expectation] timeout:1.0];
 }
 
 - (void)assertNonExistingObjectForKey:(NSString *)key class:(Class)class {
   OCMExpect([self.mockCache objectForKey:key]).andForwardToRealObject();
 
-  FBLPromise<id<NSSecureCoding>> *promise =
-      [self.storage getObjectForKey:key objectClass:class accessGroup:nil];
-
-  XCTAssert(FBLWaitForPromisesWithTimeout(1));
-  XCTAssertNil(promise.error, @"%@", self.name);
-  XCTAssertNil(promise.value, @"%@", self.name);
-
-  OCMVerifyAll(self.mockCache);
+  XCTestExpectation *expectation = [self expectationWithDescription:@""];
+  [self.storage getObjectForKey:key
+                    objectClass:class
+                    accessGroup:nil
+              completionHandler:^(id<NSSecureCoding>  _Nullable obj, NSError * _Nullable error) {
+    XCTAssertNil(error, @"%@", self.name);
+    XCTAssertNil(obj, @"%@", self.name);
+    OCMVerifyAll(self.mockCache);
+    [expectation fulfill];
+  }];
+  [self waitForExpectations:@[expectation] timeout:1.0];
 }
 
 - (void)assertRemoveObjectForKey:(NSString *)key {
   OCMExpect([self.mockCache removeObjectForKey:key]).andForwardToRealObject();
 
-  FBLPromise<NSNull *> *removePromise = [self.storage removeObjectForKey:key accessGroup:nil];
-  XCTAssert(FBLWaitForPromisesWithTimeout(1));
-  XCTAssertNil(removePromise.error);
+  XCTestExpectation *expectation = [self expectationWithDescription:@""];
+  [self.storage removeObjectForKey:key
+                       accessGroup:nil
+                 completionHandler:^(BOOL success, NSError * _Nullable error) {
+    XCTAssertNil(error);
 
-  OCMVerifyAll(self.mockCache);
+    OCMVerifyAll(self.mockCache);
+    [expectation fulfill];
+  }];
+  [self waitForExpectations:@[expectation] timeout:1.0];
 }
 
 @end
