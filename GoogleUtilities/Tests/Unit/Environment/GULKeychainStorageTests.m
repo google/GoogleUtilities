@@ -126,10 +126,13 @@
                     accessGroup:nil
               completionHandler:^(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error) {
                 XCTAssertNil(obj);
+                // Assert class mismatch error.
                 XCTAssertNotNil(error);
+                XCTAssertEqual(error.domain, NSCocoaErrorDomain);
+                XCTAssertEqual(error.code, 4864);
+
                 OCMVerifyAll(self.mockCache);
                 [expectation fulfill];
-                // TODO: Test for particular error.
               }];
   [self waitForExpectations:@[ expectation ] timeout:1.0];
 }
