@@ -58,16 +58,19 @@ NS_ASSUME_NONNULL_BEGIN
       accessGroup:(nullable NSString *)accessGroup
 completionHandler:(void (^)(id<NSSecureCoding> _Nullable obj, NSError * _Nullable error))completionHandler;
 
-/**
- * Removes the object by the given key.
- * @param key The key to store the object. If there is an existing object by the key, it will be
- * overridden.
- * @param accessGroup The Keychain Access Group.
- *
- * @return Returns which is resolved with `[NSNull null]` on success.
- */
-- (FBLPromise<NSNull *> *)removeObjectForKey:(NSString *)key
-                                 accessGroup:(nullable NSString *)accessGroup;
+/// Removes the object by the given key.
+/// @param key The key to store the object. If there is an existing object by
+/// the key, it will be overridden.
+/// @param accessGroup The Keychain Access Group.
+/// @param completionHandler The completion handler to call when the
+/// synchronized keychain removal is complete. An error is passed to the
+/// completion handler if the keychain removal fails. Else, `YES` if the item
+/// was removed successfully or doesn’t exist, `NO` otherwise.
+/// @note In the event an error occurs, the completion handler will return an
+/// error and a boolean to indicate the removal failed (`NO`).
+- (void)removeObjectForKey:(NSString *)key
+            accessGroup:(nullable NSString *)accessGroup
+         completionHandler:(void (^)(BOOL success, NSError * _Nullable error))completionHandler;
 
 #if TARGET_OS_OSX
 /// If not `nil`, then only this keychain will be used to save and read data (see
