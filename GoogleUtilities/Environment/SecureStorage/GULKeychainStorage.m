@@ -114,7 +114,7 @@
             NSError *error;
             BOOL success = [GULKeychainUtils removeItemWithQuery:query error:&error];
             if (!success) {
-              completionHandler(success, error);
+              completionHandler(NO, error);
               return;
             }
             completionHandler(success, nil);
