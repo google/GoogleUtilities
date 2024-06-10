@@ -17,12 +17,6 @@
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainStorage.h"
 #import <Security/Security.h>
 
-#if __has_include(<FBLPromises/FBLPromises.h>)
-#import <FBLPromises/FBLPromises.h>
-#else
-#import "FBLPromises.h"
-#endif
-
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainUtils.h"
 
 @interface GULKeychainStorage ()

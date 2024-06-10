@@ -29,7 +29,6 @@
 #import <XCTest/XCTest.h>
 
 #import <OCMock/OCMock.h>
-#import "FBLPromise+Testing.h"
 #import "GoogleUtilities/Tests/Unit/Utils/GULTestKeychain.h"
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainStorage.h"

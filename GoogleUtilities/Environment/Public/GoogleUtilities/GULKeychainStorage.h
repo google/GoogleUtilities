@@ -16,8 +16,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class FBLPromise<ValueType>;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /// The class provides a convenient, multiplatform abstraction of the Keychain.
