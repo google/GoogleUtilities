@@ -234,7 +234,7 @@
   XCTestExpectation *expectation = [self expectationWithDescription:NSStringFromSelector(_cmd)];
   [self.storage removeObjectForKey:key
                        accessGroup:nil
-                 completionHandler:^(BOOL success, NSError *_Nullable error) {
+                 completionHandler:^(NSError *_Nullable error) {
                    XCTAssertNil(error);
                    [expectation fulfill];
                  }];

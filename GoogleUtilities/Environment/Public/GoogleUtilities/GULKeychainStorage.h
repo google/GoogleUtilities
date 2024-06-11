@@ -68,13 +68,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param accessGroup The Keychain Access Group.
 /// @param completionHandler The completion handler to call when the
 /// synchronized keychain removal is complete. An error is passed to the
-/// completion handler if the keychain removal fails. Else, `YES` if the item
-/// was removed successfully or doesn’t exist, `NO` otherwise.
-/// @note In the event an error occurs, the completion handler will return an
-/// error and a boolean to indicate the removal failed (`NO`).
+/// completion handler if the keychain removal fails.
 - (void)removeObjectForKey:(NSString *)key
                accessGroup:(nullable NSString *)accessGroup
-         completionHandler:(void (^)(BOOL success, NSError *_Nullable error))completionHandler;
+         completionHandler:(void (^)(NSError *_Nullable error))completionHandler;
 
 #if TARGET_OS_OSX
 /// If not `nil`, then only this keychain will be used to save and read data (see

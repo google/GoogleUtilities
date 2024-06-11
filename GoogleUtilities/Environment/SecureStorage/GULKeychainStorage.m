@@ -103,19 +103,18 @@
 
 - (void)removeObjectForKey:(NSString *)key
                accessGroup:(nullable NSString *)accessGroup
-         completionHandler:(void (^)(BOOL success, NSError *_Nullable error))completionHandler {
+         completionHandler:(void (^)(NSError *_Nullable error))completionHandler {
   dispatch_async(self.inMemoryCacheQueue, ^{
     [self.inMemoryCache removeObjectForKey:key];
     dispatch_async(self.keychainQueue, ^{
       NSDictionary *query = [self keychainQueryWithKey:key accessGroup:accessGroup];
 
       NSError *error;
-      BOOL success = [GULKeychainUtils removeItemWithQuery:query error:&error];
-      if (!success) {
-        completionHandler(NO, error);
-        return;
+      if (![GULKeychainUtils removeItemWithQuery:query error:&error]) {
+        completionHandler(error);
+      } else {
+        completionHandler(nil);
       }
-      completionHandler(success, nil);
     });
   });
 }
