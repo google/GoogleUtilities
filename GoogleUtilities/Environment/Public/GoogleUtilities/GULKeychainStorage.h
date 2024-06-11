@@ -16,8 +16,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class FBLPromise<ValueType>;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /// The class provides a convenient, multiplatform abstraction of the Keychain.
@@ -46,17 +44,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getObjectForKey:(NSString *)key
             objectClass:(Class)objectClass
             accessGroup:(nullable NSString *)accessGroup
-      completionHandler:(void (^)(id<NSSecureCoding> _Nullable obj, NSError * _Nullable error))completionHandler;
+      completionHandler:
+          (void (^)(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error))completionHandler;
 
 /// Saves the given object by the given key.
 /// @param object The object to store.
-/// @param key The key to store the object. If there is an existing object by the key, it will be overridden.
+/// @param key The key to store the object. If there is an existing object by the key, it will be
+/// overridden.
 /// @param accessGroup The Keychain Access Group.
-/// @param completionHandler Returns the object that was successfully stored, or an error if one occurred.
+/// @param completionHandler  The completion handler to call when the
+/// synchronized keychain write is complete. An error is passed to the
+/// completion handler if the keychain read fails. Else, the object written to
+/// the keychain is passed to the completion handler.
 - (void)setObject:(id<NSSecureCoding>)object
-           forKey:(NSString *)key
-      accessGroup:(nullable NSString *)accessGroup
-completionHandler:(void (^)(id<NSSecureCoding> _Nullable obj, NSError * _Nullable error))completionHandler;
+               forKey:(NSString *)key
+          accessGroup:(nullable NSString *)accessGroup
+    completionHandler:
+        (void (^)(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error))completionHandler;
 
 /// Removes the object by the given key.
 /// @param key The key to store the object. If there is an existing object by
@@ -69,8 +73,8 @@ completionHandler:(void (^)(id<NSSecureCoding> _Nullable obj, NSError * _Nullabl
 /// @note In the event an error occurs, the completion handler will return an
 /// error and a boolean to indicate the removal failed (`NO`).
 - (void)removeObjectForKey:(NSString *)key
-            accessGroup:(nullable NSString *)accessGroup
-         completionHandler:(void (^)(BOOL success, NSError * _Nullable error))completionHandler;
+               accessGroup:(nullable NSString *)accessGroup
+         completionHandler:(void (^)(BOOL success, NSError *_Nullable error))completionHandler;
 
 #if TARGET_OS_OSX
 /// If not `nil`, then only this keychain will be used to save and read data (see
