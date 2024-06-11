@@ -17,6 +17,15 @@
       | tvOS  | **13.0**  |
       | macOS  | **10.15**  |
       | watchOS  | 7.0  |
+- Remove dependency on `FBLPromises`. The following public API have
+  been removed:
+  - `- [NSURLSession gul_dataTaskPromiseWithRequest:]`
+  - `GULURLSessionDataResponse`
+  The following promise-based public API have been replaced with
+  completion handler-based alternatives.
+  - `- [GULKeychainStorage getObjectForKey:objectClass:accessGroup:]`
+  - `- [GULKeychainStorage setObject:forKey:accessGroup:]`
+  - `- [GULKeychainStorage removeObjectForKey:accessGroup:]`
 
 # 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
