@@ -84,11 +84,14 @@ void GULLoggerEnableSTDERR(void) {
 }
 
 void GULLoggerForceDebug(void) {
+#warning Return instead of doing anything to avoid the App Store check.
+  return;
+
   // We should enable debug mode if we're not running from App Store.
-  if (![GULAppEnvironmentUtil isFromAppStore]) {
-    sGULLoggerDebugMode = YES;
-    GULSetLoggerLevel(GULLoggerLevelDebug);
-  }
+  //  if (![GULAppEnvironmentUtil isFromAppStore]) {
+  //    sGULLoggerDebugMode = YES;
+  //    GULSetLoggerLevel(GULLoggerLevelDebug);
+  //  }
 }
 
 GULLoggerLevel GULGetLoggerLevel(void) {
@@ -102,8 +105,10 @@ __attribute__((no_sanitize("thread"))) void GULSetLoggerLevel(GULLoggerLevel log
     return;
   }
   GULLoggerInitializeASL();
+#warning Ensure nothing below Notice is set to avoid the App Store check.
   // We should not raise the logger level if we are running from App Store.
-  if (loggerLevel >= GULLoggerLevelNotice && [GULAppEnvironmentUtil isFromAppStore]) {
+  //  if (loggerLevel >= GULLoggerLevelNotice && [GULAppEnvironmentUtil isFromAppStore]) {
+  if (loggerLevel >= GULLoggerLevelNotice) {
     return;
   }
 
