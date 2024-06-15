@@ -114,12 +114,6 @@ other Google CocoaPods. They're not intended for direct public usage.
     adss.dependency 'GoogleUtilities/Environment'
   end
 
-  s.subspec 'ISASwizzler' do |iss|
-    iss.source_files = 'GoogleUtilities/ISASwizzler/**/*.[mh]', 'GoogleUtilities/Common/*.h'
-    iss.public_header_files = 'GoogleUtilities/ISASwizzler/Public/GoogleUtilities/*.h'
-    iss.dependency 'GoogleUtilities/Privacy'
-  end
-
   s.subspec 'MethodSwizzler' do |mss|
     mss.source_files = 'GoogleUtilities/MethodSwizzler/**/*.[mh]', 'GoogleUtilities/Common/*.h'
     mss.public_header_files = 'GoogleUtilities/MethodSwizzler/Public/GoogleUtilities/*.h'
