@@ -34,10 +34,6 @@ let package = Package(
       targets: ["GoogleUtilities-Logger"]
     ),
     .library(
-      name: "GULISASwizzler",
-      targets: ["GoogleUtilities-ISASwizzler"]
-    ),
-    .library(
       name: "GULMethodSwizzler",
       targets: ["GoogleUtilities-MethodSwizzler"]
     ),
@@ -120,17 +116,6 @@ let package = Package(
     ),
 
     .target(
-      name: "GoogleUtilities-ISASwizzler",
-      dependencies: ["GoogleUtilities-Logger"],
-      path: "GoogleUtilities/ISASwizzler",
-      resources: [.process("Resources/PrivacyInfo.xcprivacy")],
-      publicHeadersPath: "Public",
-      cSettings: [
-        .headerSearchPath("../../"),
-      ]
-    ),
-
-    .target(
       name: "GoogleUtilities-MethodSwizzler",
       dependencies: ["GoogleUtilities-Logger"],
       path: "GoogleUtilities/MethodSwizzler",
@@ -199,7 +184,6 @@ let package = Package(
       dependencies: [
         "GoogleUtilities-AppDelegateSwizzler",
         "GoogleUtilities-Environment",
-        "GoogleUtilities-ISASwizzler",
         "GoogleUtilities-Logger",
         "GoogleUtilities-MethodSwizzler",
         "GoogleUtilities-Network",
@@ -214,7 +198,6 @@ let package = Package(
       dependencies: [
         "GoogleUtilities-AppDelegateSwizzler",
         "GoogleUtilities-Environment",
-        "GoogleUtilities-ISASwizzler",
         "GoogleUtilities-Logger",
         "GoogleUtilities-MethodSwizzler",
         "GoogleUtilities-Network",
@@ -231,7 +214,6 @@ let package = Package(
         .product(name: "OCMock", package: "OCMock"),
         "GoogleUtilities-AppDelegateSwizzler",
         "GoogleUtilities-Environment",
-        "GoogleUtilities-ISASwizzler",
         "GoogleUtilities-Logger",
         "GoogleUtilities-MethodSwizzler",
         "GoogleUtilities-Network",

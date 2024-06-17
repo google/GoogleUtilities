@@ -17,7 +17,6 @@
 #import "GoogleUtilities/GULLogger.h"
 #import "GoogleUtilities/GULNSData+zlib.h"
 #import "GoogleUtilities/GULNetwork.h"
-#import "GoogleUtilities/GULObjectSwizzler.h"
 #import "GoogleUtilities/GULReachabilityChecker.h"
 #import "GoogleUtilities/GULSwizzler.h"
 #import "GoogleUtilities/GULUserDefaults.h"
@@ -27,7 +26,6 @@
 #import <GoogleUtilities/GULLogger.h>
 #import <GoogleUtilities/GULNSData+zlib.h>
 #import <GoogleUtilities/GULNetwork.h>
-#import <GoogleUtilities/GULObjectSwizzler.h>
 #import <GoogleUtilities/GULReachabilityChecker.h>
 #import <GoogleUtilities/GULSwizzler.h>
 #import <GoogleUtilities/GULUserDefaults.h>
