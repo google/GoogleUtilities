@@ -16,21 +16,20 @@
 // The tests depend upon library methods only built with #ifdef DEBUG
 
 #import <OCMock/OCMock.h>
+#import <OSLog/OSLog.h>
 #import <XCTest/XCTest.h>
 
 #import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLogger.h"
 
 #import <asl.h>
 
-extern const char *kGULLoggerASLClientFacilityName;
-
 extern void GULResetLogger(void);
-
-extern aslclient getGULLoggerClient(void);
 
 extern dispatch_queue_t getGULClientQueue(void);
 
 extern BOOL getGULLoggerDebugMode(void);
+
+extern os_log_type_t GULLoggerLevelToOSLogType(GULLoggerLevel level);
 
 static NSString *const kMessageCode = @"I-COR000001";
 
@@ -45,7 +44,7 @@ static NSString *const kMessageCode = @"I-COR000001";
 @implementation GULLoggerTest
 
 + (void)setUp {
-  GULLoggerInitializeASL();
+  GULLoggerInitialize();
 }
 
 - (void)setUp {
@@ -115,6 +114,16 @@ static NSString *const kMessageCode = @"I-COR000001";
   XCTAssertEqual(GULLoggerLevelNotice, ASL_LEVEL_NOTICE);
   XCTAssertEqual(GULLoggerLevelInfo, ASL_LEVEL_INFO);
   XCTAssertEqual(GULLoggerLevelDebug, ASL_LEVEL_DEBUG);
+}
+
+- (void)testGULLoggerLevelToOSLogType {
+  XCTAssertEqual(GULLoggerLevelToOSLogType(GULLoggerLevelError), OS_LOG_TYPE_ERROR);
+  // OSLog doesn't have a WARNING level so it is remapped to DEFAULT (Notice).
+  XCTAssertEqual(GULLoggerLevelToOSLogType(GULLoggerLevelWarning),
+                 GULLoggerLevelToOSLogType(GULLoggerLevelNotice));
+  XCTAssertEqual(GULLoggerLevelToOSLogType(GULLoggerLevelNotice), OS_LOG_TYPE_DEFAULT);
+  XCTAssertEqual(GULLoggerLevelToOSLogType(GULLoggerLevelInfo), OS_LOG_TYPE_INFO);
+  XCTAssertEqual(GULLoggerLevelToOSLogType(GULLoggerLevelDebug), OS_LOG_TYPE_DEBUG);
 }
 
 - (void)testGULGetLoggerLevel {

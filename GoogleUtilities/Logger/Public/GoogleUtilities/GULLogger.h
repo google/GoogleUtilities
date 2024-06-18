@@ -32,17 +32,15 @@ extern "C" {
 /**
  * Initialize GULLogger.
  */
-extern void GULLoggerInitializeASL(void);
+extern void GULLoggerInitialize(void);
+
+extern void GULLoggerInitializeASL(void)
+    DEPRECATED_MSG_ATTRIBUTE("Use GULLoggerInitialize instead.");
 
 /**
  * Override log level to Debug.
  */
 void GULLoggerForceDebug(void);
-
-/**
- * Turn on logging to STDERR.
- */
-extern void GULLoggerEnableSTDERR(void);
 
 /**
  * Gets the current GULLoggerLevel.

@@ -14,17 +14,12 @@
 
 #import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLogger.h"
 
-#include <asl.h>
+#import <OSLog/OSLog.h>
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULAppEnvironmentUtil.h"
 #import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLoggerLevel.h"
 
-/// ASL client facility name used by GULLogger.
-const char *kGULLoggerASLClientFacilityName = "com.google.utilities.logger";
-
 static dispatch_once_t sGULLoggerOnceToken;
-
-static aslclient sGULLoggerClient;
 
 static dispatch_queue_t sGULClientQueue;
 
@@ -43,31 +38,8 @@ static NSString *const kMessageCodePattern = @"^I-[A-Z]{3}[0-9]{6}$";
 static NSRegularExpression *sMessageCodeRegex;
 #endif
 
-void GULLoggerInitializeASL(void) {
+void GULLoggerInitialize(void) {
   dispatch_once(&sGULLoggerOnceToken, ^{
-    NSInteger majorOSVersion = [[GULAppEnvironmentUtil systemVersion] integerValue];
-    uint32_t aslOptions = ASL_OPT_STDERR;
-#if TARGET_OS_SIMULATOR
-    // The iOS 11 simulator doesn't need the ASL_OPT_STDERR flag.
-    if (majorOSVersion >= 11) {
-      aslOptions = 0;
-    }
-#else
-    // Devices running iOS 10 or higher don't need the ASL_OPT_STDERR flag.
-    if (majorOSVersion >= 10) {
-      aslOptions = 0;
-    }
-#endif  // TARGET_OS_SIMULATOR
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"  // asl is deprecated
-    // Initialize the ASL client handle.
-    sGULLoggerClient = asl_open(NULL, kGULLoggerASLClientFacilityName, aslOptions);
-    sGULLoggerMaximumLevel = GULLoggerLevelNotice;
-
-    // Set the filter used by system/device log. Initialize in default mode.
-    asl_set_filter(sGULLoggerClient, ASL_FILTER_MASK_UPTO(ASL_LEVEL_NOTICE));
-
     sGULClientQueue = dispatch_queue_create("GULLoggingClientQueue", DISPATCH_QUEUE_SERIAL);
     dispatch_set_target_queue(sGULClientQueue,
                               dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
@@ -79,8 +51,8 @@ void GULLoggerInitializeASL(void) {
   });
 }
 
-void GULLoggerEnableSTDERR(void) {
-  asl_add_log_file(sGULLoggerClient, STDERR_FILENO);
+void GULLoggerInitializeASL(void) {
+  GULLoggerInitialize();
 }
 
 void GULLoggerForceDebug(void) {
@@ -101,23 +73,20 @@ __attribute__((no_sanitize("thread"))) void GULSetLoggerLevel(GULLoggerLevel log
                 (long)loggerLevel);
     return;
   }
-  GULLoggerInitializeASL();
+  GULLoggerInitialize();
   // We should not raise the logger level if we are running from App Store.
   if (loggerLevel >= GULLoggerLevelNotice && [GULAppEnvironmentUtil isFromAppStore]) {
     return;
   }
 
   sGULLoggerMaximumLevel = loggerLevel;
-  dispatch_async(sGULClientQueue, ^{
-    asl_set_filter(sGULLoggerClient, ASL_FILTER_MASK_UPTO(loggerLevel));
-  });
 }
 
 /**
  * Check if the level is high enough to be loggable.
  */
 __attribute__((no_sanitize("thread"))) BOOL GULIsLoggableLevel(GULLoggerLevel loggerLevel) {
-  GULLoggerInitializeASL();
+  GULLoggerInitialize();
   if (sGULLoggerDebugMode) {
     return YES;
   }
@@ -129,10 +98,6 @@ void GULResetLogger(void) {
   sGULLoggerOnceToken = 0;
   sGULLoggerDebugMode = NO;
   sGULLoggerMaximumLevel = GULLoggerLevelNotice;
-}
-
-aslclient getGULLoggerClient(void) {
-  return sGULLoggerClient;
 }
 
 dispatch_queue_t getGULClientQueue(void) {
@@ -148,13 +113,27 @@ void GULLoggerRegisterVersion(NSString *version) {
   sVersion = version;
 }
 
+os_log_type_t GULLoggerLevelToOSLogType(GULLoggerLevel level) {
+  switch (level) {
+    case GULLoggerLevelError:
+      return OS_LOG_TYPE_ERROR;
+    case GULLoggerLevelWarning:
+    case GULLoggerLevelNotice:
+      return OS_LOG_TYPE_DEFAULT;
+    case GULLoggerLevelInfo:
+      return OS_LOG_TYPE_INFO;
+    case GULLoggerLevelDebug:
+      return OS_LOG_TYPE_DEBUG;
+  }
+}
+
 void GULLogBasic(GULLoggerLevel level,
                  GULLoggerService service,
                  BOOL forceLog,
                  NSString *messageCode,
                  NSString *message,
                  va_list args_ptr) {
-  GULLoggerInitializeASL();
+  GULLoggerInitialize();
   if (!(level <= sGULLoggerMaximumLevel || sGULLoggerDebugMode || forceLog)) {
     return;
   }
@@ -174,10 +153,9 @@ void GULLogBasic(GULLoggerLevel level,
   }
   logMsg = [NSString stringWithFormat:@"%@ - %@[%@] %@", sVersion, service, messageCode, logMsg];
   dispatch_async(sGULClientQueue, ^{
-    asl_log(sGULLoggerClient, NULL, (int)level, "%s", logMsg.UTF8String);
+    os_log_with_type(OS_LOG_DEFAULT, GULLoggerLevelToOSLogType(level), "%s", logMsg.UTF8String);
   });
 }
-#pragma clang diagnostic pop
 
 /**
  * Generates the logging functions using macros.
@@ -202,7 +180,7 @@ GUL_LOGGING_FUNCTION(Notice)
 GUL_LOGGING_FUNCTION(Info)
 GUL_LOGGING_FUNCTION(Debug)
 
-#undef GUL_MAKE_LOGGER
+#undef GUL_LOGGING_FUNCTION
 
 #pragma mark - GULLoggerWrapper
 
