@@ -108,14 +108,14 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
            @"SceneDelegateProxy interceptor does not conform to UIApplicationDelegate");
 
   if (!interceptor) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeSceneDelegateSwizzling000],
                 @"SceneDelegateProxy cannot add nil interceptor.");
     return nil;
   }
   if (![interceptor conformsToProtocol:@protocol(UISceneDelegate)]) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeSceneDelegateSwizzling001],
                 @"SceneDelegateProxy interceptor does not conform to UIApplicationDelegate");
@@ -126,7 +126,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
   NSString *interceptorID =
       [NSString stringWithFormat:@"%@%p", kGULSceneDelegatePrefix, interceptor];
   if (!interceptorID.length) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeSceneDelegateSwizzling002],
                 @"SceneDelegateProxy cannot create Interceptor ID.");
@@ -144,7 +144,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
            @"SceneDelegateProxy cannot unregister empty interceptor ID.");
 
   if (!interceptorID) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeSceneDelegateSwizzling003],
                 @"SceneDelegateProxy cannot unregister empty interceptor ID.");
@@ -154,7 +154,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
   GULSceneZeroingWeakContainer *weakContainer =
       [GULSceneDelegateSwizzler interceptors][interceptorID];
   if (!weakContainer.object) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeSceneDelegateSwizzling004],
                 @"SceneDelegateProxy cannot unregister interceptor that was not registered. "
@@ -248,7 +248,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
   const char *types = method_getTypeEncoding(method);
   if (!class_addMethod(toClass, destinationSelector, methodIMP, types)) {
     GULLogWarning(
-        kGULLoggerSwizzler, NO,
+        kGULLogSubsystem, kGULLoggerSwizzler, NO,
         [NSString
             stringWithFormat:@"I-SWZ%06ld", (long)kGULSwizzlerMessageCodeSceneDelegateSwizzling009],
         @"Cannot copy method to destination selector %@ as it already exists",
@@ -286,7 +286,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
     id interceptor = interceptorContainer.object;
     if (!interceptor) {
       GULLogWarning(
-          kGULLoggerSwizzler, NO,
+          kGULLogSubsystem, kGULLoggerSwizzler, NO,
           [NSString stringWithFormat:@"I-SWZ%06ld",
                                      (long)kGULSwizzlerMessageCodeSceneDelegateSwizzling010],
           @"SceneDelegateProxy cannot find interceptor with ID %@. Removing the interceptor.", key);
@@ -352,7 +352,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
 
   if (NSClassFromString(newClassName)) {
     GULLogError(
-        kGULLoggerSwizzler, NO,
+        kGULLogSubsystem, kGULLoggerSwizzler, NO,
         [NSString
             stringWithFormat:@"I-SWZ%06ld",
                              (long)
@@ -368,7 +368,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
   Class sceneDelegateSubClass = objc_allocateClassPair(realClass, newClassName.UTF8String, 0);
   if (sceneDelegateSubClass == Nil) {
     GULLogError(
-        kGULLoggerSwizzler, NO,
+        kGULLogSubsystem, kGULLoggerSwizzler, NO,
         [NSString
             stringWithFormat:@"I-SWZ%06ld",
                              (long)
@@ -402,7 +402,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
   // that can lead to overwriting the isa of an object in the next frame.
   if (class_getInstanceSize(realClass) != class_getInstanceSize(sceneDelegateSubClass)) {
     GULLogError(
-        kGULLoggerSwizzler, NO,
+        kGULLogSubsystem, kGULLoggerSwizzler, NO,
         [NSString
             stringWithFormat:@"I-SWZ%06ld",
                              (long)
@@ -418,7 +418,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
   objc_registerClassPair(sceneDelegateSubClass);
   if (object_setClass(scene.delegate, sceneDelegateSubClass)) {
     GULLogDebug(
-        kGULLoggerSwizzler, NO,
+        kGULLogSubsystem, kGULLoggerSwizzler, NO,
         [NSString
             stringWithFormat:@"I-SWZ%06ld",
                              (long)

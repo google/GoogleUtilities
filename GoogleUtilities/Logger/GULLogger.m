@@ -30,7 +30,12 @@ static GULLoggerLevel sGULLoggerMaximumLevel;
 // Allow clients to register a version to include in the log.
 static NSString *sVersion = @"";
 
+NSString *const kGULLogSubsystem = @"com.google.utilities.logger";
+
 static GULLoggerService kGULLoggerLogger = @"[GULLogger]";
+
+static NSMutableDictionary<NSString *, NSMutableDictionary<GULLoggerService, os_log_t> *>
+    *sGULServiceLogs;
 
 #ifdef DEBUG
 /// The regex pattern for the message code.
@@ -43,6 +48,7 @@ void GULLoggerInitialize(void) {
     sGULClientQueue = dispatch_queue_create("GULLoggingClientQueue", DISPATCH_QUEUE_SERIAL);
     dispatch_set_target_queue(sGULClientQueue,
                               dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
+    sGULServiceLogs = [NSMutableDictionary dictionary];
 #ifdef DEBUG
     sMessageCodeRegex = [NSRegularExpression regularExpressionWithPattern:kMessageCodePattern
                                                                   options:0
@@ -69,8 +75,8 @@ GULLoggerLevel GULGetLoggerLevel(void) {
 
 __attribute__((no_sanitize("thread"))) void GULSetLoggerLevel(GULLoggerLevel loggerLevel) {
   if (loggerLevel < GULLoggerLevelMin || loggerLevel > GULLoggerLevelMax) {
-    GULLogError(kGULLoggerLogger, NO, @"I-COR000023", @"Invalid logger level, %ld",
-                (long)loggerLevel);
+    GULLogError(kGULLogSubsystem, kGULLoggerLogger, NO, @"I-COR000023",
+                @"Invalid logger level, %ld", (long)loggerLevel);
     return;
   }
   GULLoggerInitialize();
@@ -128,7 +134,8 @@ os_log_type_t GULLoggerLevelToOSLogType(GULLoggerLevel level) {
 }
 
 void GULLogBasic(GULLoggerLevel level,
-                 GULLoggerService service,
+                 NSString *subsystem,
+                 GULLoggerService category,
                  BOOL forceLog,
                  NSString *messageCode,
                  NSString *message,
@@ -151,9 +158,21 @@ void GULLogBasic(GULLoggerLevel level,
   } else {
     logMsg = [[NSString alloc] initWithFormat:message arguments:args_ptr];
   }
-  logMsg = [NSString stringWithFormat:@"%@ - %@[%@] %@", sVersion, service, messageCode, logMsg];
+  logMsg = [NSString stringWithFormat:@"%@ - %@[%@] %@", sVersion, category, messageCode, logMsg];
   dispatch_async(sGULClientQueue, ^{
-    os_log_with_type(OS_LOG_DEFAULT, GULLoggerLevelToOSLogType(level), "%s", logMsg.UTF8String);
+    NSMutableDictionary<GULLoggerService, os_log_t> *subsystemLogs = sGULServiceLogs[subsystem];
+    if (!subsystemLogs) {
+      subsystemLogs = [NSMutableDictionary dictionary];
+      sGULServiceLogs[subsystem] = subsystemLogs;
+    }
+
+    os_log_t serviceLog = [subsystemLogs objectForKey:subsystem];
+    if (!serviceLog) {
+      serviceLog = os_log_create(subsystem.UTF8String, category.UTF8String);
+      subsystemLogs[category] = serviceLog;
+    }
+
+    os_log_with_type(serviceLog, GULLoggerLevelToOSLogType(level), "%{public}@", logMsg);
   });
 }
 
@@ -165,13 +184,14 @@ void GULLogBasic(GULLoggerLevel level,
  * Calling GULLogDebug({service}, @"I-XYZ000001", @"Configure succeed.") shows:
  * yyyy-mm-dd hh:mm:ss.SSS sender[PID] <Debug> [{service}][I-XYZ000001] Configure succeed.
  */
-#define GUL_LOGGING_FUNCTION(level)                                                     \
-  void GULLog##level(GULLoggerService service, BOOL force, NSString *messageCode,       \
-                     NSString *message, ...) {                                          \
-    va_list args_ptr;                                                                   \
-    va_start(args_ptr, message);                                                        \
-    GULLogBasic(GULLoggerLevel##level, service, force, messageCode, message, args_ptr); \
-    va_end(args_ptr);                                                                   \
+#define GUL_LOGGING_FUNCTION(level)                                                      \
+  void GULLog##level(NSString *subsystem, GULLoggerService category, BOOL force,         \
+                     NSString *messageCode, NSString *message, ...) {                    \
+    va_list args_ptr;                                                                    \
+    va_start(args_ptr, message);                                                         \
+    GULLogBasic(GULLoggerLevel##level, subsystem, category, force, messageCode, message, \
+                args_ptr);                                                               \
+    va_end(args_ptr);                                                                    \
   }
 
 GUL_LOGGING_FUNCTION(Error)
@@ -187,11 +207,12 @@ GUL_LOGGING_FUNCTION(Debug)
 @implementation GULLoggerWrapper
 
 + (void)logWithLevel:(GULLoggerLevel)level
-         withService:(GULLoggerService)service
-            withCode:(NSString *)messageCode
-         withMessage:(NSString *)message
-            withArgs:(va_list)args {
-  GULLogBasic(level, service, NO, messageCode, message, args);
+           subsystem:(NSString *)subsystem
+            category:(GULLoggerService)category
+         messageCode:(NSString *)messageCode
+             message:(NSString *)message
+           arguments:(va_list)args {
+  GULLogBasic(level, subsystem, category, NO, messageCode, message, args);
 }
 
 @end

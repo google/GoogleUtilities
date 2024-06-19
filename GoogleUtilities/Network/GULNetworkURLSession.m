@@ -93,7 +93,7 @@
   if (fetcher != nil) {
     [fetcher addSystemCompletionHandler:systemCompletionHandler forSession:sessionID];
   } else {
-    GULLogError(kGULLoggerNetwork, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerNetwork, NO,
                 [NSString stringWithFormat:@"I-NET%06ld", (long)kGULNetworkMessageCodeNetwork003],
                 @"Failed to retrieve background session with ID %@ after app is relaunched.",
                 sessionID);

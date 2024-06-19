@@ -216,14 +216,14 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
            @"AppDelegateProxy interceptor does not conform to UIApplicationDelegate");
 
   if (!interceptor) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling000],
                 @"AppDelegateProxy cannot add nil interceptor.");
     return nil;
   }
   if (![interceptor conformsToProtocol:@protocol(GULApplicationDelegate)]) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling001],
                 @"AppDelegateProxy interceptor does not conform to UIApplicationDelegate");
@@ -233,7 +233,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // The ID should be the same given the same interceptor object.
   NSString *interceptorID = [NSString stringWithFormat:@"%@%p", kGULAppDelegatePrefix, interceptor];
   if (!interceptorID.length) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling002],
                 @"AppDelegateProxy cannot create Interceptor ID.");
@@ -251,7 +251,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
            @"AppDelegateProxy cannot unregister empty interceptor ID.");
 
   if (!interceptorID) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling003],
                 @"AppDelegateProxy cannot unregister empty interceptor ID.");
@@ -260,7 +260,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 
   GULZeroingWeakContainer *weakContainer = [GULAppDelegateSwizzler interceptors][interceptorID];
   if (!weakContainer.object) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling004],
                 @"AppDelegateProxy cannot unregister interceptor that was not registered. "
@@ -343,7 +343,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
       [NSString stringWithFormat:@"%@-%@", classNameWithPrefix, [NSUUID UUID].UUIDString];
 
   if (NSClassFromString(newClassName)) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling005],
                 @"Cannot create a proxy for App Delegate. Subclass already exists. Original Class: "
@@ -356,7 +356,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // size.
   Class appDelegateSubClass = objc_allocateClassPair(realClass, newClassName.UTF8String, 0);
   if (appDelegateSubClass == Nil) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling006],
                 @"Cannot create a proxy for App Delegate. Subclass already exists. Original Class: "
@@ -436,7 +436,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // cannot have more ivars/properties than its superclass since it will cause an offset in memory
   // that can lead to overwriting the isa of an object in the next frame.
   if (class_getInstanceSize(realClass) != class_getInstanceSize(appDelegateSubClass)) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling007],
                 @"Cannot create subclass of App Delegate, because the created subclass is not the "
@@ -449,7 +449,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // Make the newly created class to be the subclass of the real App Delegate class.
   objc_registerClassPair(appDelegateSubClass);
   if (object_setClass(appDelegate, appDelegateSubClass)) {
-    GULLogDebug(kGULLoggerSwizzler, NO,
+    GULLogDebug(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling008],
                 @"Successfully created App Delegate Proxy automatically. To disable the "
@@ -604,7 +604,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   IMP methodIMP = method_getImplementation(method);
   const char *types = method_getTypeEncoding(method);
   if (!class_addMethod(toClass, destinationSelector, methodIMP, types)) {
-    GULLogWarning(kGULLoggerSwizzler, NO,
+    GULLogWarning(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                   [NSString stringWithFormat:@"I-SWZ%06ld",
                                              (long)kGULSwizzlerMessageCodeAppDelegateSwizzling009],
                   @"Cannot copy method to destination selector %@ as it already exists",
@@ -641,7 +641,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
     id interceptor = interceptorContainer.object;
     if (!interceptor) {
       GULLogWarning(
-          kGULLoggerSwizzler, NO,
+          kGULLogSubsystem, kGULLoggerSwizzler, NO,
           [NSString
               stringWithFormat:@"I-SWZ%06ld", (long)kGULSwizzlerMessageCodeAppDelegateSwizzling010],
           @"AppDelegateProxy cannot find interceptor with ID %@. Removing the interceptor.", key);
@@ -946,7 +946,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 + (void)proxyAppDelegate:(id<GULApplicationDelegate>)appDelegate {
   if (![appDelegate conformsToProtocol:@protocol(GULApplicationDelegate)]) {
     GULLogNotice(
-        kGULLoggerSwizzler, NO,
+        kGULLogSubsystem, kGULLoggerSwizzler, NO,
         [NSString
             stringWithFormat:@"I-SWZ%06ld",
                              (long)kGULSwizzlerMessageCodeAppDelegateSwizzlingInvalidAppDelegate],
@@ -958,7 +958,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   id<GULApplicationDelegate> originalDelegate = appDelegate;
   // Do not create a subclass if it is not enabled.
   if (![GULAppDelegateSwizzler isAppDelegateProxyEnabled]) {
-    GULLogNotice(kGULLoggerSwizzler, NO,
+    GULLogNotice(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                  [NSString stringWithFormat:@"I-SWZ%06ld",
                                             (long)kGULSwizzlerMessageCodeAppDelegateSwizzling011],
                  @"App Delegate Proxy is disabled. %@",
@@ -967,7 +967,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   }
   // Do not accept nil delegate.
   if (!originalDelegate) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling012],
                 @"Cannot create App Delegate Proxy because App Delegate instance is nil. %@",
@@ -980,7 +980,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
     gAppDelegateSubclass = [self createSubclassWithObject:originalDelegate];
     [self reassignAppDelegate];
   } @catch (NSException *exception) {
-    GULLogError(kGULLoggerSwizzler, NO,
+    GULLogError(kGULLogSubsystem, kGULLoggerSwizzler, NO,
                 [NSString stringWithFormat:@"I-SWZ%06ld",
                                            (long)kGULSwizzlerMessageCodeAppDelegateSwizzling013],
                 @"Cannot create App Delegate Proxy. %@",
