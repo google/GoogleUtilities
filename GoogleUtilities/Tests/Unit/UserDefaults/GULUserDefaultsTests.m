@@ -380,7 +380,6 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   XCTAssertEqualObjects([newUserDefaults objectForKey:@"test-another"], @"134");
   [newUserDefaults setObject:nil forKey:@"test-another"];
   XCTAssertNil([newUserDefaults objectForKey:@"test-another"]);
-  [newUserDefaults synchronize];
   [[NSNotificationCenter defaultCenter] removeObserver:observer];
 
   // Remove the underlying reference file.
@@ -406,14 +405,12 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
 
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
   [newUserDefaults setObject:@"134" forKey:@"test-another"];
-  [newUserDefaults synchronize];
 
   XCTAssertTrue([fileManager fileExistsAtPath:filePath],
                 @"The user defaults file was not synchronized to disk.");
 
   // Now get the file directly from disk.
   XCTAssertTrue([fileManager fileExistsAtPath:filePath]);
-  [newUserDefaults synchronize];
 
   [self removePreferenceFileWithSuiteName:suiteName];
 #endif  // TARGET_OS_OSX || TARGET_OS_MACCATALYST || SWIFT_PACKAGE
