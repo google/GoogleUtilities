@@ -70,13 +70,11 @@
 + (NSString *)getNetworkRadioType {
 #ifdef TARGET_HAS_MOBILE_CONNECTIVITY
   CTTelephonyNetworkInfo *networkInfo = [GULNetworkInfo getNetworkInfo];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  return networkInfo.currentRadioAccessTechnology;
-#pragma clang diagnostic pop
-#else
-  return @"";
+  if (networkInfo.serviceCurrentRadioAccessTechnology.count) {
+    return networkInfo.serviceCurrentRadioAccessTechnology.allValues[0] ?: @"";
+  }
 #endif
+  return @"";
 }
 
 @end
