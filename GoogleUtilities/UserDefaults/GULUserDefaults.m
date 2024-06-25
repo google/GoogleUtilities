@@ -56,8 +56,8 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
   NSString *name = [suiteName copy];
 
   if (self) {
-    _userDefaults = 
-        name.length ? [[NSUserDefaults alloc] initWithSuiteName:name] : [NSUserDefaults standardUserDefaults];
+    _userDefaults = name.length ? [[NSUserDefaults alloc] initWithSuiteName:name]
+                                : [NSUserDefaults standardUserDefaults];
   }
 
   return self;
@@ -71,7 +71,7 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
                   @"Cannot get object for invalid user default key.");
     return nil;
   }
-  
+
   return [self.userDefaults objectForKey:key];
 }
 
