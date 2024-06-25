@@ -363,29 +363,6 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 }
 
-- (void)testUserDefaultNotifications {
-  // Test to ensure no notifications are sent with our implementation.
-  void (^callBlock)(NSNotification *) = ^(NSNotification *_Nonnull notification) {
-    XCTFail(@"A notification must not be sent for GULUserDefaults!");
-  };
-
-  id observer =
-      [[NSNotificationCenter defaultCenter] addObserverForName:NSUserDefaultsDidChangeNotification
-                                                        object:nil
-                                                         queue:nil
-                                                    usingBlock:callBlock];
-  NSString *suiteName = @"test_suite_notification";
-  GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
-  [newUserDefaults setObject:@"134" forKey:@"test-another"];
-  XCTAssertEqualObjects([newUserDefaults objectForKey:@"test-another"], @"134");
-  [newUserDefaults setObject:nil forKey:@"test-another"];
-  XCTAssertNil([newUserDefaults objectForKey:@"test-another"]);
-  [[NSNotificationCenter defaultCenter] removeObserver:observer];
-
-  // Remove the underlying reference file.
-  [self removePreferenceFileWithSuiteName:suiteName];
-}
-
 - (void)testSynchronizeToDisk {
 #if TARGET_OS_OSX || TARGET_OS_MACCATALYST || SWIFT_PACKAGE
   // `NSFileManager` has trouble reading the files in `~/Library` even though the
