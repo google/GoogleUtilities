@@ -96,7 +96,7 @@
   // and `TARGET_OS_IOS` are `true` when building a macCatalyst app.
 #if TARGET_OS_MACCATALYST
   NSString *expectedPlatform = @"maccatalyst";
-#elif TARGET_OS_IOS && !TARGET_OS_VISION
+#elif TARGET_OS_IOS
   NSString *expectedPlatform = @"ios";
 #elif TARGET_OS_TV
   NSString *expectedPlatform = @"tvos";
@@ -118,7 +118,7 @@
   // `true`.
 #if TARGET_OS_MACCATALYST
   NSString *expectedPlatform = @"maccatalyst";
-#elif TARGET_OS_IOS && !TARGET_OS_VISION
+#elif TARGET_OS_IOS
   NSString *expectedPlatform = @"ios";
 
   if ([[UIDevice currentDevice].model.lowercaseString containsString:@"ipad"] ||
