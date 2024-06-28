@@ -224,7 +224,7 @@ static BOOL HasEmbeddedMobileProvision(void) {
   // `true`, which means the condition list is order-sensitive.
 #if TARGET_OS_MACCATALYST
   applePlatform = @"maccatalyst";
-#elif TARGET_OS_IOS && !TARGET_OS_VISION
+#elif TARGET_OS_IOS
   if (@available(iOS 14.0, *)) {
     // Early iOS 14 betas do not include isiOSAppOnMac (#6969)
     applePlatform = ([[NSProcessInfo processInfo] respondsToSelector:@selector(isiOSAppOnMac)] &&
