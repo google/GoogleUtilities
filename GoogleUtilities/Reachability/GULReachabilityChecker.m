@@ -64,10 +64,10 @@ static NSString *const kGULReachabilityDisconnectedStatus = @"Disconnected";
 - (void)setReachabilityApi:(const struct GULReachabilityApi *)reachabilityApi {
 #if !TARGET_OS_WATCH
   if (reachability_) {
-    GULLogError(kGULLogSubsystem, kGULLoggerReachability, NO,
-                [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode000],
-                @"Cannot change reachability API while reachability is running. "
-                @"Call stop first.");
+    GULOSLogError(kGULLogSubsystem, kGULLoggerReachability, NO,
+                  [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode000],
+                  @"Cannot change reachability API while reachability is running. "
+                  @"Call stop first.");
     return;
   }
   reachabilityApi_ = reachabilityApi;
@@ -89,9 +89,9 @@ static NSString *const kGULReachabilityDisconnectedStatus = @"Disconnected";
 - (void)setReachabilityDelegate:(id<GULReachabilityDelegate>)reachabilityDelegate {
   if (reachabilityDelegate &&
       (![(NSObject *)reachabilityDelegate conformsToProtocol:@protocol(GULReachabilityDelegate)])) {
-    GULLogError(kGULLogSubsystem, kGULLoggerReachability, NO,
-                [NSString stringWithFormat:@"I-NET%06ld", (long)kGULReachabilityMessageCode005],
-                @"Reachability delegate doesn't conform to Reachability protocol.");
+    GULOSLogError(kGULLogSubsystem, kGULLoggerReachability, NO,
+                  [NSString stringWithFormat:@"I-NET%06ld", (long)kGULReachabilityMessageCode005],
+                  @"Reachability delegate doesn't conform to Reachability protocol.");
     return;
   }
   reachabilityDelegate_ = reachabilityDelegate;
@@ -102,9 +102,9 @@ static NSString *const kGULReachabilityDisconnectedStatus = @"Disconnected";
   self = [super init];
 
   if (!host || !host.length) {
-    GULLogError(kGULLogSubsystem, kGULLoggerReachability, NO,
-                [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode001],
-                @"Invalid host specified");
+    GULOSLogError(kGULLogSubsystem, kGULLoggerReachability, NO,
+                  [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode001],
+                  @"Invalid host specified");
     return nil;
   }
   if (self) {
@@ -147,15 +147,15 @@ static NSString *const kGULReachabilityDisconnectedStatus = @"Disconnected";
       reachabilityApi_->releaseFn(reachability_);
       reachability_ = nil;
 
-      GULLogError(kGULLogSubsystem, kGULLoggerReachability, NO,
-                  [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode002],
-                  @"Failed to start reachability handle");
+      GULOSLogError(kGULLogSubsystem, kGULLoggerReachability, NO,
+                    [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode002],
+                    @"Failed to start reachability handle");
       return NO;
     }
   }
-  GULLogDebug(kGULLogSubsystem, kGULLoggerReachability, NO,
-              [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode003],
-              @"Monitoring the network status");
+  GULOSLogDebug(kGULLogSubsystem, kGULLoggerReachability, NO,
+                [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode003],
+                @"Monitoring the network status");
   return YES;
 #endif
 }
@@ -214,10 +214,10 @@ static NSString *const kGULReachabilityDisconnectedStatus = @"Disconnected";
                                      : kGULReachabilityConnectedStatus;
     }
 
-    GULLogDebug(kGULLogSubsystem, kGULLoggerReachability, NO,
-                [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode004],
-                @"Network status has changed. Code:%@, status:%@", @(status),
-                reachabilityStatusString);
+    GULOSLogDebug(kGULLogSubsystem, kGULLoggerReachability, NO,
+                  [NSString stringWithFormat:@"I-REA%06ld", (long)kGULReachabilityMessageCode004],
+                  @"Network status has changed. Code:%@, status:%@", @(status),
+                  reachabilityStatusString);
     reachabilityStatus_ = status;
     [reachabilityDelegate_ reachability:self statusChanged:reachabilityStatus_];
   }

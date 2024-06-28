@@ -87,9 +87,9 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
 - (nullable id)objectForKey:(NSString *)defaultName {
   NSString *key = [defaultName copy];
   if (![key isKindOfClass:[NSString class]] || !key.length) {
-    GULLogWarning(kGULLogSubsystem, @"<GoogleUtilities>", NO,
-                  [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidKeyGet],
-                  @"Cannot get object for invalid user default key.");
+    GULOSLogWarning(kGULLogSubsystem, @"<GoogleUtilities>", NO,
+                    [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidKeyGet],
+                    @"Cannot get object for invalid user default key.");
     return nil;
   }
   return (__bridge_transfer id)CFPreferencesCopyAppValue((__bridge CFStringRef)key, _appNameRef);
@@ -98,9 +98,9 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
 - (void)setObject:(nullable id)value forKey:(NSString *)defaultName {
   NSString *key = [defaultName copy];
   if (![key isKindOfClass:[NSString class]] || !key.length) {
-    GULLogWarning(kGULLogSubsystem, kGULLogUserDefaultsService, NO,
-                  [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidKeySet],
-                  @"Cannot set object for invalid user default key.");
+    GULOSLogWarning(kGULLogSubsystem, kGULLogUserDefaultsService, NO,
+                    [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidKeySet],
+                    @"Cannot set object for invalid user default key.");
     return;
   }
   if (!value) {
@@ -113,11 +113,12 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
       [value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]] ||
       [value isKindOfClass:[NSDate class]] || [value isKindOfClass:[NSData class]];
   if (!isAcceptableValue) {
-    GULLogWarning(kGULLogSubsystem, kGULLogUserDefaultsService, NO,
-                  [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidObjectSet],
-                  @"Cannot set invalid object to user defaults. Must be a string, number, array, "
-                  @"dictionary, date, or data. Value: %@",
-                  value);
+    GULOSLogWarning(
+        kGULLogSubsystem, kGULLogUserDefaultsService, NO,
+        [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidObjectSet],
+        @"Cannot set invalid object to user defaults. Must be a string, number, array, "
+        @"dictionary, date, or data. Value: %@",
+        value);
     return;
   }
 
@@ -185,9 +186,10 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
 
 - (void)synchronize {
   if (!CFPreferencesAppSynchronize(_appNameRef)) {
-    GULLogError(kGULLogSubsystem, kGULLogUserDefaultsService, NO,
-                [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeSynchronizeFailed],
-                @"Cannot synchronize user defaults to disk");
+    GULOSLogError(
+        kGULLogSubsystem, kGULLogUserDefaultsService, NO,
+        [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeSynchronizeFailed],
+        @"Cannot synchronize user defaults to disk");
   }
 }
 

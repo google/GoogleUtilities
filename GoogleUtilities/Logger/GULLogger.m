@@ -61,6 +61,10 @@ void GULLoggerInitializeASL(void) {
   GULLoggerInitialize();
 }
 
+void GULLoggerEnableSTDERR(void) {
+  // No-op
+}
+
 void GULLoggerForceDebug(void) {
   // We should enable debug mode if we're not running from App Store.
   if (![GULAppEnvironmentUtil isFromAppStore]) {
@@ -75,8 +79,8 @@ GULLoggerLevel GULGetLoggerLevel(void) {
 
 __attribute__((no_sanitize("thread"))) void GULSetLoggerLevel(GULLoggerLevel loggerLevel) {
   if (loggerLevel < GULLoggerLevelMin || loggerLevel > GULLoggerLevelMax) {
-    GULLogError(kGULLogSubsystem, kGULLoggerLogger, NO, @"I-COR000023",
-                @"Invalid logger level, %ld", (long)loggerLevel);
+    GULOSLogError(kGULLogSubsystem, kGULLoggerLogger, NO, @"I-COR000023",
+                  @"Invalid logger level, %ld", (long)loggerLevel);
     return;
   }
   GULLoggerInitialize();
@@ -133,13 +137,13 @@ os_log_type_t GULLoggerLevelToOSLogType(GULLoggerLevel level) {
   }
 }
 
-void GULLogBasic(GULLoggerLevel level,
-                 NSString *subsystem,
-                 GULLoggerService category,
-                 BOOL forceLog,
-                 NSString *messageCode,
-                 NSString *message,
-                 va_list args_ptr) {
+void GULOSLogBasic(GULLoggerLevel level,
+                   NSString *subsystem,
+                   GULLoggerService category,
+                   BOOL forceLog,
+                   NSString *messageCode,
+                   NSString *message,
+                   va_list args_ptr) {
   GULLoggerInitialize();
   if (!(level <= sGULLoggerMaximumLevel || sGULLoggerDebugMode || forceLog)) {
     return;
@@ -176,6 +180,15 @@ void GULLogBasic(GULLoggerLevel level,
   });
 }
 
+void GULLogBasic(GULLoggerLevel level,
+                 GULLoggerService service,
+                 BOOL forceLog,
+                 NSString *messageCode,
+                 NSString *message,
+                 va_list args_ptr) {
+  GULOSLogBasic(level, kGULLogSubsystem, service, forceLog, messageCode, message, args_ptr);
+}
+
 /**
  * Generates the logging functions using macros.
  *
@@ -184,14 +197,39 @@ void GULLogBasic(GULLoggerLevel level,
  * Calling GULLogDebug({service}, @"I-XYZ000001", @"Configure succeed.") shows:
  * yyyy-mm-dd hh:mm:ss.SSS sender[PID] <Debug> [{service}][I-XYZ000001] Configure succeed.
  */
-#define GUL_LOGGING_FUNCTION(level)                                                      \
-  void GULLog##level(NSString *subsystem, GULLoggerService category, BOOL force,         \
-                     NSString *messageCode, NSString *message, ...) {                    \
-    va_list args_ptr;                                                                    \
-    va_start(args_ptr, message);                                                         \
-    GULLogBasic(GULLoggerLevel##level, subsystem, category, force, messageCode, message, \
-                args_ptr);                                                               \
-    va_end(args_ptr);                                                                    \
+#define GUL_LOGGING_FUNCTION(level)                                                     \
+  void GULLog##level(GULLoggerService service, BOOL force, NSString *messageCode,       \
+                     NSString *message, ...) {                                          \
+    va_list args_ptr;                                                                   \
+    va_start(args_ptr, message);                                                        \
+    GULLogBasic(GULLoggerLevel##level, service, force, messageCode, message, args_ptr); \
+    va_end(args_ptr);                                                                   \
+  }
+
+GUL_LOGGING_FUNCTION(Error)
+GUL_LOGGING_FUNCTION(Warning)
+GUL_LOGGING_FUNCTION(Notice)
+GUL_LOGGING_FUNCTION(Info)
+GUL_LOGGING_FUNCTION(Debug)
+
+#undef GUL_LOGGING_FUNCTION
+
+/**
+ * Generates the logging functions using macros.
+ *
+ * Calling GULLogError({service}, @"I-XYZ000001", @"Configure %@ failed.", @"blah") shows:
+ * yyyy-mm-dd hh:mm:ss.SSS sender[PID] <Error> [{service}][I-XYZ000001] Configure blah failed.
+ * Calling GULLogDebug({service}, @"I-XYZ000001", @"Configure succeed.") shows:
+ * yyyy-mm-dd hh:mm:ss.SSS sender[PID] <Debug> [{service}][I-XYZ000001] Configure succeed.
+ */
+#define GUL_LOGGING_FUNCTION(level)                                                        \
+  void GULOSLog##level(NSString *subsystem, GULLoggerService category, BOOL force,         \
+                       NSString *messageCode, NSString *message, ...) {                    \
+    va_list args_ptr;                                                                      \
+    va_start(args_ptr, message);                                                           \
+    GULOSLogBasic(GULLoggerLevel##level, subsystem, category, force, messageCode, message, \
+                  args_ptr);                                                               \
+    va_end(args_ptr);                                                                      \
   }
 
 GUL_LOGGING_FUNCTION(Error)
@@ -212,7 +250,15 @@ GUL_LOGGING_FUNCTION(Debug)
          messageCode:(NSString *)messageCode
              message:(NSString *)message
            arguments:(va_list)args {
-  GULLogBasic(level, subsystem, category, NO, messageCode, message, args);
+  GULOSLogBasic(level, subsystem, category, NO, messageCode, message, args);
+}
+
++ (void)logWithLevel:(GULLoggerLevel)level
+         withService:(GULLoggerService)service
+            withCode:(NSString *)messageCode
+         withMessage:(NSString *)message
+            withArgs:(va_list)args {
+  GULOSLogBasic(level, kGULLogSubsystem, service, NO, messageCode, message, args);
 }
 
 @end
