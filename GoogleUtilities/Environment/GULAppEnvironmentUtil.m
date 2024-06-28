@@ -167,7 +167,7 @@ static BOOL HasEmbeddedMobileProvision(void) {
     model = @"watchOS Simulator";
 #elif TARGET_OS_TV
     model = @"tvOS Simulator";
-#elif defined(TARGET_OS_VISION) && TARGET_OS_VISION
+#elif TARGET_OS_VISION
     model = @"visionOS Simulator";
 #elif TARGET_OS_IOS
     switch ([[UIDevice currentDevice] userInterfaceIdiom]) {
@@ -195,8 +195,7 @@ static BOOL HasEmbeddedMobileProvision(void) {
 + (NSString *)systemVersion {
 #if TARGET_OS_IOS
   return [UIDevice currentDevice].systemVersion;
-#elif TARGET_OS_OSX || TARGET_OS_TV || TARGET_OS_WATCH || \
-    (defined(TARGET_OS_VISION) && TARGET_OS_VISION)
+#elif TARGET_OS_OSX || TARGET_OS_TV || TARGET_OS_WATCH || TARGET_OS_VISION
   // Assemble the systemVersion, excluding the patch version if it's 0.
   NSOperatingSystemVersion osVersion = [NSProcessInfo processInfo].operatingSystemVersion;
   NSMutableString *versionString = [[NSMutableString alloc]
@@ -225,7 +224,7 @@ static BOOL HasEmbeddedMobileProvision(void) {
   // `true`, which means the condition list is order-sensitive.
 #if TARGET_OS_MACCATALYST
   applePlatform = @"maccatalyst";
-#elif TARGET_OS_IOS && (!defined(TARGET_OS_VISION) || !TARGET_OS_VISION)
+#elif TARGET_OS_IOS
   if (@available(iOS 14.0, *)) {
     // Early iOS 14 betas do not include isiOSAppOnMac (#6969)
     applePlatform = ([[NSProcessInfo processInfo] respondsToSelector:@selector(isiOSAppOnMac)] &&
@@ -241,7 +240,7 @@ static BOOL HasEmbeddedMobileProvision(void) {
   applePlatform = @"macos";
 #elif TARGET_OS_WATCH
   applePlatform = @"watchos";
-#elif defined(TARGET_OS_VISION) && TARGET_OS_VISION
+#elif TARGET_OS_VISION
   applePlatform = @"visionos";
 #endif  // TARGET_OS_MACCATALYST
 
