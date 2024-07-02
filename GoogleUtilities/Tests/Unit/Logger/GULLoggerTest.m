@@ -63,51 +63,34 @@ static NSString *const kMessageCode = @"I-COR000001";
 
 - (void)testMessageCodeFormat {
   // Valid case.
-  XCTAssertNoThrow(GULLogError(@"com.my.service", @"My/Category", NO, @"I-APP000001", @"Message."));
+  XCTAssertNoThrow(
+      GULOSLogError(@"com.my.service", @"My/Category", NO, @"I-APP000001", @"Message."));
 
   // An extra dash or missing dash should fail.
-  XCTAssertThrows(GULLogError(@"com.my.service", @"My/Category", NO, @"I-APP-000001", @"Message."));
-  XCTAssertThrows(GULLogError(@"com.my.service", @"My/Category", NO, @"IAPP000001", @"Message."));
+  XCTAssertThrows(
+      GULOSLogError(@"com.my.service", @"My/Category", NO, @"I-APP-000001", @"Message."));
+  XCTAssertThrows(GULOSLogError(@"com.my.service", @"My/Category", NO, @"IAPP000001", @"Message."));
 
   // Wrong number of digits should fail.
-  XCTAssertThrows(GULLogError(@"com.my.service", @"My/Category", NO, @"I-APP00001", @"Message."));
-  XCTAssertThrows(GULLogError(@"com.my.service", @"My/Category", NO, @"I-APP0000001", @"Message."));
+  XCTAssertThrows(GULOSLogError(@"com.my.service", @"My/Category", NO, @"I-APP00001", @"Message."));
+  XCTAssertThrows(
+      GULOSLogError(@"com.my.service", @"My/Category", NO, @"I-APP0000001", @"Message."));
 
   // Lowercase should fail.
-  XCTAssertThrows(GULLogError(@"com.my.service", @"My/Category", NO, @"I-app000001", @"Message."));
+  XCTAssertThrows(
+      GULOSLogError(@"com.my.service", @"My/Category", NO, @"I-app000001", @"Message."));
 
 // nil or empty message code should fail.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
-  XCTAssertThrows(GULLogError(@"com.my.service", @"My/Category", NO, nil, @"Message."));
+  XCTAssertThrows(GULOSLogError(@"com.my.service", @"My/Category", NO, nil, @"Message."));
 #pragma clang diagnostic pop
 
-  XCTAssertThrows(GULLogError(@"com.my.service", @"My/Category", NO, @"", @"Message."));
+  XCTAssertThrows(GULOSLogError(@"com.my.service", @"My/Category", NO, @"", @"Message."));
 
   // Android message code should fail.
-  XCTAssertThrows(GULLogError(@"com.my.service", @"My/Category", NO, @"A-APP000001", @"Message."));
-}
-
-- (void)testLoggerInterface {
-  XCTAssertNoThrow(GULLogError(@"com.my.service", @"My/Category", NO, kMessageCode, @"Message."));
-  XCTAssertNoThrow(
-      GULLogError(@"com.my.service", @"My/Category", NO, kMessageCode, @"Configure %@.", @"blah"));
-
-  XCTAssertNoThrow(GULLogWarning(@"com.my.service", @"My/Category", NO, kMessageCode, @"Message."));
-  XCTAssertNoThrow(GULLogWarning(@"com.my.service", @"My/Category", NO, kMessageCode,
-                                 @"Configure %@.", @"blah"));
-
-  XCTAssertNoThrow(GULLogNotice(@"com.my.service", @"My/Category", NO, kMessageCode, @"Message."));
-  XCTAssertNoThrow(
-      GULLogNotice(@"com.my.service", @"My/Category", NO, kMessageCode, @"Configure %@.", @"blah"));
-
-  XCTAssertNoThrow(GULLogInfo(@"com.my.service", @"My/Category", NO, kMessageCode, @"Message."));
-  XCTAssertNoThrow(
-      GULLogInfo(@"com.my.service", @"My/Category", NO, kMessageCode, @"Configure %@.", @"blah"));
-
-  XCTAssertNoThrow(GULLogDebug(@"com.my.service", @"My/Category", NO, kMessageCode, @"Message."));
-  XCTAssertNoThrow(
-      GULLogDebug(@"com.my.service", @"My/Category", NO, kMessageCode, @"Configure %@.", @"blah"));
+  XCTAssertThrows(
+      GULOSLogError(@"com.my.service", @"My/Category", NO, @"A-APP000001", @"Message."));
 }
 
 // The GULLoggerLevel enum must match the ASL_LEVEL_* constants, but we manually redefine
@@ -156,6 +139,65 @@ static NSString *const kMessageCode = @"I-COR000001";
   // The default logger level is GULLoggerLevelNotice.
   XCTAssertEqual(loggerLevel, GULLoggerLevelNotice);
 }
+
+#pragma mark - Deprecated Functions
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+- (void)testDeprecatedInitializeASL {
+  XCTAssertNoThrow(GULLoggerInitializeASL());
+}
+
+- (void)testDeprecatedEnableSTDERR {
+  XCTAssertNoThrow(GULLoggerEnableSTDERR());
+}
+
+- (void)testDeprecatedMessageCodeFormat {
+  // Valid case.
+  XCTAssertNoThrow(GULLogError(@"my service", NO, @"I-APP000001", @"Message."));
+
+  // An extra dash or missing dash should fail.
+  XCTAssertThrows(GULLogError(@"my service", NO, @"I-APP-000001", @"Message."));
+  XCTAssertThrows(GULLogError(@"my service", NO, @"IAPP000001", @"Message."));
+
+  // Wrong number of digits should fail.
+  XCTAssertThrows(GULLogError(@"my service", NO, @"I-APP00001", @"Message."));
+  XCTAssertThrows(GULLogError(@"my service", NO, @"I-APP0000001", @"Message."));
+
+  // Lowercase should fail.
+  XCTAssertThrows(GULLogError(@"my service", NO, @"I-app000001", @"Message."));
+
+  // nil or empty message code should fail.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+  XCTAssertThrows(GULLogError(@"my service", NO, nil, @"Message."));
+#pragma clang diagnostic pop
+
+  XCTAssertThrows(GULLogError(@"my service", NO, @"", @"Message."));
+
+  // Android message code should fail.
+  XCTAssertThrows(GULLogError(@"my service", NO, @"A-APP000001", @"Message."));
+}
+
+- (void)testDeprecatedLoggerInterface {
+  XCTAssertNoThrow(GULLogError(@"my service", NO, kMessageCode, @"Message."));
+  XCTAssertNoThrow(GULLogError(@"my service", NO, kMessageCode, @"Configure %@.", @"blah"));
+
+  XCTAssertNoThrow(GULLogWarning(@"my service", NO, kMessageCode, @"Message."));
+  XCTAssertNoThrow(GULLogWarning(@"my service", NO, kMessageCode, @"Configure %@.", @"blah"));
+
+  XCTAssertNoThrow(GULLogNotice(@"my service", NO, kMessageCode, @"Message."));
+  XCTAssertNoThrow(GULLogNotice(@"my service", NO, kMessageCode, @"Configure %@.", @"blah"));
+
+  XCTAssertNoThrow(GULLogInfo(@"my service", NO, kMessageCode, @"Message."));
+  XCTAssertNoThrow(GULLogInfo(@"my service", NO, kMessageCode, @"Configure %@.", @"blah"));
+
+  XCTAssertNoThrow(GULLogDebug(@"my service", NO, kMessageCode, @"Message."));
+  XCTAssertNoThrow(GULLogDebug(@"my service", NO, kMessageCode, @"Configure %@.", @"blah"));
+}
+
+#pragma clang diagnostic pop
 
 @end
 #endif
