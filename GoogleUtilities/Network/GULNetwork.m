@@ -279,10 +279,11 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
                                                                 messageCode:message:context:)] ||
       ![loggerDelegate respondsToSelector:@selector(GULNetwork_logWithLevel:
                                                                 messageCode:message:)]) {
-    GULLogError(kGULLoggerNetwork, NO,
-                [NSString stringWithFormat:@"I-NET%06ld", (long)kGULNetworkMessageCodeNetwork002],
-                @"Cannot set the network logger delegate: delegate does not conform to the network "
-                 "logger protocol.");
+    GULOSLogError(
+        kGULLogSubsystem, kGULLoggerNetwork, NO,
+        [NSString stringWithFormat:@"I-NET%06ld", (long)kGULNetworkMessageCodeNetwork002],
+        @"Cannot set the network logger delegate: delegate does not conform to the network "
+         "logger protocol.");
     return;
   }
   _loggerDelegate = loggerDelegate;
@@ -329,9 +330,9 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
       logLevel == kGULNetworkLogLevelWarning || logLevel == kGULNetworkLogLevelInfo) {
     NSString *formattedMessage = GULStringWithLogMessage(message, logLevel, contexts);
     NSLog(@"%@", formattedMessage);
-    GULLogBasic((GULLoggerLevel)logLevel, kGULLoggerNetwork, NO,
-                [NSString stringWithFormat:@"I-NET%06ld", (long)messageCode], formattedMessage,
-                NULL);
+    GULOSLogBasic((GULLoggerLevel)logLevel, kGULLogSubsystem, kGULLoggerNetwork, NO,
+                  [NSString stringWithFormat:@"I-NET%06ld", (long)messageCode], formattedMessage,
+                  NULL);
   }
 }
 
