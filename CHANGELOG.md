@@ -1,3 +1,32 @@
+# 8.0.0
+- Remove swizzling support for `application:didReceiveRemoteNotification:`.
+  Use `application:didReceiveRemoteNotification:fetchCompletionHandler:` instead. (#162)
+- Remove `GULHeartbeatDateStorable`, `GULHeartbeatDateStorage`,
+  `GULHeartbeatDateStorageUserDefaults` APIs. (#164)
+- Remove '+ [GULAppEnvironmentUtil isIOS7OrHigher]' API. (#165)
+- Remove '+ [GULAppEnvironmentUtil hasSwiftRuntime]' API. (#166)
+- Fix an issue where ObjC associated objects were sometimes set with a
+  non-const key, potentially resulting in undefined behavior. (#141)
+- Add nullabilty annotations to public headers. (#169)
+- Remove references to deprecated CTCarrier. (#106)
+- [changed] **Breaking change**: Minimum supported versions have
+  updated for the following platforms:
+    - | Platform  | GoogleUtilities 8.0|
+      | ------------- | ------------- |
+      | iOS  | **12.0**  |
+      | tvOS  | **13.0**  |
+      | macOS  | **10.15**  |
+      | watchOS  | 7.0  |
+- Remove dependency on `FBLPromises`. The following public API have
+  been removed:
+  - `- [NSURLSession gul_dataTaskPromiseWithRequest:]`
+  - `GULURLSessionDataResponse`
+  The following promise-based public API have been replaced with
+  completion handler-based alternatives.
+  - `- [GULKeychainStorage getObjectForKey:objectClass:accessGroup:]`
+  - `- [GULKeychainStorage setObject:forKey:accessGroup:]`
+  - `- [GULKeychainStorage removeObjectForKey:accessGroup:]`
+
 # 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid
   conflict with keyword. (#152)

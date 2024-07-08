@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'GoogleUtilities'
-  s.version          = '7.13.3'
+  s.version          = '8.0.0'
   s.summary          = 'Google Utilities for Apple platform SDKs'
 
   s.description      = <<-DESC
@@ -17,10 +17,10 @@ other Google CocoaPods. They're not intended for direct public usage.
     :tag => 'CocoaPods-' + s.version.to_s
   }
 
-  ios_deployment_target = '9.0'
-  osx_deployment_target = '10.12'
-  tvos_deployment_target = '10.0'
-  watchos_deployment_target = '6.0'
+  ios_deployment_target = '12.0'
+  osx_deployment_target = '10.15'
+  tvos_deployment_target = '13.0'
+  watchos_deployment_target = '7.0'
 
   s.ios.deployment_target = ios_deployment_target
   s.osx.deployment_target = osx_deployment_target
@@ -47,7 +47,6 @@ other Google CocoaPods. They're not intended for direct public usage.
       'third_party/IsAppEncrypted/**/*.[mh]'
     ]
     es.public_header_files = 'GoogleUtilities/Environment/Public/GoogleUtilities/*.h'
-    es.dependency 'PromisesObjC', '>= 1.2', '< 3.0'
     es.dependency 'GoogleUtilities/Privacy'
     es.frameworks = [
       'Security'
@@ -113,12 +112,6 @@ other Google CocoaPods. They're not intended for direct public usage.
     adss.dependency 'GoogleUtilities/Logger'
     adss.dependency 'GoogleUtilities/Network'
     adss.dependency 'GoogleUtilities/Environment'
-  end
-
-  s.subspec 'ISASwizzler' do |iss|
-    iss.source_files = 'GoogleUtilities/ISASwizzler/**/*.[mh]', 'GoogleUtilities/Common/*.h'
-    iss.public_header_files = 'GoogleUtilities/ISASwizzler/Public/GoogleUtilities/*.h'
-    iss.dependency 'GoogleUtilities/Privacy'
   end
 
   s.subspec 'MethodSwizzler' do |mss|

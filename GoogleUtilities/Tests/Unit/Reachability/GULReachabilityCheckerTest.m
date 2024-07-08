@@ -349,7 +349,8 @@ static const struct GULReachabilityApi kTestReachabilityApi = {
 }
 
 - (void)testBadHost {
-  XCTAssertNil([[GULReachabilityChecker alloc] initWithReachabilityDelegate:self withHost:nil],
+  NSString *nilHost = nil;
+  XCTAssertNil([[GULReachabilityChecker alloc] initWithReachabilityDelegate:self withHost:nilHost],
                @"Creating a checker with nil hostname must fail.");
   XCTAssertNil([[GULReachabilityChecker alloc] initWithReachabilityDelegate:self withHost:@""],
                @"Creating a checker with empty hostname must fail.");
