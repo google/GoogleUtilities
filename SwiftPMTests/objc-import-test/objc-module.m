@@ -14,7 +14,6 @@
 
 @import GoogleUtilities_AppDelegateSwizzler;
 @import GoogleUtilities_Environment;
-@import GoogleUtilities_ISASwizzler;
 @import GoogleUtilities_Logger;
 @import GoogleUtilities_MethodSwizzler;
 @import GoogleUtilities_Network;

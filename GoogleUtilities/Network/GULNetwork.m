@@ -90,11 +90,11 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
                                             completionHandler:completionHandler];
 }
 
-- (NSString *)postURL:(NSURL *)url
-                   payload:(NSData *)payload
-                     queue:(dispatch_queue_t)queue
-    usingBackgroundSession:(BOOL)usingBackgroundSession
-         completionHandler:(GULNetworkCompletionHandler)handler {
+- (nullable NSString *)postURL:(NSURL *)url
+                       payload:(NSData *)payload
+                         queue:(nullable dispatch_queue_t)queue
+        usingBackgroundSession:(BOOL)usingBackgroundSession
+             completionHandler:(GULNetworkCompletionHandler)handler {
   return [self postURL:url
                      headers:nil
                      payload:payload
@@ -103,12 +103,12 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
            completionHandler:handler];
 }
 
-- (NSString *)postURL:(NSURL *)url
-                   headers:(NSDictionary *)headers
-                   payload:(NSData *)payload
-                     queue:(dispatch_queue_t)queue
-    usingBackgroundSession:(BOOL)usingBackgroundSession
-         completionHandler:(GULNetworkCompletionHandler)handler {
+- (nullable NSString *)postURL:(NSURL *)url
+                       headers:(nullable NSDictionary *)headers
+                       payload:(NSData *)payload
+                         queue:(nullable dispatch_queue_t)queue
+        usingBackgroundSession:(BOOL)usingBackgroundSession
+             completionHandler:(GULNetworkCompletionHandler)handler {
   if (!url.absoluteString.length) {
     [self handleErrorWithCode:GULErrorCodeNetworkInvalidURL queue:queue withHandler:handler];
     return nil;
@@ -189,11 +189,11 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
   return requestID;
 }
 
-- (NSString *)getURL:(NSURL *)url
-                   headers:(NSDictionary *)headers
-                     queue:(dispatch_queue_t)queue
-    usingBackgroundSession:(BOOL)usingBackgroundSession
-         completionHandler:(GULNetworkCompletionHandler)handler {
+- (nullable NSString *)getURL:(NSURL *)url
+                      headers:(nullable NSDictionary *)headers
+                        queue:(nullable dispatch_queue_t)queue
+       usingBackgroundSession:(BOOL)usingBackgroundSession
+            completionHandler:(GULNetworkCompletionHandler)handler {
   if (!url.absoluteString.length) {
     [self handleErrorWithCode:GULErrorCodeNetworkInvalidURL queue:queue withHandler:handler];
     return nil;

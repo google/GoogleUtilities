@@ -106,8 +106,6 @@ static NSString *const kGULDidRegisterForRemoteNotificationsSEL =
     @"application:didRegisterForRemoteNotificationsWithDeviceToken:";
 static NSString *const kGULDidFailToRegisterForRemoteNotificationsSEL =
     @"application:didFailToRegisterForRemoteNotificationsWithError:";
-static NSString *const kGULDidReceiveRemoteNotificationSEL =
-    @"application:didReceiveRemoteNotification:";
 static NSString *const kGULDidReceiveRemoteNotificationWithCompletionSEL =
     @"application:didReceiveRemoteNotification:fetchCompletionHandler:";
 
@@ -499,38 +497,18 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
                               realClass:realClass
        storeDestinationImplementationTo:realImplementationsBySelector];
 
-  // For application:didReceiveRemoteNotification:
-  SEL didReceiveRemoteNotificationSEL = NSSelectorFromString(kGULDidReceiveRemoteNotificationSEL);
-  SEL didReceiveRemoteNotificationDonorSEL = @selector(application:
-                                donor_didReceiveRemoteNotification:);
-
-  [self proxyDestinationSelector:didReceiveRemoteNotificationSEL
-      implementationsFromSourceSelector:didReceiveRemoteNotificationDonorSEL
-                              fromClass:[GULAppDelegateSwizzler class]
-                                toClass:appDelegateSubClass
-                              realClass:realClass
-       storeDestinationImplementationTo:realImplementationsBySelector];
-
   // For application:didReceiveRemoteNotification:fetchCompletionHandler:
 #if !TARGET_OS_WATCH && !TARGET_OS_OSX
   SEL didReceiveRemoteNotificationWithCompletionSEL =
       NSSelectorFromString(kGULDidReceiveRemoteNotificationWithCompletionSEL);
   SEL didReceiveRemoteNotificationWithCompletionDonorSEL =
       @selector(application:donor_didReceiveRemoteNotification:fetchCompletionHandler:);
-  if ([appDelegate respondsToSelector:didReceiveRemoteNotificationWithCompletionSEL]) {
-    // Only add the application:didReceiveRemoteNotification:fetchCompletionHandler: method if
-    // the original AppDelegate implements it.
-    // This fixes a bug if an app only implements application:didReceiveRemoteNotification:
-    // (if we add the method with completion, iOS sees that one exists and does not call
-    // the method without the completion, which in this case is the only one the app implements).
-
-    [self proxyDestinationSelector:didReceiveRemoteNotificationWithCompletionSEL
-        implementationsFromSourceSelector:didReceiveRemoteNotificationWithCompletionDonorSEL
-                                fromClass:[GULAppDelegateSwizzler class]
-                                  toClass:appDelegateSubClass
-                                realClass:realClass
-         storeDestinationImplementationTo:realImplementationsBySelector];
-  }
+  [self proxyDestinationSelector:didReceiveRemoteNotificationWithCompletionSEL
+      implementationsFromSourceSelector:didReceiveRemoteNotificationWithCompletionDonorSEL
+                              fromClass:[GULAppDelegateSwizzler class]
+                                toClass:appDelegateSubClass
+                              realClass:realClass
+       storeDestinationImplementationTo:realImplementationsBySelector];
 #endif  // !TARGET_OS_WATCH && !TARGET_OS_OSX
 }
 
@@ -953,35 +931,6 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   });
 }
 #endif  // !TARGET_OS_WATCH && !TARGET_OS_OSX
-
-- (void)application:(GULApplication *)application
-    donor_didReceiveRemoteNotification:(NSDictionary *)userInfo {
-  SEL methodSelector = NSSelectorFromString(kGULDidReceiveRemoteNotificationSEL);
-  NSValue *didReceiveRemoteNotificationIMPPointer =
-      [GULAppDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
-  GULRealDidReceiveRemoteNotificationIMP didReceiveRemoteNotificationIMP =
-      [didReceiveRemoteNotificationIMPPointer pointerValue];
-
-  // Notify interceptors.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  [GULAppDelegateSwizzler
-      notifyInterceptorsWithMethodSelector:methodSelector
-                                  callback:^(id<GULApplicationDelegate> interceptor) {
-                                    NSInvocation *invocation = [GULAppDelegateSwizzler
-                                        appDelegateInvocationForSelector:methodSelector];
-                                    [invocation setTarget:interceptor];
-                                    [invocation setSelector:methodSelector];
-                                    [invocation setArgument:(void *)(&application) atIndex:2];
-                                    [invocation setArgument:(void *)(&userInfo) atIndex:3];
-                                    [invocation invoke];
-                                  }];
-#pragma clang diagnostic pop
-  // Call the real implementation if the real App Delegate has any.
-  if (didReceiveRemoteNotificationIMP) {
-    didReceiveRemoteNotificationIMP(self, methodSelector, application, userInfo);
-  }
-}
 
 + (nullable NSInvocation *)appDelegateInvocationForSelector:(SEL)selector {
   struct objc_method_description methodDescription =
