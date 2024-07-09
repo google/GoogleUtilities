@@ -387,28 +387,20 @@
         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
     dispatch_async(evaluateBackgroundQueue, ^{
-      SecTrustResultType trustEval = kSecTrustResultInvalid;
       BOOL shouldAllow;
-      OSStatus trustError;
+      CFErrorRef errorRef = NULL;
 
       @synchronized([GULNetworkURLSession class]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        trustError = SecTrustEvaluate(serverTrust, &trustEval);
-#pragma clang diagnostic pop
+        shouldAllow = SecTrustEvaluateWithError(serverTrust, &errorRef);
       }
 
-      if (trustError != errSecSuccess) {
-        [self->_loggerDelegate GULNetwork_logWithLevel:kGULNetworkLogLevelError
-                                           messageCode:kGULNetworkMessageCodeURLSession008
-                                               message:@"Cannot evaluate server trust. Error, host"
-                                              contexts:@[ @(trustError), self->_request.URL ]];
-        shouldAllow = NO;
-      } else {
-        // Having a trust level "unspecified" by the user is the usual result, described at
-        // https://developer.apple.com/library/mac/qa/qa1360
-        shouldAllow =
-            (trustEval == kSecTrustResultUnspecified || trustEval == kSecTrustResultProceed);
+      if (errorRef) {
+        [self->_loggerDelegate
+            GULNetwork_logWithLevel:kGULNetworkLogLevelError
+                        messageCode:kGULNetworkMessageCodeURLSession008
+                            message:@"Cannot evaluate server trust. Error, host"
+                           contexts:@[ @((int)CFErrorGetCode(errorRef)), self->_request.URL ]];
+        CFRelease(errorRef);
       }
 
       // Call the call back with the permission.
