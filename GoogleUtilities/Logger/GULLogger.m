@@ -139,7 +139,7 @@ os_log_type_t GULLoggerLevelToOSLogType(GULLoggerLevel level) {
 
 void GULOSLogBasic(GULLoggerLevel level,
                    NSString *subsystem,
-                   GULLoggerService category,
+                   NSString *category,
                    BOOL forceLog,
                    NSString *messageCode,
                    NSString *message,
@@ -222,14 +222,14 @@ GUL_LOGGING_FUNCTION(Debug)
  * Calling GULLogDebug({service}, @"I-XYZ000001", @"Configure succeed.") shows:
  * yyyy-mm-dd hh:mm:ss.SSS sender[PID] <Debug> [{service}][I-XYZ000001] Configure succeed.
  */
-#define GUL_LOGGING_FUNCTION(level)                                                        \
-  void GULOSLog##level(NSString *subsystem, GULLoggerService category, BOOL force,         \
-                       NSString *messageCode, NSString *message, ...) {                    \
-    va_list args_ptr;                                                                      \
-    va_start(args_ptr, message);                                                           \
-    GULOSLogBasic(GULLoggerLevel##level, subsystem, category, force, messageCode, message, \
-                  args_ptr);                                                               \
-    va_end(args_ptr);                                                                      \
+#define GUL_LOGGING_FUNCTION(level)                                                                \
+  void GULOSLog##level(NSString *subsystem, NSString *category, BOOL force, NSString *messageCode, \
+                       NSString *message, ...) {                                                   \
+    va_list args_ptr;                                                                              \
+    va_start(args_ptr, message);                                                                   \
+    GULOSLogBasic(GULLoggerLevel##level, subsystem, category, force, messageCode, message,         \
+                  args_ptr);                                                                       \
+    va_end(args_ptr);                                                                              \
   }
 
 GUL_LOGGING_FUNCTION(Error)

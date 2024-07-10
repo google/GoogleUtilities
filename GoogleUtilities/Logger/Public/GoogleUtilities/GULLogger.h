@@ -22,6 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * The services used in the logger.
+ *
+ * DEPRECATED; use NSString instead.
  */
 typedef NSString *const GULLoggerService;
 
@@ -87,7 +89,7 @@ extern void GULLoggerRegisterVersion(NSString *version);
  */
 extern void GULOSLogBasic(GULLoggerLevel level,
                           NSString *subsystem,
-                          GULLoggerService category,
+                          NSString *category,
                           BOOL forceLog,
                           NSString *messageCode,
                           NSString *message,
@@ -225,7 +227,7 @@ extern void GULOSLogDebug(NSString *subsystem,
 ///     a format string; optional if `message` is not a format string.
 + (void)logWithLevel:(GULLoggerLevel)level
            subsystem:(NSString *)subsystem
-            category:(GULLoggerService)category
+            category:(NSString *)category
          messageCode:(NSString *)messageCode
              message:(NSString *)message
            arguments:(va_list)args;
