@@ -29,6 +29,7 @@ typedef NSString *const GULLoggerService;
 extern "C" {
 #endif  // __cplusplus
 
+/// DEPRECATED; provide a relevant subsystem name rather than using default.
 extern NSString *const kGULLogSubsystem;
 
 /// Initialize GULLogger.
@@ -36,16 +37,18 @@ extern void GULLoggerInitialize(void);
 
 /// Initialize GULLogger.
 ///
-/// The Apple System Log (ASL) in Google Utilities Logger has been replaced by OSLog. This function
-/// is deprecated and simply calls its replacement `GULLoggerInitialize`.
-extern void GULLoggerInitializeASL(void)
-    DEPRECATED_MSG_ATTRIBUTE("Replaced by `GULLoggerInitialize`.");
+/// The Apple System Log (ASL) in Google Utilities Logger has been replaced by OSLog.
+///
+/// DEPRECATED; simply calls its replacement `GULLoggerInitialize`.
+extern void GULLoggerInitializeASL(void);
 
 /// Override log level to Debug.
 void GULLoggerForceDebug(void);
 
 /// Turn on logging to STDERR.
-extern void GULLoggerEnableSTDERR(void) DEPRECATED_MSG_ATTRIBUTE("This function is a no-op.");
+///
+/// DEPRECATED; this function is a no-op.
+extern void GULLoggerEnableSTDERR(void);
 
 /// Gets the current `GULLoggerLevel`.
 extern GULLoggerLevel GULGetLoggerLevel(void);
@@ -109,6 +112,8 @@ extern void GULOSLogBasic(GULLoggerLevel level,
  * (required) message string which can be a format string.
  * (optional) variable arguments list obtained from calling va_start, used when message is a format
  *            string.
+ *
+ * DEPRECATED; replaced by `GULOSLogBasic`.
  */
 extern void GULLogBasic(GULLoggerLevel level,
                         GULLoggerService service,
@@ -122,7 +127,7 @@ extern void GULLogBasic(GULLoggerLevel level,
 #else
                         va_list _Nullable args_ptr
 #endif
-                        ) DEPRECATED_MSG_ATTRIBUTE("Replaced by `GULOSLogBasic`.");
+);
 
 /**
  * The following functions accept the following parameters in order:
@@ -136,6 +141,8 @@ extern void GULLogBasic(GULLoggerLevel level,
  * (optional) the list of arguments to substitute into the format string.
  * Example usage:
  * GULLogError(kGULLoggerCore, @"I-COR000001", @"Configuration of %@ failed.", app.name);
+ *
+ * DEPRECATED; replaced by `GULOSLogError`, `GULOSLogWarning`, etc.
  */
 extern void GULLogError(
     GULLoggerService service, BOOL force, NSString *messageCode, NSString *message, ...)
@@ -234,14 +241,14 @@ extern void GULOSLogDebug(NSString *subsystem,
  * (required) message string which can be a format string.
  * (optional) variable arguments list obtained from calling va_start, used when message is a format
  *            string.
+ *
+ *  DEPRECATED; replaced by `logWithLevel:subsystem:category:messageCode:message:arguments:`.
  */
 + (void)logWithLevel:(GULLoggerLevel)level
          withService:(GULLoggerService)service
             withCode:(NSString *)messageCode
          withMessage:(NSString *)message
-            withArgs:(va_list)args
-    DEPRECATED_MSG_ATTRIBUTE(
-        "Replaced by `logWithLevel:subsystem:category:messageCode:message:arguments:`.");
+            withArgs:(va_list)args;
 
 @end
 
