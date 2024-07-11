@@ -58,9 +58,6 @@ other Google CocoaPods. They're not intended for direct public usage.
     ls.public_header_files = 'GoogleUtilities/Logger/Public/GoogleUtilities/*.h'
     ls.dependency 'GoogleUtilities/Environment'
     ls.dependency 'GoogleUtilities/Privacy'
-    ls.frameworks = [
-      'OSLog'
-    ]
   end
 
 
