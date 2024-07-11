@@ -26,6 +26,8 @@
   - `- [GULKeychainStorage getObjectForKey:objectClass:accessGroup:]`
   - `- [GULKeychainStorage setObject:forKey:accessGroup:]`
   - `- [GULKeychainStorage removeObjectForKey:accessGroup:]`
+  - Update underlying GULLogger implementation from `asl` to `os_log`.
+  - Remove `GULLoggerEnableSTDERR` API.
 
 # 7.13.3
 - Rename parameter placeholder in `GULSecureCoding` unarchiving API to avoid

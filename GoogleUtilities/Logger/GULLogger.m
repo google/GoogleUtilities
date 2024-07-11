@@ -57,14 +57,6 @@ void GULLoggerInitialize(void) {
   });
 }
 
-void GULLoggerInitializeASL(void) {
-  GULLoggerInitialize();
-}
-
-void GULLoggerEnableSTDERR(void) {
-  // No-op
-}
-
 void GULLoggerForceDebug(void) {
   // We should enable debug mode if we're not running from App Store.
   if (![GULAppEnvironmentUtil isFromAppStore]) {
@@ -179,38 +171,6 @@ void GULOSLogBasic(GULLoggerLevel level,
     os_log_with_type(serviceLog, GULLoggerLevelToOSLogType(level), "%{public}@", logMsg);
   });
 }
-
-void GULLogBasic(GULLoggerLevel level,
-                 GULLoggerService service,
-                 BOOL forceLog,
-                 NSString *messageCode,
-                 NSString *message,
-                 va_list args_ptr) {
-  GULOSLogBasic(level, kGULLogSubsystem, service, forceLog, messageCode, message, args_ptr);
-}
-
-/**
- * Generates the logging functions using macros.
- *
- * Calling GULLogError({service}, @"I-XYZ000001", @"Configure %@ failed.", @"blah") shows:
- * yyyy-mm-dd hh:mm:ss.SSS sender[PID] <Error> [{service}][I-XYZ000001] Configure blah failed.
- * Calling GULLogDebug({service}, @"I-XYZ000001", @"Configure succeed.") shows:
- * yyyy-mm-dd hh:mm:ss.SSS sender[PID] <Debug> [{service}][I-XYZ000001] Configure succeed.
- */
-#define GUL_LOGGING_FUNCTION(level)                                                     \
-  void GULLog##level(GULLoggerService service, BOOL force, NSString *messageCode,       \
-                     NSString *message, ...) {                                          \
-    va_list args_ptr;                                                                   \
-    va_start(args_ptr, message);                                                        \
-    GULLogBasic(GULLoggerLevel##level, service, force, messageCode, message, args_ptr); \
-    va_end(args_ptr);                                                                   \
-  }
-
-GUL_LOGGING_FUNCTION(Error)
-GUL_LOGGING_FUNCTION(Warning)
-GUL_LOGGING_FUNCTION(Notice)
-GUL_LOGGING_FUNCTION(Info)
-GUL_LOGGING_FUNCTION(Debug)
 
 #undef GUL_LOGGING_FUNCTION
 
