@@ -66,9 +66,9 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
 - (nullable id)objectForKey:(NSString *)defaultName {
   NSString *key = [defaultName copy];
   if (![key isKindOfClass:[NSString class]] || !key.length) {
-    GULLogWarning(@"<GoogleUtilities>", NO,
-                  [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidKeyGet],
-                  @"Cannot get object for invalid user default key.");
+    GULOSLogWarning(kGULLogSubsystem, @"<GoogleUtilities>", NO,
+                    [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidKeyGet],
+                    @"Cannot get object for invalid user default key.");
     return nil;
   }
 
@@ -78,9 +78,9 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
 - (void)setObject:(nullable id)value forKey:(NSString *)defaultName {
   NSString *key = [defaultName copy];
   if (![key isKindOfClass:[NSString class]] || !key.length) {
-    GULLogWarning(kGULLogUserDefaultsService, NO,
-                  [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidKeySet],
-                  @"Cannot set object for invalid user default key.");
+    GULOSLogWarning(kGULLogSubsystem, kGULLogUserDefaultsService, NO,
+                    [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidKeySet],
+                    @"Cannot set object for invalid user default key.");
     return;
   }
   if (!value) {
@@ -92,11 +92,12 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
       [value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]] ||
       [value isKindOfClass:[NSDate class]] || [value isKindOfClass:[NSData class]];
   if (!isAcceptableValue) {
-    GULLogWarning(kGULLogUserDefaultsService, NO,
-                  [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidObjectSet],
-                  @"Cannot set invalid object to user defaults. Must be a string, number, array, "
-                  @"dictionary, date, or data. Value: %@",
-                  value);
+    GULOSLogWarning(
+        kGULLogSubsystem, kGULLogUserDefaultsService, NO,
+        [NSString stringWithFormat:kGULLogFormat, (long)GULUDMessageCodeInvalidObjectSet],
+        @"Cannot set invalid object to user defaults. Must be a string, number, array, "
+        @"dictionary, date, or data. Value: %@",
+        value);
     return;
   }
 
