@@ -31,26 +31,14 @@ typedef NSString *const GULLoggerService;
 extern "C" {
 #endif  // __cplusplus
 
-/// DEPRECATED; provide a relevant subsystem name rather than using default.
+/// Used for other GoogleUtilities logging.
 extern NSString *const kGULLogSubsystem;
 
 /// Initialize GULLogger.
 extern void GULLoggerInitialize(void);
 
-/// Initialize GULLogger.
-///
-/// The Apple System Log (ASL) in Google Utilities Logger has been replaced by OSLog.
-///
-/// DEPRECATED; simply calls its replacement `GULLoggerInitialize`.
-extern void GULLoggerInitializeASL(void);
-
 /// Override log level to Debug.
 void GULLoggerForceDebug(void);
-
-/// Turn on logging to STDERR.
-///
-/// DEPRECATED; this function is a no-op.
-extern void GULLoggerEnableSTDERR(void);
 
 /// Gets the current `GULLoggerLevel`.
 extern GULLoggerLevel GULGetLoggerLevel(void);
@@ -101,66 +89,6 @@ extern void GULOSLogBasic(GULLoggerLevel level,
                           va_list _Nullable args_ptr
 #endif
 );
-
-/**
- * Logs a message to the Xcode console and the device log. If running from AppStore, will
- * not log any messages with a level higher than GULLoggerLevelNotice to avoid log spamming.
- * (required) log level (one of the GULLoggerLevel enum values).
- * (required) service name of type GULLoggerService.
- * (required) message code starting with "I-" which means iOS, followed by a capitalized
- *            three-character service identifier and a six digit integer message ID that is unique
- *            within the service.
- *            An example of the message code is @"I-COR000001".
- * (required) message string which can be a format string.
- * (optional) variable arguments list obtained from calling va_start, used when message is a format
- *            string.
- *
- * DEPRECATED; replaced by `GULOSLogBasic`.
- */
-extern void GULLogBasic(GULLoggerLevel level,
-                        GULLoggerService service,
-                        BOOL forceLog,
-                        NSString *messageCode,
-                        NSString *message,
-// On 64-bit simulators, va_list is not a pointer, so cannot be marked nullable
-// See: http://stackoverflow.com/q/29095469
-#if __LP64__ && TARGET_OS_SIMULATOR || TARGET_OS_OSX
-                        va_list args_ptr
-#else
-                        va_list _Nullable args_ptr
-#endif
-);
-
-/**
- * The following functions accept the following parameters in order:
- * (required) service name of type GULLoggerService.
- * (required) message code starting from "I-" which means iOS, followed by a capitalized
- *            three-character service identifier and a six digit integer message ID that is unique
- *            within the service.
- *            An example of the message code is @"I-COR000001".
- *            See go/firebase-log-proposal for details.
- * (required) message string which can be a format string.
- * (optional) the list of arguments to substitute into the format string.
- * Example usage:
- * GULLogError(kGULLoggerCore, @"I-COR000001", @"Configuration of %@ failed.", app.name);
- *
- * DEPRECATED; replaced by `GULOSLogError`, `GULOSLogWarning`, etc.
- */
-extern void GULLogError(
-    GULLoggerService service, BOOL force, NSString *messageCode, NSString *message, ...)
-    NS_FORMAT_FUNCTION(4, 5) DEPRECATED_MSG_ATTRIBUTE("Replaced by `GULOSLogError`.");
-extern void GULLogWarning(
-    GULLoggerService service, BOOL force, NSString *messageCode, NSString *message, ...)
-    NS_FORMAT_FUNCTION(4, 5) DEPRECATED_MSG_ATTRIBUTE("Replaced by `GULOSLogWarning`.");
-extern void GULLogNotice(
-    GULLoggerService service, BOOL force, NSString *messageCode, NSString *message, ...)
-    NS_FORMAT_FUNCTION(4, 5) DEPRECATED_MSG_ATTRIBUTE("Replaced by `GULOSLogInfo`.");
-extern void GULLogInfo(
-    GULLoggerService service, BOOL force, NSString *messageCode, NSString *message, ...)
-    NS_FORMAT_FUNCTION(4, 5) DEPRECATED_MSG_ATTRIBUTE("Replaced by `GULOSLogInfo`.");
-extern void GULLogDebug(
-    GULLoggerService service, BOOL force, NSString *messageCode, NSString *message, ...)
-    NS_FORMAT_FUNCTION(4, 5) DEPRECATED_MSG_ATTRIBUTE("Replaced by `GULOSLogDebug`.");
 
 /**
  * The following functions accept the following parameters in order:
@@ -231,26 +159,6 @@ extern void GULOSLogDebug(NSString *subsystem,
          messageCode:(NSString *)messageCode
              message:(NSString *)message
            arguments:(va_list)args;
-
-/**
- * Objective-C wrapper for GULLogBasic to allow weak linking to GULLogger
- * (required) log level (one of the GULLoggerLevel enum values).
- * (required) service name of type GULLoggerService.
- * (required) message code starting with "I-" which means iOS, followed by a capitalized
- *            three-character service identifier and a six digit integer message ID that is unique
- *            within the service.
- *            An example of the message code is @"I-COR000001".
- * (required) message string which can be a format string.
- * (optional) variable arguments list obtained from calling va_start, used when message is a format
- *            string.
- *
- *  DEPRECATED; replaced by `logWithLevel:subsystem:category:messageCode:message:arguments:`.
- */
-+ (void)logWithLevel:(GULLoggerLevel)level
-         withService:(GULLoggerService)service
-            withCode:(NSString *)messageCode
-         withMessage:(NSString *)message
-            withArgs:(va_list)args;
 
 @end
 
