@@ -16,12 +16,12 @@
 // The tests depend upon library methods only built with #ifdef DEBUG
 
 #import <OCMock/OCMock.h>
-#import <OSLog/OSLog.h>
 #import <XCTest/XCTest.h>
 
 #import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLogger.h"
 
 #import <asl.h>
+#import <os/log.h>
 
 extern void GULResetLogger(void);
 
