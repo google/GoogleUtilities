@@ -14,7 +14,7 @@
 
 #import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLogger.h"
 
-#import <OSLog/OSLog.h>
+#import <os/log.h>
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULAppEnvironmentUtil.h"
 #import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLoggerLevel.h"
