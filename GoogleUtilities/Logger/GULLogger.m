@@ -172,8 +172,6 @@ void GULOSLogBasic(GULLoggerLevel level,
   });
 }
 
-#undef GUL_LOGGING_FUNCTION
-
 /**
  * Generates the logging functions using macros.
  *
