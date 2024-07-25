@@ -1,3 +1,7 @@
+# 8.0.1
+- Add missing copyright to source file. (#206)
+- Removed an extraneous `#undef GUL_LOGGING_FUNCTION`. (#205)
+
 # 8.0.0
 - Remove swizzling support for `application:didReceiveRemoteNotification:`.
   Use `application:didReceiveRemoteNotification:fetchCompletionHandler:` instead. (#162)
