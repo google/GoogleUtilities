@@ -45,6 +45,7 @@ static NSRegularExpression *sMessageCodeRegex;
 
 void GULLoggerInitialize(void) {
   dispatch_once(&sGULLoggerOnceToken, ^{
+    sGULLoggerMaximumLevel = GULLoggerLevelNotice;
     sGULClientQueue = dispatch_queue_create("GULLoggingClientQueue", DISPATCH_QUEUE_SERIAL);
     dispatch_set_target_queue(sGULClientQueue,
                               dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
