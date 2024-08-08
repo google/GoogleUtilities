@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import XCTest
 @testable import GoogleUtilities
+import XCTest
 
 class GULAppEnvironmentUtilTest: XCTestCase {
   func testIsAppExtension() throws {
