@@ -45,6 +45,7 @@ static NSRegularExpression *sMessageCodeRegex;
 
 void GULLoggerInitialize(void) {
   dispatch_once(&sGULLoggerOnceToken, ^{
+    sGULLoggerMaximumLevel = GULLoggerLevelNotice;
     sGULClientQueue = dispatch_queue_create("GULLoggingClientQueue", DISPATCH_QUEUE_SERIAL);
     dispatch_set_target_queue(sGULClientQueue,
                               dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
@@ -71,7 +72,7 @@ GULLoggerLevel GULGetLoggerLevel(void) {
 
 __attribute__((no_sanitize("thread"))) void GULSetLoggerLevel(GULLoggerLevel loggerLevel) {
   if (loggerLevel < GULLoggerLevelMin || loggerLevel > GULLoggerLevelMax) {
-    GULOSLogError(kGULLogSubsystem, kGULLoggerLogger, NO, @"I-COR000023",
+    GULOSLogError(kGULLogSubsystem, kGULLoggerLogger, YES, @"I-COR000023",
                   @"Invalid logger level, %ld", (long)loggerLevel);
     return;
   }
