@@ -1,3 +1,6 @@
+# 8.0.2
+- Fix default logging level to `GULLoggerLevelNotice`; previously unset. (#207)
+
 # 8.0.1
 - Add missing copyright to source file. (#206)
 - Removed an extraneous `#undef GUL_LOGGING_FUNCTION`. (#205)
