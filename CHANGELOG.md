@@ -1,3 +1,7 @@
+# 8.0.2
+- Fix default logging level regression introduced in 8.0.0 (no value set);
+  default value is restored to `GULLoggerLevelNotice`. (#207)
+
 # 8.0.1
 - Add missing copyright to source file. (#206)
 - Removed an extraneous `#undef GUL_LOGGING_FUNCTION`. (#205)
