@@ -151,7 +151,7 @@ extern void GULOSLogDebug(NSString *subsystem,
 ///     three-character service identifier and a six digit integer message ID that is unique within
 ///     the service. An example of the message code is @"I-COR000001".
 ///   - message: The message to log, which may be a format string.
-///   - arguments: The variable arguments list obtained from calling va_start, used when message is
+///   - args: The variable arguments list obtained from calling va_start, used when message is
 ///     a format string; optional if `message` is not a format string.
 + (void)logWithLevel:(GULLoggerLevel)level
            subsystem:(NSString *)subsystem
