@@ -15,7 +15,7 @@ jobs:
     env:
       MINT_PATH: ${{ github.workspace }}/mint
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - uses: actions/setup-python@v2
       with:
@@ -34,7 +34,7 @@ jobs:
     - name: Setup check
       run: |
         brew update
-        brew install clang-format@18
+        brew install clang-format@19
         brew install mint
         mint bootstrap
 
