@@ -43,7 +43,7 @@ jobs:
     - name: Build and test
       run: |
         scripts/third_party/travis/retry.sh scripts/pod_lib_lint.rb GoogleUtilities.podspec \
-          --platforms=${{ matrix.target }}
+          --platforms=${{ matrix.target }} --analyze
 
   catalyst:
     needs: changed_today
@@ -103,4 +103,4 @@ jobs:
     - name: PodLibLint GoogleUtilities Cron
       run: |
         scripts/third_party/travis/retry.sh scripts/pod_lib_lint.rb \
-          GoogleUtilities.podspec --platforms=${{ matrix.target }} ${{ matrix.flags }}
+          GoogleUtilities.podspec --platforms=${{ matrix.target }} ${{ matrix.flags }} --analyze
