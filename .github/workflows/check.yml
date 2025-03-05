@@ -22,7 +22,7 @@ jobs:
         python-version: '3.10'
 
     - name: Cache Mint packages
-      uses: actions/cache@v1
+      uses: actions/cache@v4
       with:
         path: ${{ env.MINT_PATH }}
         key: ${{ runner.os }}-mint-${{ hashFiles('**/Mintfile') }}
@@ -32,11 +32,7 @@ jobs:
       run: ./setup-scripts.sh
 
     - name: Setup check
-      run: |
-        brew update
-        brew install clang-format@19
-        brew install mint
-        mint bootstrap
+      run: scripts/setup_check.sh
 
     - name: Style
       run: scripts/style.sh test-only
