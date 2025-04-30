@@ -46,6 +46,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// Indicates whether it is running inside an extension or an app.
 + (BOOL)isAppExtension;
 
+/// Indicates whether it is running inside an app clip or a full app.
++ (BOOL)isAppClip;
+
+/// Indicates whether the current target supports background URL session uploads.
+/// App extensions and app clips do not support background URL sessions.
++ (BOOL)supportsBackgroundURLSessionUploads;
+
 /// @return An Apple platform. Possible values "ios", "tvos", "macos", "watchos", "maccatalyst", and
 /// "visionos".
 + (NSString *)applePlatform;
