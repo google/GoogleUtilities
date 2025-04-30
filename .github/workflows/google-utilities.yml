@@ -77,7 +77,9 @@ jobs:
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Initialize xcodebuild
-      run: xcodebuild -list
+      run: |
+        sudo xcode-select -s '/Applications/Xcode_16.2.app/Contents/Developer'
+        xcodebuild -list
     - name: iOS Unit Tests
       run: scripts/third_party/travis/retry.sh scripts/build.sh GoogleUtilities-Package ${{ matrix.target }} spm
 
