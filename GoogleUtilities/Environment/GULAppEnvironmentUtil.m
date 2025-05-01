@@ -217,6 +217,25 @@ static BOOL HasEmbeddedMobileProvision(void) {
 #endif
 }
 
++ (BOOL)isAppClip {
+#if TARGET_OS_IOS
+  // Documented by <a
+  // href="https://developer.apple.com/documentation/bundleresources/information-property-list/nsappclip">Apple</a>
+  // App clips have an NSAppClip entry in the top level of their Info.plist.
+  NSDictionary *appClipEntry = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSAppClip"];
+  return appClipEntry != nil;
+#elif TARGET_OS_OSX || TARGET_OS_TV || TARGET_OS_WATCH || TARGET_OS_VISION
+  return NO;
+#endif
+}
+
++ (BOOL)supportsBackgroundURLSessionUploads {
+  // Neither app extensions nor App Clips support background uploads.
+  BOOL isExtension = self.isAppExtension;
+  BOOL isAppClip = self.isAppClip;
+  return !(isExtension || isAppClip);
+}
+
 + (NSString *)applePlatform {
   NSString *applePlatform = @"unknown";
 
