@@ -1,3 +1,7 @@
+# 8.1.0
+- Add a utility to detect App Clips and make a semantic check for background
+  URL sessions. (#220)
+
 # 8.0.2
 - Fix default logging level regression introduced in 8.0.0 (no value set);
   default value is restored to `GULLoggerLevelNotice`. (#207)
