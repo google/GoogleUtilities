@@ -81,7 +81,7 @@ jobs:
         sudo xcode-select -s '/Applications/Xcode_16.2.app/Contents/Developer'
         xcodebuild -list
     - name: Install Simulator
-      if: matrix.target != 'catalyst'
+      if: matrix.target == 'iOS' || matrix.target == 'tvOS'
       run: xcodebuild -downloadPlatform ${{ matrix.target }}
     - name: iOS Unit Tests
       run: scripts/third_party/travis/retry.sh scripts/build.sh GoogleUtilities-Package ${{ matrix.target }} spm
