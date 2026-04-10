@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'GoogleUtilities'
-  s.version          = '8.1.0'
+  s.version          = '8.1.1'
   s.summary          = 'Google Utilities for Apple platform SDKs'
 
   s.description      = <<-DESC
