@@ -1,5 +1,5 @@
 # 8.1.1
-- [fixed] Prevent race condition crashes in GULNetworkURLSession by replacing 
+- [fixed] Prevent race condition crashes in GULNetworkURLSession by replacing
   NSMapTable with thread-safe NSMutableDictionary and locking. (#228)
 
 # 8.1.0
