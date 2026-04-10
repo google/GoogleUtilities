@@ -37,6 +37,11 @@
 
 @end
 
+@interface GULNetworkURLSession (Test)
++ (void)setSessionInFetcherMap:(GULNetworkURLSession *)session forSessionID:(NSString *)sessionID;
++ (nullable GULNetworkURLSession *)sessionFromFetcherMapForSessionID:(NSString *)sessionID;
+@end
+
 @interface GULNetworkTest : XCTestCase <GULNetworkReachabilityDelegate>
 @end
 
@@ -1089,6 +1094,48 @@
 
 - (void)reachabilityDidChange {
   _currentNetworkStatus = _fakeNetworkIsReachable;
+}
+
+- (void)testSessionMapStress {
+  int iterations = 1000;
+  int numSessionIDs = 10;
+
+  XCTestExpectation *expectation = [self expectationWithDescription:@"Stress test finished"];
+
+  dispatch_queue_t queue =
+      dispatch_queue_create("com.google.utilities.stress", DISPATCH_QUEUE_CONCURRENT);
+
+  dispatch_group_t group = dispatch_group_create();
+
+  // Reader threads
+  for (int t = 0; t < 5; t++) {
+    dispatch_group_async(group, queue, ^{
+      for (int i = 0; i < iterations; i++) {
+        int id_idx = i % numSessionIDs;
+        NSString *sessionID = [NSString stringWithFormat:@"session_%d", id_idx];
+        [GULNetworkURLSession sessionFromFetcherMapForSessionID:sessionID];
+      }
+    });
+  }
+
+  // Writer threads
+  for (int t = 0; t < 5; t++) {
+    dispatch_group_async(group, queue, ^{
+      for (int i = 0; i < iterations; i++) {
+        int id_idx = i % numSessionIDs;
+        NSString *sessionID = [NSString stringWithFormat:@"session_%d", id_idx];
+        GULNetworkURLSession *session =
+            [[GULNetworkURLSession alloc] initWithNetworkLoggerDelegate:nil];
+        [GULNetworkURLSession setSessionInFetcherMap:session forSessionID:sessionID];
+      }
+    });
+  }
+
+  dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+    [expectation fulfill];
+  });
+
+  [self waitForExpectationsWithTimeout:30 handler:nil];
 }
 
 @end

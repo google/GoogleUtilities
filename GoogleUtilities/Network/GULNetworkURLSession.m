@@ -28,6 +28,13 @@
                                     NSURLSessionTaskDelegate>
 @end
 
+@interface GULNetworkURLSessionWeakHolder : NSObject
+@property(nonatomic, weak) GULNetworkURLSession *session;
+@end
+
+@implementation GULNetworkURLSessionWeakHolder
+@end
+
 @implementation GULNetworkURLSession {
   /// The handler to be called when the request completes or error has occurs.
   GULNetworkURLSessionCompletionHandler _completionHandler;
@@ -552,12 +559,12 @@
 /// When reading and writing from/to the session map, don't use this method directly.
 /// To avoid thread safety issues, use one of the helper methods at the bottom of the
 /// file: setSessionInFetcherMap:forSessionID:, sessionFromFetcherMapForSessionID:
-+ (NSMapTable<NSString *, GULNetworkURLSession *> *)sessionIDToFetcherMap {
-  static NSMapTable *sessionIDToFetcherMap;
++ (NSMutableDictionary<NSString *, GULNetworkURLSessionWeakHolder *> *)sessionIDToFetcherMap {
+  static NSMutableDictionary *sessionIDToFetcherMap;
 
   static dispatch_once_t sessionMapOnceToken;
   dispatch_once(&sessionMapOnceToken, ^{
-    sessionIDToFetcherMap = [NSMapTable strongToWeakObjectsMapTable];
+    sessionIDToFetcherMap = [[NSMutableDictionary alloc] init];
   });
   return sessionIDToFetcherMap;
 }
@@ -673,8 +680,9 @@
 
 + (void)setSessionInFetcherMap:(GULNetworkURLSession *)session forSessionID:(NSString *)sessionID {
   [[self sessionIDToFetcherMapReadWriteLock] lock];
-  GULNetworkURLSession *existingSession =
+  GULNetworkURLSessionWeakHolder *holder =
       [[[self class] sessionIDToFetcherMap] objectForKey:sessionID];
+  GULNetworkURLSession *existingSession = holder.session;
   if (existingSession) {
     if (session) {
       NSString *message = [NSString stringWithFormat:@"Discarding session: %@", existingSession];
@@ -685,7 +693,9 @@
     [existingSession->_URLSession finishTasksAndInvalidate];
   }
   if (session) {
-    [[[self class] sessionIDToFetcherMap] setObject:session forKey:sessionID];
+    GULNetworkURLSessionWeakHolder *newHolder = [[GULNetworkURLSessionWeakHolder alloc] init];
+    newHolder.session = session;
+    [[[self class] sessionIDToFetcherMap] setObject:newHolder forKey:sessionID];
   } else {
     [[[self class] sessionIDToFetcherMap] removeObjectForKey:sessionID];
   }
@@ -694,7 +704,9 @@
 
 + (nullable GULNetworkURLSession *)sessionFromFetcherMapForSessionID:(NSString *)sessionID {
   [[self sessionIDToFetcherMapReadWriteLock] lock];
-  GULNetworkURLSession *session = [[[self class] sessionIDToFetcherMap] objectForKey:sessionID];
+  GULNetworkURLSessionWeakHolder *holder =
+      [[[self class] sessionIDToFetcherMap] objectForKey:sessionID];
+  GULNetworkURLSession *session = holder.session;
   [[self sessionIDToFetcherMapReadWriteLock] unlock];
   return session;
 }
