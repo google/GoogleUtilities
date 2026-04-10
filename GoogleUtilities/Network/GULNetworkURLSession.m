@@ -679,6 +679,9 @@
 #pragma mark - Helper Methods
 
 + (void)setSessionInFetcherMap:(GULNetworkURLSession *)session forSessionID:(NSString *)sessionID {
+  if (!sessionID) {
+    return;
+  }
   [[self sessionIDToFetcherMapReadWriteLock] lock];
   GULNetworkURLSessionWeakHolder *holder =
       [[[self class] sessionIDToFetcherMap] objectForKey:sessionID];
@@ -703,6 +706,9 @@
 }
 
 + (nullable GULNetworkURLSession *)sessionFromFetcherMapForSessionID:(NSString *)sessionID {
+  if (!sessionID) {
+    return nil;
+  }
   [[self sessionIDToFetcherMapReadWriteLock] lock];
   GULNetworkURLSessionWeakHolder *holder =
       [[[self class] sessionIDToFetcherMap] objectForKey:sessionID];
