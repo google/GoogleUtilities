@@ -399,8 +399,8 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   }
 
   // For application:handleEventsForBackgroundURLSession:completionHandler:
-  SEL handleEventsForBackgroundURLSessionSEL = @selector(application:
-                                 handleEventsForBackgroundURLSession:completionHandler:);
+  SEL handleEventsForBackgroundURLSessionSEL =
+      @selector(application:handleEventsForBackgroundURLSession:completionHandler:);
   [self proxyDestinationSelector:handleEventsForBackgroundURLSessionSEL
       implementationsFromSourceSelector:handleEventsForBackgroundURLSessionSEL
                               fromClass:[GULAppDelegateSwizzler class]
@@ -411,8 +411,8 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 
 #if TARGET_OS_IOS
   // For application:openURL:sourceApplication:annotation:
-  SEL openURLSourceApplicationAnnotationSEL = @selector(application:
-                                                            openURL:sourceApplication:annotation:);
+  SEL openURLSourceApplicationAnnotationSEL =
+      @selector(application:openURL:sourceApplication:annotation:);
 
   [self proxyDestinationSelector:openURLSourceApplicationAnnotationSEL
       implementationsFromSourceSelector:openURLSourceApplicationAnnotationSEL
@@ -477,8 +477,8 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // For application:didRegisterForRemoteNotificationsWithDeviceToken:
   SEL didRegisterForRemoteNotificationsSEL =
       NSSelectorFromString(kGULDidRegisterForRemoteNotificationsSEL);
-  SEL didRegisterForRemoteNotificationsDonorSEL = @selector(application:
-                 donor_didRegisterForRemoteNotificationsWithDeviceToken:);
+  SEL didRegisterForRemoteNotificationsDonorSEL =
+      @selector(application:donor_didRegisterForRemoteNotificationsWithDeviceToken:);
 
   [self proxyDestinationSelector:didRegisterForRemoteNotificationsSEL
       implementationsFromSourceSelector:didRegisterForRemoteNotificationsDonorSEL
@@ -490,8 +490,8 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // For application:didFailToRegisterForRemoteNotificationsWithError:
   SEL didFailToRegisterForRemoteNotificationsSEL =
       NSSelectorFromString(kGULDidFailToRegisterForRemoteNotificationsSEL);
-  SEL didFailToRegisterForRemoteNotificationsDonorSEL = @selector(application:
-                       donor_didFailToRegisterForRemoteNotificationsWithError:);
+  SEL didFailToRegisterForRemoteNotificationsDonorSEL =
+      @selector(application:donor_didFailToRegisterForRemoteNotificationsWithError:);
 
   [self proxyDestinationSelector:didFailToRegisterForRemoteNotificationsSEL
       implementationsFromSourceSelector:didFailToRegisterForRemoteNotificationsDonorSEL
@@ -747,8 +747,8 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
     handleEventsForBackgroundURLSession:(NSString *)identifier
                       completionHandler:(void (^)())completionHandler {
 #pragma clang diagnostic pop
-  SEL methodSelector = @selector(application:
-         handleEventsForBackgroundURLSession:completionHandler:);
+  SEL methodSelector =
+      @selector(application:handleEventsForBackgroundURLSession:completionHandler:);
   NSValue *handleBackgroundSessionPointer =
       [GULAppDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
   GULRealHandleEventsForBackgroundURLSessionIMP handleBackgroundSessionIMP =

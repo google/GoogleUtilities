@@ -273,12 +273,12 @@ static NSString *const kGULNetworkLogTag = @"Google/Utilities/Network";
   // Explicitly check whether the delegate responds to the methods because conformsToProtocol does
   // not work correctly even though the delegate does respond to the methods.
   if (!loggerDelegate ||
-      ![loggerDelegate respondsToSelector:@selector(GULNetwork_logWithLevel:
-                                                                messageCode:message:contexts:)] ||
-      ![loggerDelegate respondsToSelector:@selector(GULNetwork_logWithLevel:
-                                                                messageCode:message:context:)] ||
-      ![loggerDelegate respondsToSelector:@selector(GULNetwork_logWithLevel:
-                                                                messageCode:message:)]) {
+      ![loggerDelegate
+          respondsToSelector:@selector(GULNetwork_logWithLevel:messageCode:message:contexts:)] ||
+      ![loggerDelegate
+          respondsToSelector:@selector(GULNetwork_logWithLevel:messageCode:message:context:)] ||
+      ![loggerDelegate
+          respondsToSelector:@selector(GULNetwork_logWithLevel:messageCode:message:)]) {
     GULOSLogError(
         kGULLogSubsystem, kGULLoggerNetwork, NO,
         [NSString stringWithFormat:@"I-NET%06ld", (long)kGULNetworkMessageCodeNetwork002],

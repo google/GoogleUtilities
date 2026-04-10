@@ -107,8 +107,8 @@ static BOOL gRespondsToHandleBackgroundSession;
   gRespondsToOpenURLHandler_iOS9 =
       [self instancesRespondToSelector:@selector(application:openURL:options:)];
   gRespondsToHandleBackgroundSession =
-      [self instancesRespondToSelector:@selector(application:
-                                           handleEventsForBackgroundURLSession:completionHandler:)];
+      [self instancesRespondToSelector:
+                @selector(application:handleEventsForBackgroundURLSession:completionHandler:)];
   gRespondsToContinueUserActivity = [self
       instancesRespondToSelector:@selector(application:continueUserActivity:restorationHandler:)];
 #pragma clang diagnostic pop
@@ -292,22 +292,22 @@ static BOOL gRespondsToHandleBackgroundSession;
   // Class size must stay the same.
   XCTAssertEqual(sizeBefore, sizeAfter);
 
-  XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
-                                                        continueUserActivity:restorationHandler:)]);
+  XCTAssertTrue([realAppDelegate
+      respondsToSelector:@selector(application:continueUserActivity:restorationHandler:)]);
   XCTAssertTrue([realAppDelegate
       respondsToSelector:@selector(application:didRegisterForRemoteNotificationsWithDeviceToken:)]);
   XCTAssertTrue([realAppDelegate
       respondsToSelector:@selector(application:didFailToRegisterForRemoteNotificationsWithError:)]);
-  XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
-                                                        didReceiveRemoteNotification:)]);
+  XCTAssertTrue(
+      [realAppDelegate respondsToSelector:@selector(application:didReceiveRemoteNotification:)]);
 #if TARGET_OS_IOS || TARGET_OS_TV
   XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:openURL:options:)]);
   XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:
-                             handleEventsForBackgroundURLSession:completionHandler:)]);
+      respondsToSelector:@selector(
+                             application:handleEventsForBackgroundURLSession:completionHandler:)]);
   XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:
-                             didReceiveRemoteNotification:fetchCompletionHandler:)]);
+      respondsToSelector:@selector(
+                             application:didReceiveRemoteNotification:fetchCompletionHandler:)]);
 #endif  // TARGET_OS_IOS || TARGET_OS_TV
 
   // Make sure that the class has changed.
@@ -343,25 +343,25 @@ static BOOL gRespondsToHandleBackgroundSession;
   // Class size must stay the same.
   XCTAssertEqual(sizeBefore, sizeAfter);
 
-  XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
-                                                        continueUserActivity:restorationHandler:)]);
+  XCTAssertTrue([realAppDelegate
+      respondsToSelector:@selector(application:continueUserActivity:restorationHandler:)]);
   // Remote notifications methods should be added only by
   // -proxyOriginalDelegateIncludingAPNSMethods
   XCTAssertFalse([realAppDelegate
       respondsToSelector:@selector(application:didRegisterForRemoteNotificationsWithDeviceToken:)]);
   XCTAssertFalse([realAppDelegate
       respondsToSelector:@selector(application:didFailToRegisterForRemoteNotificationsWithError:)]);
-  XCTAssertFalse([realAppDelegate respondsToSelector:@selector(application:
-                                                         didReceiveRemoteNotification:)]);
+  XCTAssertFalse(
+      [realAppDelegate respondsToSelector:@selector(application:didReceiveRemoteNotification:)]);
 #if TARGET_OS_IOS || TARGET_OS_TV
   // The implementation should not be added if there is no original implementation
   XCTAssertFalse([realAppDelegate respondsToSelector:@selector(application:openURL:options:)]);
   XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:
-                             handleEventsForBackgroundURLSession:completionHandler:)]);
+      respondsToSelector:@selector(
+                             application:handleEventsForBackgroundURLSession:completionHandler:)]);
   XCTAssertFalse([realAppDelegate
-      respondsToSelector:@selector(application:
-                             didReceiveRemoteNotification:fetchCompletionHandler:)]);
+      respondsToSelector:@selector(
+                             application:didReceiveRemoteNotification:fetchCompletionHandler:)]);
 #endif  // TARGET_OS_IOS || TARGET_OS_TV
 
   // Make sure that the class has changed.
@@ -390,8 +390,8 @@ static BOOL gRespondsToHandleBackgroundSession;
   // Class size must stay the same.
   XCTAssertEqual(sizeBefore, sizeAfter);
 
-  XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
-                                                        continueUserActivity:restorationHandler:)]);
+  XCTAssertTrue([realAppDelegate
+      respondsToSelector:@selector(application:continueUserActivity:restorationHandler:)]);
 
   // Remote notifications methods should be added only by
   // -proxyOriginalDelegateIncludingAPNSMethods
@@ -405,12 +405,12 @@ static BOOL gRespondsToHandleBackgroundSession;
   XCTAssertFalse([realAppDelegate respondsToSelector:@selector(application:openURL:options:)]);
 
   XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:
-                             handleEventsForBackgroundURLSession:completionHandler:)]);
+      respondsToSelector:@selector(
+                             application:handleEventsForBackgroundURLSession:completionHandler:)]);
 
   XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:
-                             didReceiveRemoteNotification:fetchCompletionHandler:)]);
+      respondsToSelector:@selector(
+                             application:didReceiveRemoteNotification:fetchCompletionHandler:)]);
 
 #endif  // TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_VISION
 
@@ -440,8 +440,8 @@ static BOOL gRespondsToHandleBackgroundSession;
   // Class size must stay the same.
   XCTAssertEqual(sizeBefore, sizeAfter);
 
-  XCTAssertTrue([realAppDelegate respondsToSelector:@selector(application:
-                                                        continueUserActivity:restorationHandler:)]);
+  XCTAssertTrue([realAppDelegate
+      respondsToSelector:@selector(application:continueUserActivity:restorationHandler:)]);
   // Proxy remote notifications methods
   [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
 
@@ -454,12 +454,12 @@ static BOOL gRespondsToHandleBackgroundSession;
   // The implementation should not be added if there is no original implementation
   XCTAssertFalse([realAppDelegate respondsToSelector:@selector(application:openURL:options:)]);
   XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:
-                             handleEventsForBackgroundURLSession:completionHandler:)]);
+      respondsToSelector:@selector(
+                             application:handleEventsForBackgroundURLSession:completionHandler:)]);
 
   XCTAssertTrue([realAppDelegate
-      respondsToSelector:@selector(application:
-                             didReceiveRemoteNotification:fetchCompletionHandler:)]);
+      respondsToSelector:@selector(
+                             application:didReceiveRemoteNotification:fetchCompletionHandler:)]);
 #endif  // TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_VISION
 
   // Make sure that the class has changed.
@@ -1004,13 +1004,15 @@ static BOOL gRespondsToHandleBackgroundSession;
   GULTestInterceptorAppDelegate *delegate = [[GULTestInterceptorAppDelegate alloc] init];
   OCMStub([self.mockSharedApplication delegate]).andReturn(delegate);
 
-  XCTAssertFalse([delegate respondsToSelector:@selector
-                           (application:didReceiveRemoteNotification:fetchCompletionHandler:)]);
+  XCTAssertFalse([delegate
+      respondsToSelector:@selector(
+                             application:didReceiveRemoteNotification:fetchCompletionHandler:)]);
 
   [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
 
-  XCTAssertTrue([delegate respondsToSelector:@selector
-                          (application:didReceiveRemoteNotification:fetchCompletionHandler:)]);
+  XCTAssertTrue([delegate
+      respondsToSelector:@selector(
+                             application:didReceiveRemoteNotification:fetchCompletionHandler:)]);
 }
 #endif  // TARGET_OS_IOS || TARGET_OS_TV
 
