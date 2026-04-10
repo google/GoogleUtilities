@@ -696,6 +696,15 @@
     [existingSession->_URLSession finishTasksAndInvalidate];
   }
   if (session) {
+    // Cleanup nil entries.
+    NSMutableArray *keysToRemove = [[NSMutableArray alloc] init];
+    [[[self class] sessionIDToFetcherMap] enumerateKeysAndObjectsUsingBlock:^(NSString *key, GULNetworkURLSessionWeakHolder *holder, BOOL *stop) {
+      if (holder.session == nil) {
+        [keysToRemove addObject:key];
+      }
+    }];
+    [[[self class] sessionIDToFetcherMap] removeObjectsForKeys:keysToRemove];
+
     GULNetworkURLSessionWeakHolder *newHolder = [[GULNetworkURLSessionWeakHolder alloc] init];
     newHolder.session = session;
     [[[self class] sessionIDToFetcherMap] setObject:newHolder forKey:sessionID];
