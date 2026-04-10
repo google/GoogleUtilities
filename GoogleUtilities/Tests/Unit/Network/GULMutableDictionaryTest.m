@@ -15,6 +15,12 @@
 #import <XCTest/XCTest.h>
 
 #import "GoogleUtilities/Network/Public/GoogleUtilities/GULMutableDictionary.h"
+#import "GoogleUtilities/Network/Public/GoogleUtilities/GULNetworkURLSession.h"
+
+@interface GULNetworkURLSession (Test)
++ (void)setSessionInFetcherMap:(GULNetworkURLSession *)session forSessionID:(NSString *)sessionID;
++ (nullable GULNetworkURLSession *)sessionFromFetcherMapForSessionID:(NSString *)sessionID;
+@end
 
 const static NSString *const kKey = @"testKey1";
 const static NSString *const kValue = @"testValue1";
@@ -82,6 +88,48 @@ const static NSString *const kValue2 = @"testValue2";
   XCTAssertEqual([dict count], 2);
   XCTAssertEqual(dict[kKey], kValue);
   XCTAssertEqual(dict[kKey2], kValue2);
+}
+
+- (void)testSessionMapStress {
+  int iterations = 1000;
+  int numSessionIDs = 10;
+
+  XCTestExpectation *expectation = [self expectationWithDescription:@"Stress test finished"];
+
+  dispatch_queue_t queue =
+      dispatch_queue_create("com.google.utilities.stress", DISPATCH_QUEUE_CONCURRENT);
+
+  dispatch_group_t group = dispatch_group_create();
+
+  // Reader threads
+  for (int t = 0; t < 5; t++) {
+    dispatch_group_async(group, queue, ^{
+      for (int i = 0; i < iterations; i++) {
+        int id_idx = i % numSessionIDs;
+        NSString *sessionID = [NSString stringWithFormat:@"session_%d", id_idx];
+        [GULNetworkURLSession sessionFromFetcherMapForSessionID:sessionID];
+      }
+    });
+  }
+
+  // Writer threads
+  for (int t = 0; t < 5; t++) {
+    dispatch_group_async(group, queue, ^{
+      for (int i = 0; i < iterations; i++) {
+        int id_idx = i % numSessionIDs;
+        NSString *sessionID = [NSString stringWithFormat:@"session_%d", id_idx];
+        GULNetworkURLSession *session =
+            [[GULNetworkURLSession alloc] initWithNetworkLoggerDelegate:nil];
+        [GULNetworkURLSession setSessionInFetcherMap:session forSessionID:sessionID];
+      }
+    });
+  }
+
+  dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+    [expectation fulfill];
+  });
+
+  [self waitForExpectationsWithTimeout:30 handler:nil];
 }
 
 @end
