@@ -58,29 +58,43 @@
 }
 
 - (void)capture {
-  int numberOfClasses = objc_getClassList(NULL, 0);
-  Class *classList = (Class *)malloc(numberOfClasses * sizeof(Class));
-  numberOfClasses = objc_getClassList(classList, numberOfClasses);
+  int bufferLen = objc_getClassList(NULL, 0);
+  if (bufferLen <= 0) {
+    return;
+  }
+  Class *classList = (Class *)calloc(bufferLen, sizeof(Class));
+  if (classList == NULL) {
+    return;
+  }
+  int numberOfClasses = objc_getClassList(classList, bufferLen);
+  int count = MIN(bufferLen, numberOfClasses);
 
   // If we should track specific classes, then there's no need to figure out all ObjC classes.
   if (_classes) {
     for (Class aClass in _classes) {
       NSString *classString = NSStringFromClass(aClass);
-      GULRuntimeClassSnapshot *classSnapshot =
-          [[GULRuntimeClassSnapshot alloc] initWithClass:aClass];
-      _classSnapshots[classString] = classSnapshot;
-      [classSnapshot capture];
-      _runningHash ^= [classSnapshot hash];
+      if (classString) {
+        GULRuntimeClassSnapshot *classSnapshot =
+            [[GULRuntimeClassSnapshot alloc] initWithClass:aClass];
+        _classSnapshots[classString] = classSnapshot;
+        [classSnapshot capture];
+        _runningHash ^= [classSnapshot hash];
+      }
     }
   } else {
-    for (int i = 0; i < numberOfClasses; i++) {
+    for (int i = 0; i < count; i++) {
       Class aClass = classList[i];
+      if (aClass == Nil) {
+        continue;
+      }
       NSString *classString = NSStringFromClass(aClass);
-      GULRuntimeClassSnapshot *classSnapshot =
-          [[GULRuntimeClassSnapshot alloc] initWithClass:aClass];
-      _classSnapshots[classString] = classSnapshot;
-      [classSnapshot capture];
-      _runningHash ^= [classSnapshot hash];
+      if (classString) {
+        GULRuntimeClassSnapshot *classSnapshot =
+            [[GULRuntimeClassSnapshot alloc] initWithClass:aClass];
+        _classSnapshots[classString] = classSnapshot;
+        [classSnapshot capture];
+        _runningHash ^= [classSnapshot hash];
+      }
     }
   }
   free(classList);
