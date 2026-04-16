@@ -80,9 +80,15 @@ jobs:
       run: |
         sudo xcode-select -s '/Applications/Xcode_16.2.app/Contents/Developer'
         xcodebuild -list
-    - name: Install Simulator
-      if: matrix.target == 'iOS' || matrix.target == 'tvOS'
-      run: xcodebuild -downloadPlatform ${{ matrix.target }}
+    - name: Install simulator SDKs
+      if: matrix.target != 'macOS' && matrix.target != 'catalyst'
+      uses: nick-fields/retry@ce71cc2ab81d554ebbe88c79ab5975992d79ba08 # v3      
+      with:
+        timeout_minutes: 15
+        max_attempts: 5
+        retry_wait_seconds: 120
+        continue_on_error: true
+        command: xcodebuild -downloadPlatform ${{ matrix.target }}
     - name: iOS Unit Tests
       run: scripts/third_party/travis/retry.sh scripts/build.sh GoogleUtilities-Package ${{ matrix.target }} spm
 
