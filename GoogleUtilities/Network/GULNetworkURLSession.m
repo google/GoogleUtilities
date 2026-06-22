@@ -746,6 +746,7 @@ static const void *kGULSessionTrackerKey = &kGULSessionTrackerKey;
   }
   [[self sessionIDToFetcherMapReadWriteLock] unlock];
   // oldTrackerToReleaseOutsideLock deallocates here, outside the lock.
+  oldTrackerToReleaseOutsideLock = nil;
 }
 
 + (nullable GULNetworkURLSession *)sessionFromFetcherMapForSessionID:(NSString *)sessionID {
