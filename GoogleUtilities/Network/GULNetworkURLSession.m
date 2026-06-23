@@ -752,7 +752,7 @@ static const void *kGULSessionTrackerKey = &kGULSessionTrackerKey;
     [[[self class] sessionIDToFetcherMap] removeObjectForKey:sessionID];
   }
   [[self sessionIDToFetcherMapReadWriteLock] unlock];
-  oldTrackerToReleaseOutsideLock = nil;
+  (void)oldTrackerToReleaseOutsideLock;
 }
 
 + (nullable GULNetworkURLSession *)sessionFromFetcherMapForSessionID:(NSString *)sessionID {
