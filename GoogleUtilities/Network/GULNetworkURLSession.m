@@ -53,6 +53,7 @@
                            holder:(GULNetworkURLSessionWeakHolder *)holder {
   self = [super init];
   if (self) {
+    NSParameterAssert(sessionID);
     _sessionID = [sessionID copy];
     _holder = holder;
   }
@@ -752,6 +753,9 @@ static const void *kGULSessionTrackerKey = &kGULSessionTrackerKey;
     [[[self class] sessionIDToFetcherMap] removeObjectForKey:sessionID];
   }
   [[self sessionIDToFetcherMapReadWriteLock] unlock];
+
+  // Retain the old tracker until the lock is released. If it deallocates inside the lock,
+  // its -dealloc method will attempt to re-acquire the lock, resulting in a deadlock.
   (void)oldTrackerToReleaseOutsideLock;
 }
 
