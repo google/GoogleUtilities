@@ -44,11 +44,13 @@
 @interface GULSessionDeallocTracker : NSObject
 @property(nonatomic, copy) NSString *sessionID;
 @property(nonatomic, strong) GULNetworkURLSessionWeakHolder *holder;
-- (instancetype)initWithSessionID:(NSString *)sessionID holder:(GULNetworkURLSessionWeakHolder *)holder;
+- (instancetype)initWithSessionID:(NSString *)sessionID
+                           holder:(GULNetworkURLSessionWeakHolder *)holder;
 @end
 
 @implementation GULSessionDeallocTracker
-- (instancetype)initWithSessionID:(NSString *)sessionID holder:(GULNetworkURLSessionWeakHolder *)holder {
+- (instancetype)initWithSessionID:(NSString *)sessionID
+                           holder:(GULNetworkURLSessionWeakHolder *)holder {
   self = [super init];
   if (self) {
     _sessionID = [sessionID copy];
@@ -59,7 +61,8 @@
 
 - (void)dealloc {
   [[GULNetworkURLSession sessionIDToFetcherMapReadWriteLock] lock];
-  GULNetworkURLSessionWeakHolder *currentDictionaryHolder = [[GULNetworkURLSession sessionIDToFetcherMap] objectForKey:_sessionID];
+  GULNetworkURLSessionWeakHolder *currentDictionaryHolder =
+      [[GULNetworkURLSession sessionIDToFetcherMap] objectForKey:_sessionID];
   if (currentDictionaryHolder == _holder) {
     [[GULNetworkURLSession sessionIDToFetcherMap] removeObjectForKey:_sessionID];
   }
@@ -716,9 +719,9 @@ static const void *kGULSessionTrackerKey = &kGULSessionTrackerKey;
   if (!sessionID) {
     return;
   }
-  
+
   GULSessionDeallocTracker *oldTrackerToReleaseOutsideLock = nil;
-  
+
   [[self sessionIDToFetcherMapReadWriteLock] lock];
   GULNetworkURLSessionWeakHolder *holder =
       [[[self class] sessionIDToFetcherMap] objectForKey:sessionID];
@@ -730,8 +733,10 @@ static const void *kGULSessionTrackerKey = &kGULSessionTrackerKey;
                                                     messageCode:kGULNetworkMessageCodeURLSession019
                                                         message:message];
     }
-    oldTrackerToReleaseOutsideLock = objc_getAssociatedObject(existingSession, kGULSessionTrackerKey);
-    objc_setAssociatedObject(existingSession, kGULSessionTrackerKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    oldTrackerToReleaseOutsideLock =
+        objc_getAssociatedObject(existingSession, kGULSessionTrackerKey);
+    objc_setAssociatedObject(existingSession, kGULSessionTrackerKey, nil,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [existingSession->_URLSession finishTasksAndInvalidate];
   }
   if (session) {
@@ -739,8 +744,10 @@ static const void *kGULSessionTrackerKey = &kGULSessionTrackerKey;
     newHolder.session = session;
     [[[self class] sessionIDToFetcherMap] setObject:newHolder forKey:sessionID];
 
-    GULSessionDeallocTracker *tracker = [[GULSessionDeallocTracker alloc] initWithSessionID:sessionID holder:newHolder];
-    objc_setAssociatedObject(session, kGULSessionTrackerKey, tracker, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    GULSessionDeallocTracker *tracker =
+        [[GULSessionDeallocTracker alloc] initWithSessionID:sessionID holder:newHolder];
+    objc_setAssociatedObject(session, kGULSessionTrackerKey, tracker,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   } else {
     [[[self class] sessionIDToFetcherMap] removeObjectForKey:sessionID];
   }
