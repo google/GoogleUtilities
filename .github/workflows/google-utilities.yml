@@ -78,7 +78,7 @@ jobs:
       run: ./setup-scripts.sh
     - name: Initialize xcodebuild
       run: |
-        sudo xcode-select -s '/Applications/Xcode_16.2.app/Contents/Developer'
+        sudo xcode-select -s '/Applications/Xcode_26.4.app/Contents/Developer'
         xcodebuild -list
     - name: Install Simulator
       if: matrix.target == 'iOS' || matrix.target == 'tvOS'
