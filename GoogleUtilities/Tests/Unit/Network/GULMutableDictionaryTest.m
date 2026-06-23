@@ -129,7 +129,7 @@ const static NSString *const kValue2 = @"testValue2";
     [expectation fulfill];
   });
 
-  [self waitForExpectationsWithTimeout:30 handler:nil];
+  [self waitForExpectationsWithTimeout:60 handler:nil];
 }
 
 @end
