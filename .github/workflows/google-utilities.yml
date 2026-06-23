@@ -17,7 +17,7 @@ jobs:
     outputs:
       WAS_CHANGED: ${{ steps.check_changed.outputs.WAS_CHANGED }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - id: check_changed
         name: Check
         if: ${{ github.event_name == 'schedule' }}
@@ -35,7 +35,7 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: "2.7"
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Setup Bundler
@@ -51,10 +51,10 @@ jobs:
 
     runs-on: macOS-latest
     steps:
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@354a1ad156761f5ee2b7b13fa8e09943a5e8d252 # v1
       with:
         ruby-version: "2.7"
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Setup Bundler
@@ -73,12 +73,12 @@ jobs:
       matrix:
         target: [iOS, tvOS, macOS, catalyst]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Initialize xcodebuild
       run: |
-        sudo xcode-select -s '/Applications/Xcode_26.4.app/Contents/Developer'
+        sudo xcode-select -s /Applications/Xcode_26.4.app/Contents/Developer
         xcodebuild -list
     - name: Install Simulator
       if: matrix.target == 'iOS' || matrix.target == 'tvOS'
@@ -97,10 +97,10 @@ jobs:
           '--use-libraries --skip-tests'
         ]
     steps:
-    - uses: ruby/setup-ruby@v1
+    - uses: ruby/setup-ruby@354a1ad156761f5ee2b7b13fa8e09943a5e8d252 # v1
       with:
         ruby-version: "2.7"
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
     - name: Setup Bundler
