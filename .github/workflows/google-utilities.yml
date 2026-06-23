@@ -68,7 +68,7 @@ jobs:
     needs: changed_today
     if: ${{ github.event_name == 'pull_request' || needs.changed_today.outputs.WAS_CHANGED == 'true' }}
 
-    runs-on: macOS-latest
+    runs-on: macos-26
     strategy:
       matrix:
         target: [iOS, tvOS, macOS, catalyst]
