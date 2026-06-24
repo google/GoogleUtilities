@@ -1,5 +1,8 @@
 name: google-utilities
 
+permissions:
+  contents: read
+
 on:
   pull_request:
   schedule:
