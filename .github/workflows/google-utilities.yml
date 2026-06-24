@@ -53,7 +53,7 @@ jobs:
     steps:
     - uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314
       with:
-        ruby-version: "2.7"
+        ruby-version: "3.4"
     - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
