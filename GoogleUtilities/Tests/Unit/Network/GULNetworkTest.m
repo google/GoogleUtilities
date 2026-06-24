@@ -122,6 +122,36 @@
   reachabilityMock = nil;
 }
 
+#pragma mark - Test Passive Deallocation
+
+- (void)testSessionPassiveRemovalOnDeallocation {
+  NSString *testSessionID = @"test_passive_removal_id";
+
+  @autoreleasepool {
+    // 1. Create a session inside a limited scope.
+    GULNetworkURLSession *session =
+        [[GULNetworkURLSession alloc] initWithNetworkLoggerDelegate:nil];
+
+    // 2. Insert it into the fetcher map (which stores a WeakHolder and sets an Associated Object).
+    [GULNetworkURLSession setSessionInFetcherMap:session forSessionID:testSessionID];
+
+    // 3. Verify it is accessible from the map.
+    GULNetworkURLSession *retrievedSession =
+        [GULNetworkURLSession sessionFromFetcherMapForSessionID:testSessionID];
+    XCTAssertEqualObjects(session, retrievedSession, @"Session should be in the fetcher map.");
+  }
+  // 4. Exiting the autoreleasepool destroys the 'session' local variable.
+  //    ARC calls -dealloc on the session, which triggers the destruction of its
+  //    Associated Objects (including the GULSessionDeallocTracker), which in turn
+  //    cleans up the sessionID from the fetcher map.
+
+  // 5. Verify the session was passively removed.
+  GULNetworkURLSession *retrievedAfterDealloc =
+      [GULNetworkURLSession sessionFromFetcherMapForSessionID:testSessionID];
+  XCTAssertNil(retrievedAfterDealloc,
+               @"Session should be automatically removed from fetcher map upon deallocation.");
+}
+
 #pragma mark - Test POST Foreground
 
 - (void)testSessionNetwork_POST_foreground {
