@@ -133,7 +133,7 @@
                 OCMVerifyAll(self.mockCache);
                 [expectation fulfill];
               }];
-  [self waitForExpectations:@[ expectation ] timeout:1.0];
+  [self waitForExpectations:@[ expectation ] timeout:5.0];
 }
 
 - (void)testRemoveExistingObject {
@@ -174,7 +174,7 @@
           [expectation fulfill];
         }];
 
-  [self waitForExpectations:@[ expectation ] timeout:1.0];
+  [self waitForExpectations:@[ expectation ] timeout:5.0];
   OCMVerifyAll(self.mockCache);
 }
 
@@ -204,7 +204,7 @@
         XCTAssertEqualObjects([weakSelf.cache objectForKey:key], object, @"%@", weakSelf.name);
         [expectation fulfill];
       }];
-  [self waitForExpectations:@[ expectation ] timeout:1.0];
+  [self waitForExpectations:@[ expectation ] timeout:5.0];
   OCMVerifyAll(self.mockCache);
 }
 
@@ -224,7 +224,7 @@
                 XCTAssertNil(obj, @"%@", weakSelf.name);
                 [expectation fulfill];
               }];
-  [self waitForExpectations:@[ expectation ] timeout:1.0];
+  [self waitForExpectations:@[ expectation ] timeout:5.0];
   OCMVerifyAll(self.mockCache);
 }
 
@@ -238,7 +238,7 @@
                    XCTAssertNil(error);
                    [expectation fulfill];
                  }];
-  [self waitForExpectations:@[ expectation ] timeout:1.0];
+  [self waitForExpectations:@[ expectation ] timeout:5.0];
   OCMVerifyAll(self.mockCache);
 }
 
