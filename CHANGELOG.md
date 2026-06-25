@@ -1,3 +1,7 @@
+# 8.1.2
+- [fixed] Resolve EXC_BAD_ACCESS in GULNetworkURLSession via O(1) passive memory
+  lifecycle cleanup. (#233)
+
 # 8.1.1
 - [fixed] Prevent race condition crashes in GULNetworkURLSession by replacing
   NSMapTable with thread-safe NSMutableDictionary and locking. (#228)
