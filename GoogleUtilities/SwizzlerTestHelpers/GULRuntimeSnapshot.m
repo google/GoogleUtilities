@@ -76,11 +76,13 @@
     for (int i = 0; i < numberOfClasses; i++) {
       Class aClass = classList[i];
       NSString *classString = NSStringFromClass(aClass);
-      GULRuntimeClassSnapshot *classSnapshot =
-          [[GULRuntimeClassSnapshot alloc] initWithClass:aClass];
-      _classSnapshots[classString] = classSnapshot;
-      [classSnapshot capture];
-      _runningHash ^= [classSnapshot hash];
+      if (classString) {
+        GULRuntimeClassSnapshot *classSnapshot =
+            [[GULRuntimeClassSnapshot alloc] initWithClass:aClass];
+        _classSnapshots[classString] = classSnapshot;
+        [classSnapshot capture];
+        _runningHash ^= [classSnapshot hash];
+      }
     }
   }
   free(classList);
