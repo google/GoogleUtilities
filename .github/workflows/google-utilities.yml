@@ -1,5 +1,8 @@
 name: google-utilities
 
+permissions:
+  contents: read
+
 on:
   pull_request:
   schedule:
@@ -53,7 +56,7 @@ jobs:
     steps:
     - uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314
       with:
-        ruby-version: "2.7"
+        ruby-version: "3.4"
     - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Setup Scripts Directory
       run: ./setup-scripts.sh
@@ -80,9 +83,15 @@ jobs:
       run: |
         sudo xcode-select -s /Applications/Xcode_26.4.app/Contents/Developer
         xcodebuild -list
-    - name: Install Simulator
+    - name: Install simulators in case they are missing.
       if: matrix.target == 'iOS'
-      run: xcodebuild -downloadPlatform ${{ matrix.target }}
+      uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
+      with:
+        timeout_minutes: 15
+        max_attempts: 5
+        retry_wait_seconds: 120
+        continue_on_error: true
+        command: xcodebuild -downloadPlatform ${{ matrix.target }}
     - name: iOS Unit Tests
       run: scripts/third_party/travis/retry.sh scripts/build.sh GoogleUtilities-Package ${{ matrix.target }} spm
 
