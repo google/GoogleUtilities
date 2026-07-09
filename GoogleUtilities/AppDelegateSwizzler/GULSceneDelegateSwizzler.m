@@ -103,6 +103,18 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
              selector:@selector(handleSceneWillConnectToNotification:)
                  name:UISceneWillConnectNotification
                object:nil];
+
+      // For catching scene delegates that were already connected when swizzling started,
+      // which may or may not be an actual problem. Not sure, but better safe than sorry.
+      id sharedApplication = [GULAppDelegateSwizzler sharedApplication];
+      if ([sharedApplication respondsToSelector:@selector(openSessions)]) {
+        NSSet<UISceneSession *> *sessions = [sharedApplication openSessions];
+        for (UISceneSession *session in sessions) {
+          if (session.scene) {
+            [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:session.scene];
+          }
+        }
+      }
     }
   });
 #endif  // UISCENE_SUPPORTED
