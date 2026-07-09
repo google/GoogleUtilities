@@ -30,6 +30,13 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 typedef void (*GULOpenURLContextsIMP)(id, SEL, UIScene *, NSSet<UIOpenURLContext *> *);
 
 API_AVAILABLE(ios(13.0), tvos(13.0))
+typedef void (*GULWillConnectToSessionIMP)(
+    id, SEL, UIScene *, UISceneSession *, UISceneConnectionOptions *);
+
+API_AVAILABLE(ios(13.0), tvos(13.0))
+typedef void (*GULContinueUserActivityIMP)(id, SEL, UIScene *, NSUserActivity *);
+
+API_AVAILABLE(ios(13.0), tvos(13.0))
 typedef void (^GULSceneDelegateInterceptorCallback)(id<UISceneDelegate>);
 
 // The strings below are the keys for associated objects.
@@ -341,6 +348,54 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
   }
 }
 
+- (void)scene:(UIScene *)scene
+    willConnectToSession:(UISceneSession *)session
+                 options:(UISceneConnectionOptions *)connectionOptions
+    API_AVAILABLE(ios(13.0), tvos(13.0)) {
+  if (@available(iOS 13.0, tvOS 13.0, *)) {
+    SEL methodSelector = @selector(scene:willConnectToSession:options:);
+    NSValue *willConnectToSessionIMPPointer =
+        [GULSceneDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
+    GULWillConnectToSessionIMP willConnectToSessionIMP =
+        [willConnectToSessionIMPPointer pointerValue];
+
+    [GULSceneDelegateSwizzler
+        notifyInterceptorsWithMethodSelector:methodSelector
+                                    callback:^(id<UISceneDelegate> interceptor) {
+                                      [interceptor scene:scene
+                                          willConnectToSession:session
+                                                       options:connectionOptions];
+                                    }];
+
+    // Call the real implementation if the real Scene Delegate has any.
+    if (willConnectToSessionIMP) {
+      willConnectToSessionIMP(self, methodSelector, scene, session, connectionOptions);
+    }
+  }
+}
+
+- (void)scene:(UIScene *)scene
+    continueUserActivity:(NSUserActivity *)userActivity API_AVAILABLE(ios(13.0), tvos(13.0)) {
+  if (@available(iOS 13.0, tvOS 13.0, *)) {
+    SEL methodSelector = @selector(scene:continueUserActivity:);
+    NSValue *continueUserActivityIMPPointer =
+        [GULSceneDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
+    GULContinueUserActivityIMP continueUserActivityIMP =
+        [continueUserActivityIMPPointer pointerValue];
+
+    [GULSceneDelegateSwizzler
+        notifyInterceptorsWithMethodSelector:methodSelector
+                                    callback:^(id<UISceneDelegate> interceptor) {
+                                      [interceptor scene:scene continueUserActivity:userActivity];
+                                    }];
+
+    // Call the real implementation if the real Scene Delegate has any.
+    if (continueUserActivityIMP) {
+      continueUserActivityIMP(self, methodSelector, scene, userActivity);
+    }
+  }
+}
+
 + (void)proxySceneDelegateIfNeeded:(UIScene *)scene {
   Class realClass = [scene.delegate class];
   NSString *className = NSStringFromClass(realClass);
@@ -391,6 +446,24 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
   SEL openURLContextsSEL = @selector(scene:openURLContexts:);
   [self proxyDestinationSelector:openURLContextsSEL
       implementationsFromSourceSelector:openURLContextsSEL
+                              fromClass:[GULSceneDelegateSwizzler class]
+                                toClass:sceneDelegateSubClass
+                              realClass:realClass
+       storeDestinationImplementationTo:realImplementationsBySelector];
+
+  // For scene:willConnectToSession:options:
+  SEL willConnectToSessionSEL = @selector(scene:willConnectToSession:options:);
+  [self proxyDestinationSelector:willConnectToSessionSEL
+      implementationsFromSourceSelector:willConnectToSessionSEL
+                              fromClass:[GULSceneDelegateSwizzler class]
+                                toClass:sceneDelegateSubClass
+                              realClass:realClass
+       storeDestinationImplementationTo:realImplementationsBySelector];
+
+  // For scene:continueUserActivity:
+  SEL continueUserActivitySEL = @selector(scene:continueUserActivity:);
+  [self proxyDestinationSelector:continueUserActivitySEL
+      implementationsFromSourceSelector:continueUserActivitySEL
                               fromClass:[GULSceneDelegateSwizzler class]
                                 toClass:sceneDelegateSubClass
                               realClass:realClass
