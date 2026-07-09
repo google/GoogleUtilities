@@ -45,10 +45,38 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 @implementation GULTestSceneDelegate
 @end
 
+API_AVAILABLE(ios(13.0), tvos(13.0))
+@interface GULImplementingTestSceneDelegate : NSObject <UISceneDelegate>
+@property(nonatomic, assign) BOOL openURLContextsInvoked;
+@property(nonatomic, assign) BOOL willConnectToSessionOptionsInvoked;
+@property(nonatomic, assign) BOOL continueUserActivityInvoked;
+@end
+
+@implementation GULImplementingTestSceneDelegate
+- (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
+  _openURLContextsInvoked = YES;
+}
+- (void)scene:(UIScene *)scene
+    willConnectToSession:(UISceneSession *)session
+                 options:(UISceneConnectionOptions *)connectionOptions {
+  _willConnectToSessionOptionsInvoked = YES;
+}
+- (void)scene:(UIScene *)scene continueUserActivity:(NSUserActivity *)userActivity {
+  _continueUserActivityInvoked = YES;
+}
+@end
+
 @interface GULSceneDelegateSwizzlerTest : XCTestCase
 @end
 
 @implementation GULSceneDelegateSwizzlerTest
+
+- (void)tearDown {
+  if (@available(iOS 13.0, tvOS 13.0, *)) {
+    [GULSceneDelegateSwizzler clearInterceptors];
+  }
+  [super tearDown];
+}
 
 - (void)testProxySceneDelegateWithNoSceneDelegate {
   if (@available(iOS 13, tvOS 13, *)) {
@@ -85,6 +113,9 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
     // After being proxied, it should be able to respond to the required method selector.
     XCTAssertTrue([realSceneDelegate respondsToSelector:@selector(scene:openURLContexts:)]);
+    XCTAssertTrue(
+        [realSceneDelegate respondsToSelector:@selector(scene:willConnectToSession:options:)]);
+    XCTAssertTrue([realSceneDelegate respondsToSelector:@selector(scene:continueUserActivity:)]);
 
     // Make sure that the class has changed.
     XCTAssertNotEqualObjects([realSceneDelegate class], realSceneDelegateClassBefore);
@@ -141,6 +172,118 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
     [mockSharedScene stopMocking];
     mockSharedScene = nil;
+  }
+}
+
+- (void)testSceneWillConnectToSessionOptionsIsInvokedOnInterceptors {
+  if (@available(iOS 13, tvOS 13, *)) {
+    id mockSession = OCMClassMock([UISceneSession class]);
+    id mockConnectionOptions = OCMClassMock([UISceneConnectionOptions class]);
+
+    GULTestSceneDelegate *realSceneDelegate = [[GULTestSceneDelegate alloc] init];
+    id mockSharedScene = OCMClassMock([UIScene class]);
+    OCMStub([mockSharedScene delegate]).andReturn(realSceneDelegate);
+
+    id interceptor = OCMProtocolMock(@protocol(TestSceneProtocol));
+    OCMExpect([interceptor scene:mockSharedScene
+            willConnectToSession:mockSession
+                         options:mockConnectionOptions]);
+
+    id interceptor2 = OCMProtocolMock(@protocol(TestSceneProtocol));
+    OCMExpect([interceptor2 scene:mockSharedScene
+             willConnectToSession:mockSession
+                          options:mockConnectionOptions]);
+
+    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:mockSharedScene];
+
+    [GULSceneDelegateSwizzler registerSceneDelegateInterceptor:interceptor];
+    [GULSceneDelegateSwizzler registerSceneDelegateInterceptor:interceptor2];
+
+    [realSceneDelegate scene:mockSharedScene
+        willConnectToSession:mockSession
+                     options:mockConnectionOptions];
+    OCMVerifyAll(interceptor);
+    OCMVerifyAll(interceptor2);
+
+    [mockSharedScene stopMocking];
+    [mockSession stopMocking];
+    [mockConnectionOptions stopMocking];
+    mockSharedScene = nil;
+    mockSession = nil;
+    mockConnectionOptions = nil;
+  }
+}
+
+- (void)testSceneContinueUserActivityIsInvokedOnInterceptors {
+  if (@available(iOS 13, tvOS 13, *)) {
+    NSUserActivity *userActivity =
+        [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
+
+    GULTestSceneDelegate *realSceneDelegate = [[GULTestSceneDelegate alloc] init];
+    id mockSharedScene = OCMClassMock([UIScene class]);
+    OCMStub([mockSharedScene delegate]).andReturn(realSceneDelegate);
+
+    id interceptor = OCMProtocolMock(@protocol(TestSceneProtocol));
+    OCMExpect([interceptor scene:mockSharedScene continueUserActivity:userActivity]);
+
+    id interceptor2 = OCMProtocolMock(@protocol(TestSceneProtocol));
+    OCMExpect([interceptor2 scene:mockSharedScene continueUserActivity:userActivity]);
+
+    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:mockSharedScene];
+
+    [GULSceneDelegateSwizzler registerSceneDelegateInterceptor:interceptor];
+    [GULSceneDelegateSwizzler registerSceneDelegateInterceptor:interceptor2];
+
+    [realSceneDelegate scene:mockSharedScene continueUserActivity:userActivity];
+    OCMVerifyAll(interceptor);
+    OCMVerifyAll(interceptor2);
+
+    [mockSharedScene stopMocking];
+    mockSharedScene = nil;
+  }
+}
+
+- (void)testDonorMethodsInvokeOriginalSceneDelegateImplementations {
+  if (@available(iOS 13, tvOS 13, *)) {
+    GULImplementingTestSceneDelegate *realSceneDelegate =
+        [[GULImplementingTestSceneDelegate alloc] init];
+    id mockSharedScene = OCMClassMock([UIScene class]);
+    OCMStub([mockSharedScene delegate]).andReturn(realSceneDelegate);
+
+    id interceptor = OCMProtocolMock(@protocol(TestSceneProtocol));
+    OCMExpect([interceptor scene:mockSharedScene openURLContexts:[NSSet set]]);
+
+    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:mockSharedScene];
+    [GULSceneDelegateSwizzler registerSceneDelegateInterceptor:interceptor];
+
+    [realSceneDelegate scene:mockSharedScene openURLContexts:[NSSet set]];
+    OCMVerifyAll(interceptor);
+    XCTAssertTrue(realSceneDelegate.openURLContextsInvoked);
+
+    id mockSession = OCMClassMock([UISceneSession class]);
+    id mockConnectionOptions = OCMClassMock([UISceneConnectionOptions class]);
+    OCMExpect([interceptor scene:mockSharedScene
+            willConnectToSession:mockSession
+                         options:mockConnectionOptions]);
+    [realSceneDelegate scene:mockSharedScene
+        willConnectToSession:mockSession
+                     options:mockConnectionOptions];
+    OCMVerifyAll(interceptor);
+    XCTAssertTrue(realSceneDelegate.willConnectToSessionOptionsInvoked);
+
+    NSUserActivity *userActivity =
+        [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
+    OCMExpect([interceptor scene:mockSharedScene continueUserActivity:userActivity]);
+    [realSceneDelegate scene:mockSharedScene continueUserActivity:userActivity];
+    OCMVerifyAll(interceptor);
+    XCTAssertTrue(realSceneDelegate.continueUserActivityInvoked);
+
+    [mockSharedScene stopMocking];
+    [mockSession stopMocking];
+    [mockConnectionOptions stopMocking];
+    mockSharedScene = nil;
+    mockSession = nil;
+    mockConnectionOptions = nil;
   }
 }
 
