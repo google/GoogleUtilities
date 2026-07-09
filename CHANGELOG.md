@@ -1,3 +1,12 @@
+# Unrelease
+- [feature] Added proxy support for `scene:willConnectToSession:options:` and
+  `scene:continueUserActivity:` to `GULSceneDelegateSwizzler`. Existing implementations
+  will override this behavior, so current scene delegate implementations will
+  continue to work as expected. (#242)
+- [fixed] Fixed a potentional race-condition where `GULSceneDelegateSwizzler`
+  could miss being configured on scene delegates if they were spawned before
+  the proxy was ready. (#242)
+
 # 8.1.2
 - [fixed] Resolve EXC_BAD_ACCESS in GULNetworkURLSession via O(1) passive memory
   lifecycle cleanup. (#233)
