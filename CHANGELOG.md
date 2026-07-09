@@ -1,4 +1,4 @@
-# Unrelease
+# Unreleased
 - [feature] Added proxy support for `scene:willConnectToSession:options:` and
   `scene:continueUserActivity:` to `GULSceneDelegateSwizzler`. Existing implementations
   will override this behavior, so current scene delegate implementations will
