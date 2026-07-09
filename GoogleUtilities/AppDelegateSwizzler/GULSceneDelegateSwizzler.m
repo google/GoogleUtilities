@@ -334,12 +334,7 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
     [GULSceneDelegateSwizzler
         notifyInterceptorsWithMethodSelector:methodSelector
                                     callback:^(id<UISceneDelegate> interceptor) {
-                                      if ([interceptor
-                                              conformsToProtocol:@protocol(UISceneDelegate)]) {
-                                        id<UISceneDelegate> sceneInterceptor =
-                                            (id<UISceneDelegate>)interceptor;
-                                        [sceneInterceptor scene:scene openURLContexts:URLContexts];
-                                      }
+                                      [interceptor scene:scene openURLContexts:URLContexts];
                                     }];
 
     if (openURLContextsIMP) {
