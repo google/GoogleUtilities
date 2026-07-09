@@ -359,47 +359,43 @@ static NSString *const kGULSceneDelegatePrefix = @"GUL_";
     willConnectToSession:(UISceneSession *)session
                  options:(UISceneConnectionOptions *)connectionOptions
     API_AVAILABLE(ios(13.0), tvos(13.0)) {
-  if (@available(iOS 13.0, tvOS 13.0, *)) {
-    SEL methodSelector = @selector(scene:willConnectToSession:options:);
-    NSValue *willConnectToSessionIMPPointer =
-        [GULSceneDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
-    GULWillConnectToSessionIMP willConnectToSessionIMP =
-        [willConnectToSessionIMPPointer pointerValue];
+  SEL methodSelector = @selector(scene:willConnectToSession:options:);
+  NSValue *willConnectToSessionIMPPointer =
+      [GULSceneDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
+  GULWillConnectToSessionIMP willConnectToSessionIMP =
+      [willConnectToSessionIMPPointer pointerValue];
 
-    [GULSceneDelegateSwizzler
-        notifyInterceptorsWithMethodSelector:methodSelector
-                                    callback:^(id<UISceneDelegate> interceptor) {
-                                      [interceptor scene:scene
-                                          willConnectToSession:session
-                                                       options:connectionOptions];
-                                    }];
+  [GULSceneDelegateSwizzler
+      notifyInterceptorsWithMethodSelector:methodSelector
+                                  callback:^(id<UISceneDelegate> interceptor) {
+                                    [interceptor scene:scene
+                                        willConnectToSession:session
+                                                     options:connectionOptions];
+                                  }];
 
-    // Call the real implementation if the real Scene Delegate has any.
-    if (willConnectToSessionIMP) {
-      willConnectToSessionIMP(self, methodSelector, scene, session, connectionOptions);
-    }
+  // Call the real implementation if the real Scene Delegate has any.
+  if (willConnectToSessionIMP) {
+    willConnectToSessionIMP(self, methodSelector, scene, session, connectionOptions);
   }
 }
 
 - (void)scene:(UIScene *)scene
     continueUserActivity:(NSUserActivity *)userActivity API_AVAILABLE(ios(13.0), tvos(13.0)) {
-  if (@available(iOS 13.0, tvOS 13.0, *)) {
-    SEL methodSelector = @selector(scene:continueUserActivity:);
-    NSValue *continueUserActivityIMPPointer =
-        [GULSceneDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
-    GULContinueUserActivityIMP continueUserActivityIMP =
-        [continueUserActivityIMPPointer pointerValue];
+  SEL methodSelector = @selector(scene:continueUserActivity:);
+  NSValue *continueUserActivityIMPPointer =
+      [GULSceneDelegateSwizzler originalImplementationForSelector:methodSelector object:self];
+  GULContinueUserActivityIMP continueUserActivityIMP =
+      [continueUserActivityIMPPointer pointerValue];
 
-    [GULSceneDelegateSwizzler
-        notifyInterceptorsWithMethodSelector:methodSelector
-                                    callback:^(id<UISceneDelegate> interceptor) {
-                                      [interceptor scene:scene continueUserActivity:userActivity];
-                                    }];
+  [GULSceneDelegateSwizzler
+      notifyInterceptorsWithMethodSelector:methodSelector
+                                  callback:^(id<UISceneDelegate> interceptor) {
+                                    [interceptor scene:scene continueUserActivity:userActivity];
+                                  }];
 
-    // Call the real implementation if the real Scene Delegate has any.
-    if (continueUserActivityIMP) {
-      continueUserActivityIMP(self, methodSelector, scene, userActivity);
-    }
+  // Call the real implementation if the real Scene Delegate has any.
+  if (continueUserActivityIMP) {
+    continueUserActivityIMP(self, methodSelector, scene, userActivity);
   }
 }
 
