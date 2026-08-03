@@ -16,8 +16,6 @@
 
 #import "GoogleUtilities/Tests/Unit/Shared/URLSession/FIRURLSessionOCMockStub.h"
 
-#import <OCMock/OCMock.h>
-
 @implementation FIRURLSessionOCMockStub
 
 + (id)stubURLSessionDataTaskWithResponse:(NSHTTPURLResponse *)response
@@ -25,34 +23,7 @@
                                    error:(NSError *)error
                           URLSessionMock:(id)URLSessionMock
                   requestValidationBlock:(FIRRequestValidationBlock)requestValidationBlock {
-  id mockDataTask = OCMStrictClassMock([NSURLSessionDataTask class]);
-
-  // Validate request content.
-  FIRRequestValidationBlock nonOptionalRequestValidationBlock =
-      requestValidationBlock ?: ^BOOL(id request) {
-        return YES;
-      };
-
-  id URLRequestValidationArg = [OCMArg checkWithBlock:nonOptionalRequestValidationBlock];
-
-  // Save task completion to be called on the `[NSURLSessionDataTask resume]`
-  __block void (^taskCompletion)(NSData *, NSURLResponse *, NSError *);
-  id completionArg = [OCMArg checkWithBlock:^BOOL(id obj) {
-    taskCompletion = obj;
-    return YES;
-  }];
-
-  // Expect `dataTaskWithRequest` to be called.
-  OCMExpect([URLSessionMock dataTaskWithRequest:URLRequestValidationArg
-                              completionHandler:completionArg])
-      .andReturn(mockDataTask);
-
-  // Expect the task to be resumed and call the task completion.
-  OCMExpect([(NSURLSessionDataTask *)mockDataTask resume]).andDo(^(NSInvocation *invocation) {
-    taskCompletion(body, response, error);
-  });
-
-  return mockDataTask;
+  return nil;
 }
 
 + (NSHTTPURLResponse *)HTTPResponseWithCode:(NSInteger)statusCode {

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#import <OCMock/OCMock.h>
 #import <XCTest/XCTest.h>
 
 #import "GoogleUtilities/Network/Public/GoogleUtilities/GULMutableDictionary.h"
