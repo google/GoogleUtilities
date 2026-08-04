@@ -58,14 +58,7 @@ let package = Package(
       targets: ["GoogleUtilities-UserDefaults"]
     ),
   ],
-  dependencies: [
-    // TODO: restore OCMock when https://github.com/erikdoe/ocmock/pull/537
-    // gets merged to fix Xcode 15.3 builds.
-    .package(
-      url: "https://github.com/paulb777/ocmock.git",
-      revision: "173955e93e6ee6999a10729ab67e4b4efdd1db6d"
-    ),
-  ],
+  dependencies: [],
   targets: [
     .target(
       name: "GoogleUtilities-AppDelegateSwizzler",
@@ -210,7 +203,6 @@ let package = Package(
     .testTarget(
       name: "UtilitiesUnit",
       dependencies: [
-        .product(name: "OCMock", package: "OCMock"),
         "GoogleUtilities-AppDelegateSwizzler",
         "GoogleUtilities-Environment",
         "GoogleUtilities-Logger",

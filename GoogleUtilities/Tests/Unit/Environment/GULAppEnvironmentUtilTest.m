@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #import <Foundation/Foundation.h>
-#import <OCMock/OCMock.h>
 #import <XCTest/XCTest.h>
 
 #if __has_include(<UIKit/UIKit.h>)
@@ -22,24 +21,32 @@
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULAppEnvironmentUtil.h"
 
+@interface GULAppEnvironmentUtil (Tests)
++ (void)setProcessInfoForTest:(NSProcessInfo *)processInfo;
+@end
+
+@interface GULFakeNSProcessInfo : NSProcessInfo
+@property(nonatomic) NSOperatingSystemVersion fakeOperatingSystemVersion;
+@end
+
+@implementation GULFakeNSProcessInfo
+- (NSOperatingSystemVersion)operatingSystemVersion {
+  return self.fakeOperatingSystemVersion;
+}
+@end
+
 @interface GULAppEnvironmentUtilTest : XCTestCase
-
-@property(nonatomic) id processInfoMock;
-
 @end
 
 @implementation GULAppEnvironmentUtilTest
 
 - (void)setUp {
   [super setUp];
-
-  _processInfoMock = OCMPartialMock([NSProcessInfo processInfo]);
 }
 
 - (void)tearDown {
   [super tearDown];
-
-  [_processInfoMock stopMocking];
+  [GULAppEnvironmentUtil setProcessInfoForTest:nil];
 }
 
 - (void)testSystemVersionInfoMajorOnly {
@@ -47,8 +54,10 @@
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion],
                         [UIDevice currentDevice].systemVersion);
 #else
+  GULFakeNSProcessInfo *fakeProcessInfo = [[GULFakeNSProcessInfo alloc] init];
   NSOperatingSystemVersion osTen = {.majorVersion = 10, .minorVersion = 0, .patchVersion = 0};
-  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTen);
+  fakeProcessInfo.fakeOperatingSystemVersion = osTen;
+  [GULAppEnvironmentUtil setProcessInfoForTest:fakeProcessInfo];
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.0");
 #endif
 }
@@ -58,8 +67,10 @@
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion],
                         [UIDevice currentDevice].systemVersion);
 #else
+  GULFakeNSProcessInfo *fakeProcessInfo = [[GULFakeNSProcessInfo alloc] init];
   NSOperatingSystemVersion osTenTwo = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 0};
-  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwo);
+  fakeProcessInfo.fakeOperatingSystemVersion = osTenTwo;
+  [GULAppEnvironmentUtil setProcessInfoForTest:fakeProcessInfo];
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2");
 #endif
 }
@@ -69,8 +80,10 @@
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion],
                         [UIDevice currentDevice].systemVersion);
 #else
+  GULFakeNSProcessInfo *fakeProcessInfo = [[GULFakeNSProcessInfo alloc] init];
   NSOperatingSystemVersion osTenTwoOne = {.majorVersion = 10, .minorVersion = 2, .patchVersion = 1};
-  OCMStub([self.processInfoMock operatingSystemVersion]).andReturn(osTenTwoOne);
+  fakeProcessInfo.fakeOperatingSystemVersion = osTenTwoOne;
+  [GULAppEnvironmentUtil setProcessInfoForTest:fakeProcessInfo];
   XCTAssertEqualObjects([GULAppEnvironmentUtil systemVersion], @"10.2.1");
 #endif
 }

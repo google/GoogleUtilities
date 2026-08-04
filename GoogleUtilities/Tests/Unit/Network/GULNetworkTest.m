@@ -14,7 +14,6 @@
 
 #import "GoogleUtilities/Tests/Unit/Network/third_party/GTMHTTPServer.h"
 
-#import <OCMock/OCMock.h>
 #import <XCTest/XCTest.h>
 
 #if !TARGET_OS_MACCATALYST
@@ -100,26 +99,19 @@
   id reachability = [_network valueForKey:@"_reachability"];
   XCTAssertNotNil(reachability);
 
-  id reachabilityMock = OCMPartialMock(reachability);
-  [[[reachabilityMock stub] andCall:@selector(reachabilityStatus)
-                           onObject:self] reachabilityStatus];
-
   // Fake scenario with connectivity.
   _fakeNetworkIsReachable = YES;
   _fakeReachabilityStatus = kGULReachabilityViaWifi;
-  [_network reachability:reachabilityMock statusChanged:[reachabilityMock reachabilityStatus]];
+  [_network reachability:reachability statusChanged:kGULReachabilityViaWifi];
   XCTAssertTrue([_network isNetworkConnected]);
   XCTAssertEqual(_currentNetworkStatus, _fakeNetworkIsReachable);
 
   // Fake scenario without connectivity.
   _fakeNetworkIsReachable = NO;
   _fakeReachabilityStatus = kGULReachabilityNotReachable;
-  [_network reachability:reachabilityMock statusChanged:[reachabilityMock reachabilityStatus]];
+  [_network reachability:reachability statusChanged:kGULReachabilityNotReachable];
   XCTAssertFalse([_network isNetworkConnected]);
   XCTAssertEqual(_currentNetworkStatus, _fakeNetworkIsReachable);
-
-  [reachabilityMock stopMocking];
-  reachabilityMock = nil;
 }
 
 #pragma mark - Test Passive Deallocation
@@ -1041,28 +1033,23 @@
   XCTAssertTrue([fileManager fileExistsAtPath:tempFile1.path]);
   XCTAssertTrue([fileManager fileExistsAtPath:tempFile2.path]);
 
-  NSDate *now =
-      [[NSDate date] dateByAddingTimeInterval:1];  // Start mocking the clock to avoid flakiness.
-  id mockDate = OCMStrictClassMock([NSDate class]);
-  [[[mockDate stub] andReturn:now] date];
-
   // The file should not be removed since it is not expired yet.
   [session maybeRemoveTempFilesAtURL:folderURL expiringTime:20];
   XCTAssertTrue([fileManager fileExistsAtPath:tempFile1.path]);
   XCTAssertTrue([fileManager fileExistsAtPath:tempFile2.path]);
 
-  [mockDate stopMocking];
-  mockDate = nil;
-
-  now = [[NSDate date] dateByAddingTimeInterval:100];  // Move forward in time 100s.
-  mockDate = OCMStrictClassMock([NSDate class]);
-  [[[mockDate stub] andReturn:now] date];
+  // Backdate the files to 100 seconds in the past
+  NSDate *pastDate = [[NSDate date] dateByAddingTimeInterval:-100];
+  [fileManager setAttributes:@{NSFileCreationDate : pastDate}
+                ofItemAtPath:tempFile1.path
+                       error:nil];
+  [fileManager setAttributes:@{NSFileCreationDate : pastDate}
+                ofItemAtPath:tempFile2.path
+                       error:nil];
 
   [session maybeRemoveTempFilesAtURL:folderURL expiringTime:20];
   XCTAssertFalse([fileManager fileExistsAtPath:tempFile1.path]);
   XCTAssertFalse([fileManager fileExistsAtPath:tempFile2.path]);
-  [mockDate stopMocking];
-  mockDate = nil;
 }
 
 #pragma mark - Internal Methods
@@ -1110,14 +1097,6 @@
   return [GTMHTTPResponseMessage responseWithBody:html
                                       contentType:@"text/html; charset=UTF-8"
                                        statusCode:_statusCode];
-}
-
-- (BOOL)isReachable {
-  return _fakeNetworkIsReachable;
-}
-
-- (GULReachabilityStatus)reachabilityStatus {
-  return _fakeReachabilityStatus;
 }
 
 #pragma mark - FIRReachabilityDelegate

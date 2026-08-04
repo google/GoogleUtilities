@@ -15,7 +15,6 @@
 #import "GoogleUtilities/AppDelegateSwizzler/Internal/GULSceneDelegateSwizzler_Private.h"
 #import "GoogleUtilities/AppDelegateSwizzler/Public/GoogleUtilities/GULSceneDelegateSwizzler.h"
 
-#import <OCMock/OCMock.h>
 #import <XCTest/XCTest.h>
 #import <objc/runtime.h>
 
@@ -35,6 +34,8 @@ static NSString *const kGULGoogleSceneDelegateProxyEnabledPlistKey =
 
 #if UISCENE_SUPPORTED
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
 @protocol TestSceneProtocol <UISceneDelegate>
 @end
 
@@ -45,31 +46,103 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 @implementation GULTestSceneDelegate
 @end
 
+API_AVAILABLE(ios(13.0), tvos(13.0))
+@interface GULFakeSceneDelegateInterceptor : NSObject <UISceneDelegate>
+@property(nonatomic) dispatch_queue_t syncQueue;
+@property(nonatomic) BOOL isSceneWillConnectToSessionOptionsCalled;
+@property(nonatomic) BOOL isSceneOpenURLContextsCalled;
+@end
+
+@implementation GULFakeSceneDelegateInterceptor
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    _syncQueue = dispatch_queue_create("GULFakeSceneDelegateInterceptor", DISPATCH_QUEUE_SERIAL);
+  }
+  return self;
+}
+
+- (void)scene:(UIScene *)scene
+    willConnectToSession:(UISceneSession *)session
+                 options:(UISceneConnectionOptions *)connectionOptions {
+  dispatch_sync(_syncQueue, ^{
+    self->_isSceneWillConnectToSessionOptionsCalled = YES;
+  });
+}
+
+- (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts {
+  dispatch_sync(_syncQueue, ^{
+    self->_isSceneOpenURLContextsCalled = YES;
+  });
+}
+@end
+
+API_AVAILABLE(ios(13.0), tvos(13.0))
+@interface GULFakeScene : NSObject
+@property(nonatomic, weak) id<UISceneDelegate> delegate;
+@end
+
+@implementation GULFakeScene
+@synthesize delegate = _delegate;
+@end
+
+static NSDictionary *gSceneFakeInfoDictionary = nil;
+
+@interface NSBundle (SceneFakeInfoDictionary)
+- (NSDictionary *)gul_scene_fakeInfoDictionary;
+@end
+
+@implementation NSBundle (SceneFakeInfoDictionary)
+- (NSDictionary *)gul_scene_fakeInfoDictionary {
+  if (gSceneFakeInfoDictionary) return gSceneFakeInfoDictionary;
+  return [self gul_scene_fakeInfoDictionary];
+}
+@end
+
 @interface GULSceneDelegateSwizzlerTest : XCTestCase
 @end
 
 @implementation GULSceneDelegateSwizzlerTest
 
+- (void)setUp {
+  [super setUp];
+  Method originalBundleMethod =
+      class_getInstanceMethod([NSBundle class], @selector(infoDictionary));
+  Method swizzledBundleMethod =
+      class_getInstanceMethod([NSBundle class], @selector(gul_scene_fakeInfoDictionary));
+  method_exchangeImplementations(originalBundleMethod, swizzledBundleMethod);
+}
+
+- (void)tearDown {
+  [GULSceneDelegateSwizzler clearInterceptors];
+  Method originalBundleMethod =
+      class_getInstanceMethod([NSBundle class], @selector(infoDictionary));
+  Method swizzledBundleMethod =
+      class_getInstanceMethod([NSBundle class], @selector(gul_scene_fakeInfoDictionary));
+  method_exchangeImplementations(originalBundleMethod, swizzledBundleMethod);
+  gSceneFakeInfoDictionary = nil;
+  [super tearDown];
+}
+
 - (void)testProxySceneDelegateWithNoSceneDelegate {
   if (@available(iOS 13, tvOS 13, *)) {
-    id mockSharedScene = OCMClassMock([UIScene class]);
-    OCMStub([mockSharedScene delegate]).andReturn(nil);
-    XCTAssertNoThrow([GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:mockSharedScene]);
-    [mockSharedScene stopMocking];
-    mockSharedScene = nil;
+    GULFakeScene *mockSharedScene = [[GULFakeScene alloc] init];
+    mockSharedScene.delegate = nil;
+    XCTAssertNoThrow(
+        [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:(UIScene *)mockSharedScene]);
   }
 }
 
 - (void)testProxySceneDelegate {
   if (@available(iOS 13, tvOS 13, *)) {
     GULTestSceneDelegate *realSceneDelegate = [[GULTestSceneDelegate alloc] init];
-    id mockSharedScene = OCMClassMock([UIScene class]);
-    OCMStub([mockSharedScene delegate]).andReturn(realSceneDelegate);
+    GULFakeScene *mockSharedScene = [[GULFakeScene alloc] init];
+    mockSharedScene.delegate = realSceneDelegate;
     size_t sizeBefore = class_getInstanceSize([GULTestSceneDelegate class]);
 
     Class realSceneDelegateClassBefore = [realSceneDelegate class];
 
-    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:mockSharedScene];
+    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:(UIScene *)mockSharedScene];
 
     XCTAssertTrue([realSceneDelegate isKindOfClass:[GULTestSceneDelegate class]]);
 
@@ -88,31 +161,25 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 
     // Make sure that the class has changed.
     XCTAssertNotEqualObjects([realSceneDelegate class], realSceneDelegateClassBefore);
-
-    [mockSharedScene stopMocking];
-    mockSharedScene = nil;
   }
 }
 
 - (void)testProxyProxiedSceneDelegate {
   if (@available(iOS 13, tvOS 13, *)) {
     GULTestSceneDelegate *realSceneDelegate = [[GULTestSceneDelegate alloc] init];
-    id mockSharedScene = OCMClassMock([UIScene class]);
-    OCMStub([mockSharedScene delegate]).andReturn(realSceneDelegate);
+    GULFakeScene *mockSharedScene = [[GULFakeScene alloc] init];
+    mockSharedScene.delegate = realSceneDelegate;
 
     // Proxy the scene delegate for the 1st time.
-    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:mockSharedScene];
+    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:(UIScene *)mockSharedScene];
 
     Class realSceneDelegateClassBefore = [realSceneDelegate class];
 
     // Proxy the scene delegate for the 2nd time.
-    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:mockSharedScene];
+    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:(UIScene *)mockSharedScene];
 
     // Make sure that the class isn't changed.
     XCTAssertEqualObjects([realSceneDelegate class], realSceneDelegateClassBefore);
-
-    [mockSharedScene stopMocking];
-    mockSharedScene = nil;
   }
 }
 
@@ -121,26 +188,29 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
     NSSet *urlContexts = [NSSet set];
 
     GULTestSceneDelegate *realSceneDelegate = [[GULTestSceneDelegate alloc] init];
-    id mockSharedScene = OCMClassMock([UIScene class]);
-    OCMStub([mockSharedScene delegate]).andReturn(realSceneDelegate);
+    GULFakeScene *mockSharedScene = [[GULFakeScene alloc] init];
+    mockSharedScene.delegate = realSceneDelegate;
 
-    id interceptor = OCMProtocolMock(@protocol(TestSceneProtocol));
-    OCMExpect([interceptor scene:mockSharedScene openURLContexts:urlContexts]);
+    GULFakeSceneDelegateInterceptor *interceptor = [[GULFakeSceneDelegateInterceptor alloc] init];
 
-    id interceptor2 = OCMProtocolMock(@protocol(TestSceneProtocol));
-    OCMExpect([interceptor2 scene:mockSharedScene openURLContexts:urlContexts]);
+    GULFakeSceneDelegateInterceptor *interceptor2 = [[GULFakeSceneDelegateInterceptor alloc] init];
 
-    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:mockSharedScene];
+    [GULSceneDelegateSwizzler proxySceneDelegateIfNeeded:(UIScene *)mockSharedScene];
 
     [GULSceneDelegateSwizzler registerSceneDelegateInterceptor:interceptor];
     [GULSceneDelegateSwizzler registerSceneDelegateInterceptor:interceptor2];
 
-    [realSceneDelegate scene:mockSharedScene openURLContexts:urlContexts];
-    OCMVerifyAll(interceptor);
-    OCMVerifyAll(interceptor2);
-
-    [mockSharedScene stopMocking];
-    mockSharedScene = nil;
+    [realSceneDelegate scene:(UIScene *)mockSharedScene openURLContexts:urlContexts];
+    __block BOOL isCalled1 = NO;
+    __block BOOL isCalled2 = NO;
+    dispatch_sync(interceptor.syncQueue, ^{
+      isCalled1 = interceptor.isSceneOpenURLContextsCalled;
+    });
+    dispatch_sync(interceptor2.syncQueue, ^{
+      isCalled2 = interceptor2.isSceneOpenURLContextsCalled;
+    });
+    XCTAssertTrue(isCalled1);
+    XCTAssertTrue(isCalled2);
   }
 }
 
@@ -168,12 +238,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 - (void)testAppProxyPlistFlag_NoFlag {
   // No keys anywhere. If there is no key, the default should be enabled.
   NSDictionary *mainDictionary = nil;
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertTrue([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that scene delegate proxy is enabled when there is neither the Firebase nor the
@@ -182,12 +250,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 - (void)testAppProxyPlistFlag_NoSceneDelegateProxyKey {
   // No scene delegate disable key. If there is no key, the default should be enabled.
   NSDictionary *mainDictionary = @{@"randomKey" : @"randomValue"};
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertTrue([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that scene delegate proxy is enabled when the Firebase plist is explicitly set to YES and
@@ -195,12 +261,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 - (void)testAppProxyPlistFlag_FirebaseEnabled {
   // Set proxy enabled to YES.
   NSDictionary *mainDictionary = @{kGULFirebaseSceneDelegateProxyEnabledPlistKey : @(YES)};
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertTrue([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that scene delegate proxy is enabled when the Google plist is explicitly set to YES and
@@ -208,12 +272,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 - (void)testAppProxyPlistFlag_GoogleEnabled {
   // Set proxy enabled to YES.
   NSDictionary *mainDictionary = @{kGULGoogleSceneDelegateProxyEnabledPlistKey : @(YES)};
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertTrue([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that the scene delegate proxy is enabled when the Firebase flag has the wrong type of
@@ -221,12 +283,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 - (void)testAppProxyPlist_WrongFirebaseDisableFlagValueType {
   // Set proxy enabled to "NO" - a string.
   NSDictionary *mainDictionary = @{kGULFirebaseSceneDelegateProxyEnabledPlistKey : @"NO"};
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertTrue([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that the scene delegate proxy is enabled when the Google flag has the wrong type of value
@@ -234,12 +294,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 - (void)testAppProxyPlist_WrongGoogleDisableFlagValueType {
   // Set proxy enabled to "NO" - a string.
   NSDictionary *mainDictionary = @{kGULGoogleSceneDelegateProxyEnabledPlistKey : @"NO"};
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertTrue([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that the scene delegate proxy is disabled when the Firebase flag is set to NO and the
@@ -247,12 +305,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 - (void)testAppProxyPlist_FirebaseDisableFlag {
   // Set proxy enabled to NO.
   NSDictionary *mainDictionary = @{kGULFirebaseSceneDelegateProxyEnabledPlistKey : @(NO)};
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertFalse([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that the scene delegate proxy is disabled when the Google flag is set to NO and the
@@ -260,12 +316,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
 - (void)testAppProxyPlist_GoogleDisableFlag {
   // Set proxy enabled to NO.
   NSDictionary *mainDictionary = @{kGULGoogleSceneDelegateProxyEnabledPlistKey : @(NO)};
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertFalse([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that the scene delegate proxy is disabled when the Google flag is set to NO and the
@@ -276,12 +330,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
     kGULGoogleSceneDelegateProxyEnabledPlistKey : @(NO),
     kGULFirebaseSceneDelegateProxyEnabledPlistKey : @(YES)
   };
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertFalse([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that the scene delegate proxy is disabled when the Google flag is set to NO and the
@@ -292,12 +344,10 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
     kGULGoogleSceneDelegateProxyEnabledPlistKey : @(YES),
     kGULFirebaseSceneDelegateProxyEnabledPlistKey : @(NO)
   };
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertFalse([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 /** Tests that the scene delegate proxy is disabled when the Google flag is set to NO and the
@@ -308,14 +358,13 @@ API_AVAILABLE(ios(13.0), tvos(13.0))
     kGULGoogleSceneDelegateProxyEnabledPlistKey : @(NO),
     kGULFirebaseSceneDelegateProxyEnabledPlistKey : @(NO)
   };
-  id mainBundleMock = OCMPartialMock([NSBundle mainBundle]);
-  [[[mainBundleMock expect] andReturn:mainDictionary] infoDictionary];
+  gSceneFakeInfoDictionary = mainDictionary;
 
   XCTAssertFalse([GULSceneDelegateSwizzler isSceneDelegateProxyEnabled]);
-  [mainBundleMock stopMocking];
-  mainBundleMock = nil;
+  gSceneFakeInfoDictionary = nil;
 }
 
 @end
 
+#pragma clang diagnostic pop
 #endif  // UISCENE_SUPPORTED

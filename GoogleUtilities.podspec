@@ -152,7 +152,6 @@ other Google CocoaPods. They're not intended for direct public usage.
       'GoogleUtilities/Tests/Unit/Environment/**/*.[mh]'
     ]
     unit_tests.requires_app_host = true
-    unit_tests.dependency 'OCMock'
   end
 
   s.test_spec 'unit-swift' do |unit_tests_swift|

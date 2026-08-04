@@ -28,7 +28,6 @@
 
 #import <XCTest/XCTest.h>
 
-#import <OCMock/OCMock.h>
 #import "GoogleUtilities/Tests/Unit/Utils/GULTestKeychain.h"
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainStorage.h"
@@ -38,10 +37,115 @@
 - (void)resetInMemoryCache;
 @end
 
+@interface GULFakeNSCache : NSCache
+
+@property(nonatomic, assign) BOOL forceCacheMiss;
+
+@property(nonatomic, assign) NSInteger objectForKeyCallCount;
+@property(nonatomic, strong) id lastObjectForKey;
+
+@property(nonatomic, assign) NSInteger setObjectCallCount;
+@property(nonatomic, strong) id lastSetObjectKey;
+@property(nonatomic, strong) id lastSetObject;
+
+@property(nonatomic, assign) NSInteger removeObjectCallCount;
+@property(nonatomic, strong) id lastRemoveObjectKey;
+
+- (void)resetTrackers;
+
+- (NSInteger)syncObjectForKeyCallCount;
+- (id)syncLastObjectForKey;
+- (NSInteger)syncSetObjectCallCount;
+- (id)syncLastSetObjectKey;
+- (id)syncLastSetObject;
+- (NSInteger)syncRemoveObjectCallCount;
+- (id)syncLastRemoveObjectKey;
+
+@end
+
+@implementation GULFakeNSCache
+
+- (id)objectForKey:(id)key {
+  @synchronized(self) {
+    _objectForKeyCallCount++;
+    _lastObjectForKey = key;
+    if (_forceCacheMiss) {
+      return nil;
+    }
+  }
+  return [super objectForKey:key];
+}
+
+- (void)setObject:(id)obj forKey:(id)key {
+  @synchronized(self) {
+    _setObjectCallCount++;
+    _lastSetObjectKey = key;
+    _lastSetObject = obj;
+  }
+  [super setObject:obj forKey:key];
+}
+
+- (void)removeObjectForKey:(id)key {
+  @synchronized(self) {
+    _removeObjectCallCount++;
+    _lastRemoveObjectKey = key;
+  }
+  [super removeObjectForKey:key];
+}
+
+- (void)resetTrackers {
+  @synchronized(self) {
+    _objectForKeyCallCount = 0;
+    _lastObjectForKey = nil;
+    _setObjectCallCount = 0;
+    _lastSetObjectKey = nil;
+    _lastSetObject = nil;
+    _removeObjectCallCount = 0;
+    _lastRemoveObjectKey = nil;
+  }
+}
+
+- (NSInteger)syncObjectForKeyCallCount {
+  @synchronized(self) {
+    return _objectForKeyCallCount;
+  }
+}
+- (id)syncLastObjectForKey {
+  @synchronized(self) {
+    return _lastObjectForKey;
+  }
+}
+- (NSInteger)syncSetObjectCallCount {
+  @synchronized(self) {
+    return _setObjectCallCount;
+  }
+}
+- (id)syncLastSetObjectKey {
+  @synchronized(self) {
+    return _lastSetObjectKey;
+  }
+}
+- (id)syncLastSetObject {
+  @synchronized(self) {
+    return _lastSetObject;
+  }
+}
+- (NSInteger)syncRemoveObjectCallCount {
+  @synchronized(self) {
+    return _removeObjectCallCount;
+  }
+}
+- (id)syncLastRemoveObjectKey {
+  @synchronized(self) {
+    return _lastRemoveObjectKey;
+  }
+}
+
+@end
+
 @interface GULKeychainStorageTests : XCTestCase
 @property(nonatomic, strong) GULKeychainStorage *storage;
-@property(nonatomic, strong) NSCache *cache;
-@property(nonatomic, strong) id mockCache;
+@property(nonatomic, strong) GULFakeNSCache *fakeCache;
 
 #if TARGET_OS_OSX
 @property(nonatomic) GULTestKeychain *privateKeychain;
@@ -52,10 +156,9 @@
 @implementation GULKeychainStorageTests
 
 - (void)setUp {
-  self.cache = [[NSCache alloc] init];
-  self.mockCache = OCMPartialMock(self.cache);
+  self.fakeCache = [[GULFakeNSCache alloc] init];
   self.storage = [[GULKeychainStorage alloc] initWithService:@"com.tests.GULKeychainStorageTests"
-                                                       cache:self.mockCache];
+                                                       cache:self.fakeCache];
 
 #if TARGET_OS_OSX
   self.privateKeychain = [[GULTestKeychain alloc] init];
@@ -65,8 +168,7 @@
 
 - (void)tearDown {
   self.storage = nil;
-  self.mockCache = nil;
-  self.cache = nil;
+  self.fakeCache = nil;
 
 #if TARGET_OS_OSX
   self.privateKeychain = nil;
@@ -89,7 +191,7 @@
                   existsInCache:YES];
 
   // 3. Read existing object which is not present in in-memory cache.
-  [self.cache removeAllObjects];
+  [self.fakeCache removeAllObjects];
   // TODO: Evaluate if GULKeychainStorage needs an API that takes set of classes. (#42)
   // The following method causes an NSKeyedUnarchiver-related runtime warning log.
   [self assertSuccessReadObject:@{@"key" : @"value"}
@@ -117,7 +219,8 @@
 
   // Read.
   // Skip in-memory cache because the error is relevant only for Keychain.
-  OCMExpect([self.mockCache objectForKey:key]).andReturn(nil);
+  self.fakeCache.forceCacheMiss = YES;
+  [self.fakeCache resetTrackers];
 
   XCTestExpectation *expectation = [self expectationWithDescription:NSStringFromSelector(_cmd)];
   [self.storage getObjectForKey:key
@@ -130,7 +233,7 @@
                 XCTAssertEqual(error.domain, NSCocoaErrorDomain);
                 XCTAssertEqual(error.code, 4864);
 
-                OCMVerifyAll(self.mockCache);
+                XCTAssertEqual([self.fakeCache syncObjectForKeyCallCount], 1);
                 [expectation fulfill];
               }];
   [self waitForExpectations:@[ expectation ] timeout:5.0];
@@ -157,7 +260,7 @@
 #pragma mark - Common
 
 - (void)assertSuccessWriteObject:(id<NSSecureCoding>)object forKey:(NSString *)key {
-  OCMExpect([self.mockCache setObject:object forKey:key]).andForwardToRealObject();
+  [self.fakeCache resetTrackers];
 
   XCTestExpectation *expectation = [self expectationWithDescription:NSStringFromSelector(_cmd)];
   __weak __auto_type weakSelf = self;
@@ -169,47 +272,46 @@
             return;
           }
           XCTAssertNil(error, @"%@", weakSelf.name);
-          // Check in-memory cache.
-          XCTAssertEqualObjects([weakSelf.cache objectForKey:key], object);
+          XCTAssertEqual([weakSelf.fakeCache syncSetObjectCallCount], 1);
+          XCTAssertEqualObjects([weakSelf.fakeCache syncLastSetObjectKey], key);
           [expectation fulfill];
         }];
 
   [self waitForExpectations:@[ expectation ] timeout:5.0];
-  OCMVerifyAll(self.mockCache);
 }
 
 - (void)assertSuccessReadObject:(id<NSSecureCoding>)object
                          forKey:(NSString *)key
                           class:(Class)class
                   existsInCache:(BOOL)existisInCache {
-  OCMExpect([self.mockCache objectForKey:key]).andForwardToRealObject();
-
-  if (!existisInCache) {
-    OCMExpect([self.mockCache setObject:object forKey:key]).andForwardToRealObject();
-  }
+  [self.fakeCache resetTrackers];
 
   XCTestExpectation *expectation = [self expectationWithDescription:NSStringFromSelector(_cmd)];
   __weak __auto_type weakSelf = self;
-  [self.storage
-        getObjectForKey:key
-            objectClass:class
-            accessGroup:nil
-      completionHandler:^(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error) {
-        if (!weakSelf) {
-          return;
-        }
-        XCTAssertEqualObjects(obj, object, @"%@", weakSelf.name);
-        XCTAssertNil(error, @"%@", weakSelf.name);
-        // Check in-memory cache.
-        XCTAssertEqualObjects([weakSelf.cache objectForKey:key], object, @"%@", weakSelf.name);
-        [expectation fulfill];
-      }];
+  [self.storage getObjectForKey:key
+                    objectClass:class
+                    accessGroup:nil
+              completionHandler:^(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error) {
+                if (!weakSelf) {
+                  return;
+                }
+                XCTAssertEqualObjects(obj, object, @"%@", weakSelf.name);
+                XCTAssertNil(error, @"%@", weakSelf.name);
+                XCTAssertEqual([weakSelf.fakeCache syncObjectForKeyCallCount], 1);
+                XCTAssertEqualObjects([weakSelf.fakeCache syncLastObjectForKey], key);
+
+                if (!existisInCache) {
+                  XCTAssertEqual([weakSelf.fakeCache syncSetObjectCallCount], 1);
+                  XCTAssertEqualObjects([weakSelf.fakeCache syncLastSetObjectKey], key);
+                }
+
+                [expectation fulfill];
+              }];
   [self waitForExpectations:@[ expectation ] timeout:5.0];
-  OCMVerifyAll(self.mockCache);
 }
 
 - (void)assertNonExistingObjectForKey:(NSString *)key class:(Class)class {
-  OCMExpect([self.mockCache objectForKey:key]).andForwardToRealObject();
+  [self.fakeCache resetTrackers];
 
   XCTestExpectation *expectation = [self expectationWithDescription:NSStringFromSelector(_cmd)];
   __weak __auto_type weakSelf = self;
@@ -222,24 +324,27 @@
                 }
                 XCTAssertNil(error, @"%@", weakSelf.name);
                 XCTAssertNil(obj, @"%@", weakSelf.name);
+                XCTAssertEqual([weakSelf.fakeCache syncObjectForKeyCallCount], 1);
+                XCTAssertEqualObjects([weakSelf.fakeCache syncLastObjectForKey], key);
                 [expectation fulfill];
               }];
   [self waitForExpectations:@[ expectation ] timeout:5.0];
-  OCMVerifyAll(self.mockCache);
 }
 
 - (void)assertRemoveObjectForKey:(NSString *)key {
-  OCMExpect([self.mockCache removeObjectForKey:key]).andForwardToRealObject();
+  [self.fakeCache resetTrackers];
 
   XCTestExpectation *expectation = [self expectationWithDescription:NSStringFromSelector(_cmd)];
+  __weak __auto_type weakSelf = self;
   [self.storage removeObjectForKey:key
                        accessGroup:nil
                  completionHandler:^(NSError *_Nullable error) {
                    XCTAssertNil(error);
+                   XCTAssertEqual([weakSelf.fakeCache syncRemoveObjectCallCount], 1);
+                   XCTAssertEqualObjects([weakSelf.fakeCache syncLastRemoveObjectKey], key);
                    [expectation fulfill];
                  }];
   [self waitForExpectations:@[ expectation ] timeout:5.0];
-  OCMVerifyAll(self.mockCache);
 }
 
 @end

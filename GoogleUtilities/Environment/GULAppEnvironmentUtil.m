@@ -27,6 +27,16 @@
 
 @implementation GULAppEnvironmentUtil
 
+static NSProcessInfo *gProcessInfo = nil;
+
++ (NSProcessInfo *)processInfo {
+  return gProcessInfo ?: [NSProcessInfo processInfo];
+}
+
++ (void)setProcessInfoForTest:(NSProcessInfo *)processInfo {
+  gProcessInfo = processInfo;
+}
+
 /// A key for the Info.plist to enable or disable checking if the App Store is running in a sandbox.
 /// This will affect your data integrity when using Firebase Analytics, as it will disable some
 /// necessary checks.
@@ -197,7 +207,7 @@ static BOOL HasEmbeddedMobileProvision(void) {
   return [UIDevice currentDevice].systemVersion;
 #elif TARGET_OS_OSX || TARGET_OS_TV || TARGET_OS_WATCH || TARGET_OS_VISION
   // Assemble the systemVersion, excluding the patch version if it's 0.
-  NSOperatingSystemVersion osVersion = [NSProcessInfo processInfo].operatingSystemVersion;
+  NSOperatingSystemVersion osVersion = [self processInfo].operatingSystemVersion;
   NSMutableString *versionString = [[NSMutableString alloc]
       initWithFormat:@"%ld.%ld", (long)osVersion.majorVersion, (long)osVersion.minorVersion];
   if (osVersion.patchVersion != 0) {
@@ -246,8 +256,8 @@ static BOOL HasEmbeddedMobileProvision(void) {
 #elif TARGET_OS_IOS
   if (@available(iOS 14.0, *)) {
     // Early iOS 14 betas do not include isiOSAppOnMac (#6969)
-    applePlatform = ([[NSProcessInfo processInfo] respondsToSelector:@selector(isiOSAppOnMac)] &&
-                     [NSProcessInfo processInfo].isiOSAppOnMac)
+    applePlatform = ([[self processInfo] respondsToSelector:@selector(isiOSAppOnMac)] &&
+                     [self processInfo].isiOSAppOnMac)
                         ? @"ios_on_mac"
                         : @"ios";
   } else {
