@@ -58,13 +58,7 @@ let package = Package(
       targets: ["GoogleUtilities-UserDefaults"]
     ),
   ],
-  dependencies: [
-    // gets merged to fix Xcode 15.3 builds.
-    .package(
-      url: "https://github.com/paulb777/ocmock.git",
-      revision: "173955e93e6ee6999a10729ab67e4b4efdd1db6d"
-    ),
-  ],
+  dependencies: [],
   targets: [
     .target(
       name: "GoogleUtilities-AppDelegateSwizzler",
