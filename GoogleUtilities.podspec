@@ -152,7 +152,7 @@ other Google CocoaPods. They're not intended for direct public usage.
       'GoogleUtilities/Tests/Unit/Environment/**/*.[mh]'
     ]
     unit_tests.requires_app_host = true
-    end
+  end
 
   s.test_spec 'unit-swift' do |unit_tests_swift|
     unit_tests_swift.scheme = { :code_coverage => true }
