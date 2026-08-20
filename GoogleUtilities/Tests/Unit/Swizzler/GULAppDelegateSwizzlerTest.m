@@ -1125,6 +1125,46 @@ static NSDictionary *gAppFakeInfoDictionary;
                                  expectedResult:UIBackgroundFetchResultNewData];
 }
 
+- (void)testApplicationDidReceiveRemoteNotificationWithCompletionDuplicateInvocationDoesNotCrash {
+  NSDictionary *notification = @{};
+  GULApplication *application = [GULApplication sharedApplication];
+
+  XCTestExpectation *completionExpectation =
+      [[XCTestExpectation alloc] initWithDescription:@"Completion called once"];
+
+  __block NSUInteger completionCallCount = 0;
+  void (^completion)(UIBackgroundFetchResult) = ^(UIBackgroundFetchResult result) {
+    completionCallCount++;
+    XCTAssertEqual(result, UIBackgroundFetchResultNewData);
+    [completionExpectation fulfill];
+  };
+
+  GULFakeAppDelegateInterceptor *interceptor = [[GULFakeAppDelegateInterceptor alloc] init];
+  interceptor.onDidReceiveRemoteNotificationWithCompletion =
+      ^(NSDictionary *userInfo, void (^completionHandler)(UIBackgroundFetchResult)) {
+        // Simulate a misbehaving SDK that invokes the completion handler more than once. The
+        // duplicate invocation must be ignored instead of over-releasing the dispatch group.
+        completionHandler(UIBackgroundFetchResultNewData);
+        completionHandler(UIBackgroundFetchResultFailed);
+      };
+
+  GULTestAppDelegate *testAppDelegate = [[GULTestAppDelegate alloc] init];
+  [GULApplication sharedApplication].delegate = testAppDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
+
+  [GULAppDelegateSwizzler registerAppDelegateInterceptor:interceptor];
+
+  [testAppDelegate application:application
+      didReceiveRemoteNotification:notification
+            fetchCompletionHandler:completion];
+
+  testAppDelegate.remoteNotificationCompletionHandler(UIBackgroundFetchResultFailed);
+
+  [self waitForExpectations:@[ completionExpectation ] timeout:0.1];
+
+  XCTAssertEqual(completionCallCount, 1);
+}
+
 - (void)testApplicationDidReceiveRemoteNotificationWithCompletionImplementationIsAdded {
   // The delegate must have an application:didReceiveRemoteNotification:fetchCompletionHandler:
   // implementation

@@ -855,6 +855,26 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 }
 
 #if !TARGET_OS_WATCH && !TARGET_OS_OSX
+/// Returns a completion handler that forwards its result to `handler` only on the first
+/// invocation and ignores any subsequent calls. Apple's documentation does not explicitly forbid
+/// calling a background-fetch completion handler more than once, and some third-party SDKs do so.
+/// Each duplicate invocation would otherwise over-release the shared dispatch group in the donor
+/// method below, crashing with an unbalanced call to `dispatch_group_leave`.
+static void (^GULCompletionHandlerOnce(void (^handler)(UIBackgroundFetchResult)))(
+    UIBackgroundFetchResult) {
+  NSObject *guardToken = [[NSObject alloc] init];
+  __block BOOL hasBeenCalled = NO;
+  return ^(UIBackgroundFetchResult result) {
+    @synchronized(guardToken) {
+      if (hasBeenCalled) {
+        return;
+      }
+      hasBeenCalled = YES;
+    }
+    handler(result);
+  };
+}
+
 - (void)application:(GULApplication *)application
     donor_didReceiveRemoteNotification:(NSDictionary *)userInfo
                 fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
@@ -886,7 +906,9 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
                                     [invocation setSelector:methodSelector];
                                     [invocation setArgument:(void *)(&application) atIndex:2];
                                     [invocation setArgument:(void *)(&userInfo) atIndex:3];
-                                    [invocation setArgument:(void *)(&localCompletionHandler)
+                                    void (^guardedCompletionHandler)(UIBackgroundFetchResult) =
+                                        GULCompletionHandlerOnce(localCompletionHandler);
+                                    [invocation setArgument:(void *)(&guardedCompletionHandler)
                                                     atIndex:4];
                                     [invocation invoke];
                                   }];
@@ -894,8 +916,10 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (didReceiveRemoteNotificationWithCompletionIMP) {
     dispatch_group_enter(callbackGroup);
 
+    void (^guardedCompletionHandler)(UIBackgroundFetchResult) =
+        GULCompletionHandlerOnce(localCompletionHandler);
     didReceiveRemoteNotificationWithCompletionIMP(self, methodSelector, application, userInfo,
-                                                  localCompletionHandler);
+                                                  guardedCompletionHandler);
   }
 
   dispatch_group_notify(callbackGroup, dispatch_get_main_queue(), ^() {
