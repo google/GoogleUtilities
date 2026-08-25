@@ -58,6 +58,30 @@
 
 @end
 
+@interface IvarTestObject : NSObject {
+ @public
+  NSString *_strongIvar1;
+  NSNumber *_strongIvar2;
+  int _primitiveInt;
+  double _primitiveDouble;
+  __weak id _weakIvar;
+}
+
+@property(nonatomic, strong) NSString *strongProperty;
+@property(nonatomic, weak) id weakProperty;
+@property(nonatomic, assign) NSInteger primitiveProperty;
+
+@end
+
+@implementation IvarTestObject
+@end
+
+@interface EmptyIvarTestObject : NSObject
+@end
+
+@implementation EmptyIvarTestObject
+@end
+
 @interface GULSwizzlerTest : XCTestCase
 
 @end
@@ -757,7 +781,6 @@
  *  a new IMP that a consumer of GULSwizzler is putting in place of that old IMP works correctly
  *  in case of class methods.
  */
-
 - (void)testWrappingAPreviouslySwizzledClassSELPairWithANewOneWorksOnClassMethods {
   NSString * (^replacingBlock1)(id, NSString *) = ^NSString *(id _self, NSString *something) {
     return [something stringByAppendingString:@"SWIZZLED!"];
@@ -794,6 +817,73 @@
                         @"anythingSWIZZLED!anythingSWIZZLED2!");
 
   [GULSwizzler unswizzleClass:[TestObject class] selector:swizzledSelector isClassSelector:YES];
+}
+
+/** Tests ivarObjectsForObject: returns strong Objective-C object ivars. */
+- (void)testIvarObjectsForObjectReturnsStrongObjectIvars {
+  IvarTestObject *object = [[IvarTestObject alloc] init];
+  NSString *strongIvar1 = @"value1";
+  NSNumber *strongIvar2 = @(42);
+  NSString *strongProperty = @"propertyValue";
+
+  object->_strongIvar1 = strongIvar1;
+  object->_strongIvar2 = strongIvar2;
+  object.strongProperty = strongProperty;
+
+  NSArray<id> *ivarObjects = [GULSwizzler ivarObjectsForObject:object];
+  XCTAssertEqual(ivarObjects.count, 3);
+  XCTAssertTrue([ivarObjects containsObject:strongIvar1]);
+  XCTAssertTrue([ivarObjects containsObject:strongIvar2]);
+  XCTAssertTrue([ivarObjects containsObject:strongProperty]);
+}
+
+/** Tests ivarObjectsForObject: excludes weak ivars. */
+- (void)testIvarObjectsForObjectExcludesWeakIvars {
+  IvarTestObject *object = [[IvarTestObject alloc] init];
+  NSObject *weakTarget = [[NSObject alloc] init];
+  NSString *strongIvar1 = @"strongValue";
+
+  object->_strongIvar1 = strongIvar1;
+  object->_weakIvar = weakTarget;
+  object.weakProperty = weakTarget;
+
+  NSArray<id> *ivarObjects = [GULSwizzler ivarObjectsForObject:object];
+  XCTAssertEqual(ivarObjects.count, 1);
+  XCTAssertTrue([ivarObjects containsObject:strongIvar1]);
+  XCTAssertFalse([ivarObjects containsObject:weakTarget]);
+}
+
+/** Tests ivarObjectsForObject: excludes primitive ivars. */
+- (void)testIvarObjectsForObjectExcludesPrimitiveIvars {
+  IvarTestObject *object = [[IvarTestObject alloc] init];
+  object->_primitiveInt = 42;
+  object->_primitiveDouble = 3.14159;
+  object.primitiveProperty = 100;
+
+  NSArray<id> *ivarObjects = [GULSwizzler ivarObjectsForObject:object];
+  XCTAssertEqual(ivarObjects.count, 0);
+}
+
+/** Tests ivarObjectsForObject: handles objects with nil ivars safely. */
+- (void)testIvarObjectsForObjectWithNilIvars {
+  IvarTestObject *object = [[IvarTestObject alloc] init];
+  // All object ivars are nil by default.
+  NSArray<id> *ivarObjects = [GULSwizzler ivarObjectsForObject:object];
+  XCTAssertEqual(ivarObjects.count, 0);
+
+  // Set only one strong ivar; others remain nil.
+  NSString *strongIvar1 = @"onlyOneSet";
+  object->_strongIvar1 = strongIvar1;
+  ivarObjects = [GULSwizzler ivarObjectsForObject:object];
+  XCTAssertEqual(ivarObjects.count, 1);
+  XCTAssertTrue([ivarObjects containsObject:strongIvar1]);
+}
+
+/** Tests ivarObjectsForObject: returns an empty array for an object without ivars. */
+- (void)testIvarObjectsForObjectWithNoIvars {
+  EmptyIvarTestObject *object = [[EmptyIvarTestObject alloc] init];
+  NSArray<id> *ivarObjects = [GULSwizzler ivarObjectsForObject:object];
+  XCTAssertEqual(ivarObjects.count, 0);
 }
 
 @end
