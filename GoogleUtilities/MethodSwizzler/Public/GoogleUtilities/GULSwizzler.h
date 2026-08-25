@@ -59,7 +59,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (BOOL)selector:(SEL)selector existsInClass:(Class)aClass isClassSelector:(BOOL)isClassSelector;
 
-/** Returns a list of all Objective-C (and not primitive) ivars contained by the given object.
+/** Returns a list of all Objective-C (but not weak or primitive) ivars contained by the given
+ * object.
  *
  *  @param object The object whose ivars will be iterated.
  *  @return The list of ivar objects.

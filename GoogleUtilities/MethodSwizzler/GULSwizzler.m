@@ -23,6 +23,47 @@
 static GULLoggerService kGULLoggerSwizzler = @"[GoogleUtilities/MethodSwizzler]";
 #endif
 
+// Returns an NSIndexSet that can be queried using an ivar's offset.
+// Do note that this is an inline function - which helps constrain
+// the Ivars and Class to be consistent.
+FOUNDATION_STATIC_INLINE NSIndexSet *GULWeakIvarOffsets(Ivar *vars,
+                                                        unsigned int count,
+                                                        Class aClass) {
+  NSMutableIndexSet *weakIvarOffsets = [NSMutableIndexSet indexSet];
+  if (vars == NULL || count == 0 || aClass == Nil) {
+    return weakIvarOffsets;
+  }
+  const uint8_t *weakIvarLayout = class_getWeakIvarLayout(aClass);
+
+  if (weakIvarLayout != NULL) {
+    ptrdiff_t baseOffset = PTRDIFF_MAX;
+    for (unsigned int i = 0; i < count; i++) {
+      ptrdiff_t offset = ivar_getOffset(vars[i]);
+      if (offset < baseOffset) {
+        baseOffset = offset;
+      }
+    }
+
+    NSUInteger currentWordIndex = 0;
+    while (*weakIvarLayout != 0x00) {
+      uint8_t byte = *weakIvarLayout++;
+      NSUInteger skipCount = (byte >> 4) & 0x0F;
+      NSUInteger weakCount = byte & 0x0F;
+
+      currentWordIndex += skipCount;
+
+      for (NSUInteger w = 0; w < weakCount; w++) {
+        ptrdiff_t weakOffset = baseOffset + ((currentWordIndex + w) * sizeof(void *));
+        [weakIvarOffsets addIndex:(NSUInteger)weakOffset];
+      }
+
+      currentWordIndex += weakCount;
+    }
+  }
+
+  return weakIvarOffsets;
+}
+
 dispatch_queue_t GetGULSwizzlingQueue(void) {
   static dispatch_queue_t queue;
   static dispatch_once_t onceToken;
@@ -138,14 +179,31 @@ dispatch_queue_t GetGULSwizzlingQueue(void) {
 
 + (NSArray<id> *)ivarObjectsForObject:(id)object {
   NSMutableArray *array = [NSMutableArray array];
-  unsigned int count;
-  Ivar *vars = class_copyIvarList([object class], &count);
+  unsigned int count = 0;
+  Class aClass = object_getClass(object);
+  Ivar *vars = class_copyIvarList(aClass, &count);
+  if (vars == NULL) {
+    return array;
+  }
+  NSIndexSet *weakIvarOffsets = GULWeakIvarOffsets(vars, count, aClass);
+
   for (NSUInteger i = 0; i < count; i++) {
     const char *typeEncoding = ivar_getTypeEncoding(vars[i]);
     // Check to see if the ivar is an object.
-    if (strncmp(typeEncoding, "@", 1) == 0) {
+    if (typeEncoding != NULL && strncmp(typeEncoding, "@", 1) == 0) {
+      // Skip weak ivars as swizzling them results in crashes.
+      ptrdiff_t offset = ivar_getOffset(vars[i]);
+      if ([weakIvarOffsets containsIndex:(NSUInteger)offset]) {
+        // Adding logic to isa swizzle weak ivars is an additional effort,
+        // which would likely involve objc_loadWeakRetained.
+        // See https://github.com/firebase/firebase-ios-sdk/pull/16074
+        continue;
+      }
+
       id ivarObject = object_getIvar(object, vars[i]);
-      [array addObject:ivarObject];
+      if (ivarObject != nil) {
+        [array addObject:ivarObject];
+      }
     }
   }
   free(vars);
