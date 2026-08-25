@@ -1,6 +1,6 @@
-# Unreleased
+# 8.1.3
 - [fixed] Fixed [GULSwizzler ivarObjectsForObject] to correctly query instance variables
-  of an NSProxy and to exclude weak instances in the returned array.
+  of an NSProxy and to exclude weak instances in the returned array. (#244)
 
 # 8.1.2
 - [fixed] Resolve EXC_BAD_ACCESS in GULNetworkURLSession via O(1) passive memory
