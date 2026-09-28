@@ -547,6 +547,21 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   return realImplementationBySelector[NSStringFromSelector(selector)];
 }
 
+// The App Delegate SwiftUI installs for UIApplicationDelegateAdaptor implements a handful of
+// selectors itself and forwards the rest to the app's own delegate. Such a delegate has no
+// implementation for the runtime to find, so the donor methods have nothing to call.
++ (nullable id<GULApplicationDelegate>)forwardingTargetForProxiedSelector:(SEL)selector
+                                                                  object:(id)object {
+  if (![object respondsToSelector:@selector(forwardingTargetForSelector:)]) {
+    return nil;
+  }
+  id target = [object forwardingTargetForSelector:selector];
+  if (target == nil || target == object || ![target respondsToSelector:selector]) {
+    return nil;
+  }
+  return target;
+}
+
 + (void)proxyDestinationSelector:(SEL)destinationSelector
     implementationsFromSourceSelector:(SEL)sourceSelector
                             fromClass:(Class)sourceClass
@@ -696,6 +711,12 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 #pragma clang diagnostic pop
   if (openURLOptionsIMP) {
     returnedValue |= openURLOptionsIMP(self, methodSelector, application, url, options);
+  } else {
+    returnedValue |= [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector
+                                                                          object:self]
+        application:application
+            openURL:url
+            options:options];
   }
   return returnedValue;
 }
@@ -731,6 +752,18 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (openURLSourceApplicationAnnotationIMP) {
     returnedValue |= openURLSourceApplicationAnnotationIMP(self, methodSelector, application, url,
                                                            sourceApplication, annotation);
+  } else {
+// The forwarding target is messaged directly, unlike the IMP call above, so the deprecation of
+// application:openURL:sourceApplication:annotation: is diagnosed here.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    returnedValue |= [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector
+                                                                          object:self]
+                  application:application
+                      openURL:url
+            sourceApplication:sourceApplication
+                   annotation:annotation];
+#pragma clang diagnostic pop
   }
   return returnedValue;
 }
@@ -765,6 +798,11 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // Call the real implementation if the real App Delegate has any.
   if (handleBackgroundSessionIMP) {
     handleBackgroundSessionIMP(self, methodSelector, application, identifier, completionHandler);
+  } else {
+    [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self]
+                        application:application
+        handleEventsForBackgroundURLSession:identifier
+                          completionHandler:completionHandler];
   }
 }
 
@@ -795,6 +833,12 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (continueUserActivityIMP) {
     returnedValue |= continueUserActivityIMP(self, methodSelector, application, userActivity,
                                              restorationHandler);
+  } else {
+    returnedValue |= [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector
+                                                                          object:self]
+                 application:application
+        continueUserActivity:userActivity
+          restorationHandler:restorationHandler];
   }
   return returnedValue;
 }
@@ -825,6 +869,10 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // Call the real implementation if the real App Delegate has any.
   if (didRegisterForRemoteNotificationsIMP) {
     didRegisterForRemoteNotificationsIMP(self, methodSelector, application, deviceToken);
+  } else {
+    [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self]
+                              application:application
+        didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
   }
 }
 
@@ -851,6 +899,10 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // Call the real implementation if the real App Delegate has any.
   if (didFailToRegisterForRemoteNotificationsIMP) {
     didFailToRegisterForRemoteNotificationsIMP(self, methodSelector, application, error);
+  } else {
+    [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self]
+                              application:application
+        didFailToRegisterForRemoteNotificationsWithError:error];
   }
 }
 
@@ -896,6 +948,16 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 
     didReceiveRemoteNotificationWithCompletionIMP(self, methodSelector, application, userInfo,
                                                   localCompletionHandler);
+  } else {
+    id<GULApplicationDelegate> forwardingTarget =
+        [GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self];
+    if (forwardingTarget) {
+      dispatch_group_enter(callbackGroup);
+
+      [forwardingTarget application:application
+          didReceiveRemoteNotification:userInfo
+                fetchCompletionHandler:localCompletionHandler];
+    }
   }
 
   dispatch_group_notify(callbackGroup, dispatch_get_main_queue(), ^() {
