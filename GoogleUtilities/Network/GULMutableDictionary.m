@@ -29,6 +29,18 @@ static void GULMutableDictionaryLogIgnoredWrite(GULNetworkMessageCode messageCod
                   reason);
 }
 
+/// Copies `key` on the caller's thread. Writes run asynchronously, and NSMutableDictionary copies
+/// the key only when the write runs, so a caller that mutates the key after the call would
+/// otherwise change which entry is written. Returns nil, and logs, if the copy is nil.
+static id<NSCopying> GULMutableDictionaryCopyKey(id<NSCopying> key, SEL selector) {
+  id<NSCopying> keyCopy = [(id)key copy];
+  if (keyCopy == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary000, selector,
+                                        @"the key's copy is nil");
+  }
+  return keyCopy;
+}
+
 @implementation GULMutableDictionary {
   /// The mutable dictionary.
   NSMutableDictionary *_objects;
@@ -84,8 +96,12 @@ static void GULMutableDictionaryLogIgnoredWrite(GULNetworkMessageCode messageCod
                                         @"the object is nil");
     return;
   }
+  id<NSCopying> keyCopy = GULMutableDictionaryCopyKey(key, _cmd);
+  if (keyCopy == nil) {
+    return;
+  }
   dispatch_async(_queue, ^{
-    [self->_objects setObject:object forKey:key];
+    [self->_objects setObject:object forKey:keyCopy];
   });
 }
 
@@ -133,8 +149,12 @@ static void GULMutableDictionaryLogIgnoredWrite(GULNetworkMessageCode messageCod
                                         @"the key is nil");
     return;
   }
+  id<NSCopying> keyCopy = GULMutableDictionaryCopyKey(key, _cmd);
+  if (keyCopy == nil) {
+    return;
+  }
   dispatch_async(_queue, ^{
-    self->_objects[key] = obj;
+    self->_objects[keyCopy] = obj;
   });
 }
 
