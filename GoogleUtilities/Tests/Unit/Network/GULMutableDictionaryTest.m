@@ -90,6 +90,8 @@ const static NSString *const kValue2 = @"testValue2";
 
   self.dictionary[kKey2] = kValue2;
   [self.dictionary removeObjectForKey:kKey];
+  XCTAssertNil(self.dictionary[kKey]);
+  XCTAssertEqual(self.dictionary[kKey2], kValue2);
 
   XCTAssertEqual([snapshot count], 1);
   XCTAssertEqual(snapshot[kKey], kValue);
@@ -169,6 +171,7 @@ const static NSString *const kValue2 = @"testValue2";
 
 - (void)testKeyedNilObjectRemovesKey {
   self.dictionary[kKey] = kValue;
+  XCTAssertEqual(self.dictionary[kKey], kValue);
   // The object parameter is nullable, so no workaround is needed to pass nil.
   self.dictionary[kKey] = nil;
   XCTAssertNil(self.dictionary[kKey]);
@@ -178,12 +181,14 @@ const static NSString *const kValue2 = @"testValue2";
 - (void)testObjectForNilKey {
   id nilKey = nil;
   self.dictionary[kKey] = kValue;
+  XCTAssertEqual([self.dictionary count], 1);
   XCTAssertNil([self.dictionary objectForKey:nilKey]);
 }
 
 - (void)testObjectForNilKeyedSubscript {
   id nilKey = nil;
   self.dictionary[kKey] = kValue;
+  XCTAssertEqual([self.dictionary count], 1);
   XCTAssertNil([self.dictionary objectForKeyedSubscript:nilKey]);
 }
 
