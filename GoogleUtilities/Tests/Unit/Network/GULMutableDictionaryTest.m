@@ -84,11 +84,69 @@ const static NSString *const kValue2 = @"testValue2";
   XCTAssertEqual(dict[kKey2], kValue2);
 }
 
-- (void)testNilKeyIsIgnored {
+- (void)testDictionaryReturnsSnapshot {
+  self.dictionary[kKey] = kValue;
+  NSDictionary *snapshot = self.dictionary.dictionary;
+
+  self.dictionary[kKey2] = kValue2;
+  [self.dictionary removeObjectForKey:kKey];
+
+  XCTAssertEqual([snapshot count], 1);
+  XCTAssertEqual(snapshot[kKey], kValue);
+}
+
+- (void)testRemoveMissingKey {
+  self.dictionary[kKey] = kValue;
+  [self.dictionary removeObjectForKey:kKey2];
+  XCTAssertEqual([self.dictionary count], 1);
+  XCTAssertEqual(self.dictionary[kKey], kValue);
+}
+
+- (void)testRemoveAllWhenEmpty {
+  [self.dictionary removeAllObjects];
+  XCTAssertEqual([self.dictionary count], 0);
+}
+
+- (void)testDescription {
+  self.dictionary[kKey] = kValue;
+  NSString *description = [self.dictionary description];
+  XCTAssertNotNil(description);
+  XCTAssertTrue([description containsString:(NSString *)kKey]);
+}
+
+- (void)testSetObjectForNilKeyIsIgnored {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
+  [self.dictionary setObject:kValue2 forKey:nilKey];
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testKeyedSetObjectForNilKeyIsIgnored {
   id nilKey = nil;
   self.dictionary[kKey] = kValue;
   self.dictionary[nilKey] = kValue2;
-  [self.dictionary setObject:kValue2 forKey:nilKey];
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testKeyedSetNilObjectForNilKeyIsIgnored {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
+  self.dictionary[nilKey] = nil;
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testRemoveObjectForNilKeyIsIgnored {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
   [self.dictionary removeObjectForKey:nilKey];
 
   NSDictionary *dict = self.dictionary.dictionary;
