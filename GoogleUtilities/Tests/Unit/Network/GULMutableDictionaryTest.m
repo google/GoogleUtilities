@@ -139,8 +139,9 @@ const static NSString *const kValue2 = @"testValue2";
 
 - (void)testKeyedSetNilObjectForNilKeyIsIgnored {
   id nilKey = nil;
+  id nilObj = nil;
   self.dictionary[kKey] = kValue;
-  self.dictionary[nilKey] = nil;
+  self.dictionary[nilKey] = nilObj;
 
   NSDictionary *dict = self.dictionary.dictionary;
   XCTAssertEqual([dict count], 1);
@@ -173,7 +174,8 @@ const static NSString *const kValue2 = @"testValue2";
   self.dictionary[kKey] = kValue;
   XCTAssertEqual(self.dictionary[kKey], kValue);
   // The object parameter is nullable, so no workaround is needed to pass nil.
-  self.dictionary[kKey] = nil;
+  id nilObj = nil;
+  self.dictionary[kKey] = nilObj;
   XCTAssertNil(self.dictionary[kKey]);
   XCTAssertEqual([self.dictionary count], 0);
 }
@@ -190,6 +192,47 @@ const static NSString *const kValue2 = @"testValue2";
   self.dictionary[kKey] = kValue;
   XCTAssertEqual([self.dictionary count], 1);
   XCTAssertNil([self.dictionary objectForKeyedSubscript:nilKey]);
+}
+
+- (void)testConcurrentAccess {
+  GULMutableDictionary *dictionary = self.dictionary;
+  id nilKey = nil;
+  const size_t keyCount = 10;
+
+  dispatch_apply(10000, DISPATCH_APPLY_AUTO, ^(size_t i) {
+    NSString *key = [NSString stringWithFormat:@"key%zu", i % keyCount];
+    NSNumber *value = @(i);
+
+    dictionary[key] = value;
+    [dictionary setObject:value forKey:key];
+    (void)dictionary[key];
+    (void)[dictionary objectForKey:key];
+
+    dictionary[nilKey] = value;
+    [dictionary setObject:value forKey:nilKey];
+    [dictionary removeObjectForKey:nilKey];
+    (void)dictionary[nilKey];
+    (void)[dictionary objectForKey:nilKey];
+
+    if (i % 7 == 0) {
+      [dictionary removeObjectForKey:key];
+    }
+    if (i % 997 == 0) {
+      [dictionary removeAllObjects];
+    }
+
+    (void)dictionary.count;
+    (void)dictionary.dictionary;
+    (void)dictionary.description;
+  });
+
+  NSDictionary *snapshot = dictionary.dictionary;
+  XCTAssertEqual([snapshot count], [dictionary count]);
+  XCTAssertLessThanOrEqual([snapshot count], keyCount);
+  for (NSString *key in snapshot) {
+    XCTAssertTrue([key hasPrefix:@"key"]);
+    XCTAssertTrue([snapshot[key] isKindOfClass:[NSNumber class]]);
+  }
 }
 
 @end
