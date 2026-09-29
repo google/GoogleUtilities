@@ -14,6 +14,21 @@
 
 #import "GoogleUtilities/Network/Public/GoogleUtilities/GULMutableDictionary.h"
 
+#import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLogger.h"
+#import "GoogleUtilities/Network/GULNetworkInternal.h"
+#import "GoogleUtilities/Network/Public/GoogleUtilities/GULNetworkMessageCode.h"
+
+/// Logs a write that was dropped because of a nil argument. Dropping the write avoids a crash, and
+/// the log keeps the caller's bug visible.
+static void GULMutableDictionaryLogIgnoredWrite(GULNetworkMessageCode messageCode,
+                                                SEL selector,
+                                                NSString *reason) {
+  GULOSLogWarning(kGULLogSubsystem, kGULLoggerNetwork, NO,
+                  [NSString stringWithFormat:@"I-NET%06ld", (long)messageCode],
+                  @"GULMutableDictionary ignored -%@ because %@.", NSStringFromSelector(selector),
+                  reason);
+}
+
 @implementation GULMutableDictionary {
   /// The mutable dictionary.
   NSMutableDictionary *_objects;
@@ -51,9 +66,17 @@
 }
 
 - (void)setObject:(id)object forKey:(id<NSCopying>)key {
-  // NSMutableDictionary throws on a nil key or object. The write runs asynchronously, so the
-  // exception would surface on the internal queue and crash the app instead of the caller.
-  if (key == nil || object == nil) {
+  // NSMutableDictionary throws on a nil key or object. Because the write runs asynchronously, the
+  // exception would be raised on the internal queue, where the caller cannot catch it and the crash
+  // is attributed to GoogleUtilities.
+  if (key == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary000, _cmd,
+                                        @"the key is nil");
+    return;
+  }
+  if (object == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary001, _cmd,
+                                        @"the object is nil");
     return;
   }
   dispatch_async(_queue, ^{
@@ -63,6 +86,8 @@
 
 - (void)removeObjectForKey:(id)key {
   if (key == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary000, _cmd,
+                                        @"the key is nil");
     return;
   }
   dispatch_async(_queue, ^{
@@ -93,8 +118,10 @@
 }
 
 - (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key {
-  // A nil object removes the key, but a nil key throws on the internal queue.
+  // A nil object removes the key, but a nil key would throw on the internal queue.
   if (key == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary000, _cmd,
+                                        @"the key is nil");
     return;
   }
   dispatch_async(_queue, ^{

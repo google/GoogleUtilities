@@ -46,6 +46,9 @@ typedef NS_ENUM(NSInteger, GULNetworkMessageCode) {
   kGULNetworkMessageCodeURLSession017 = 901017,  // I-NET901017
   kGULNetworkMessageCodeURLSession018 = 901018,  // I-NET901018
   kGULNetworkMessageCodeURLSession019 = 901019,  // I-NET901019
+  // GULMutableDictionary.m
+  kGULNetworkMessageCodeMutableDictionary000 = 902000,  // I-NET902000
+  kGULNetworkMessageCodeMutableDictionary001 = 902001,  // I-NET902001
 };
 
 NS_ASSUME_NONNULL_END

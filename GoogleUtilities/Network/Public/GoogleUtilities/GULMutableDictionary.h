@@ -25,9 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)objectForKey:(id)key;
 
 /// Updates the object given its key or adds it to the dictionary if it is not in the dictionary.
+/// If `key` or `object` is `nil`, the call is ignored and a warning is logged.
 - (void)setObject:(id)object forKey:(id<NSCopying>)key;
 
 /// Removes the object given its session ID from the dictionary.
+/// If `key` is `nil`, the call is ignored and a warning is logged.
 - (void)removeObjectForKey:(id)key;
 
 /// Removes all objects.
@@ -40,7 +42,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)objectForKeyedSubscript:(id<NSCopying>)key;
 
 /// Updates the object given its key or adds it to the dictionary if it is not in the dictionary.
-- (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key;
+/// A `nil` object removes the key, matching `NSMutableDictionary`. If `key` is `nil`, the call is
+/// ignored and a warning is logged.
+- (void)setObject:(nullable id)obj forKeyedSubscript:(id<NSCopying>)key;
 
 /// Returns the immutable dictionary.
 - (NSDictionary *)dictionary;

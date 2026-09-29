@@ -98,15 +98,22 @@ const static NSString *const kValue2 = @"testValue2";
 
 - (void)testNilObjectIsIgnored {
   id nilObject = nil;
+  self.dictionary[kKey] = kValue;
+
+  // Unlike keyed subscripting, -setObject:forKey: with a nil object leaves the existing entry.
   [self.dictionary setObject:nilObject forKey:kKey];
-  XCTAssertEqual([self.dictionary.dictionary count], 0);
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
 }
 
 - (void)testKeyedNilObjectRemovesKey {
-  id nilObject = nil;
   self.dictionary[kKey] = kValue;
-  self.dictionary[kKey] = nilObject;
+  // The object parameter is nullable, so no workaround is needed to pass nil.
+  self.dictionary[kKey] = nil;
   XCTAssertNil(self.dictionary[kKey]);
+  XCTAssertEqual([self.dictionary count], 0);
 }
 
 @end
