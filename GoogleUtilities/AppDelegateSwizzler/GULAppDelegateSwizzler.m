@@ -551,7 +551,7 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 // selectors itself and forwards the rest to the app's own delegate. Such a delegate has no
 // implementation for the runtime to find, so the donor methods have nothing to call.
 + (nullable id<GULApplicationDelegate>)forwardingTargetForProxiedSelector:(SEL)selector
-                                                                  object:(id)object {
+                                                                   object:(id)object {
   if (![object respondsToSelector:@selector(forwardingTargetForSelector:)]) {
     return nil;
   }
@@ -560,6 +560,33 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
     return nil;
   }
   return target;
+}
+
++ (nullable NSInvocation *)forwardSelector:(SEL)selector
+                                fromObject:(id)object
+                            argumentSetter:(void (^)(NSInvocation *invocation))argumentSetter {
+  id target = [self forwardingTargetForProxiedSelector:selector object:object];
+  if (target == nil) {
+    return nil;
+  }
+  NSInvocation *invocation = [self appDelegateInvocationForSelector:selector];
+  if (invocation == nil) {
+    return nil;
+  }
+  [invocation setTarget:target];
+  [invocation setSelector:selector];
+  argumentSetter(invocation);
+  [invocation invoke];
+  return invocation;
+}
+
++ (BOOL)boolReturnValueOfInvocation:(nullable NSInvocation *)invocation {
+  if (invocation == nil) {
+    return NO;
+  }
+  BOOL returnValue = NO;
+  [invocation getReturnValue:&returnValue];
+  return returnValue;
 }
 
 + (void)proxyDestinationSelector:(SEL)destinationSelector
@@ -712,11 +739,16 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (openURLOptionsIMP) {
     returnedValue |= openURLOptionsIMP(self, methodSelector, application, url, options);
   } else {
-    returnedValue |= [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector
-                                                                          object:self]
-        application:application
-            openURL:url
-            options:options];
+    returnedValue |= [GULAppDelegateSwizzler
+        boolReturnValueOfInvocation:[GULAppDelegateSwizzler
+                                        forwardSelector:methodSelector
+                                             fromObject:self
+                                         argumentSetter:^(NSInvocation *invocation) {
+                                           [invocation setArgument:(void *)(&application)
+                                                           atIndex:2];
+                                           [invocation setArgument:(void *)(&url) atIndex:3];
+                                           [invocation setArgument:(void *)(&options) atIndex:4];
+                                         }]];
   }
   return returnedValue;
 }
@@ -753,17 +785,18 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
     returnedValue |= openURLSourceApplicationAnnotationIMP(self, methodSelector, application, url,
                                                            sourceApplication, annotation);
   } else {
-// The forwarding target is messaged directly, unlike the IMP call above, so the deprecation of
-// application:openURL:sourceApplication:annotation: is diagnosed here.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    returnedValue |= [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector
-                                                                          object:self]
-                  application:application
-                      openURL:url
-            sourceApplication:sourceApplication
-                   annotation:annotation];
-#pragma clang diagnostic pop
+    returnedValue |= [GULAppDelegateSwizzler
+        boolReturnValueOfInvocation:[GULAppDelegateSwizzler
+                                        forwardSelector:methodSelector
+                                             fromObject:self
+                                         argumentSetter:^(NSInvocation *invocation) {
+                                           [invocation setArgument:(void *)(&application)
+                                                           atIndex:2];
+                                           [invocation setArgument:(void *)(&url) atIndex:3];
+                                           [invocation setArgument:(void *)(&sourceApplication)
+                                                           atIndex:4];
+                                           [invocation setArgument:(void *)(&annotation) atIndex:5];
+                                         }]];
   }
   return returnedValue;
 }
@@ -799,10 +832,13 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (handleBackgroundSessionIMP) {
     handleBackgroundSessionIMP(self, methodSelector, application, identifier, completionHandler);
   } else {
-    [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self]
-                        application:application
-        handleEventsForBackgroundURLSession:identifier
-                          completionHandler:completionHandler];
+    [GULAppDelegateSwizzler forwardSelector:methodSelector
+                                 fromObject:self
+                             argumentSetter:^(NSInvocation *invocation) {
+                               [invocation setArgument:(void *)(&application) atIndex:2];
+                               [invocation setArgument:(void *)(&identifier) atIndex:3];
+                               [invocation setArgument:(void *)(&completionHandler) atIndex:4];
+                             }];
   }
 }
 
@@ -834,11 +870,18 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
     returnedValue |= continueUserActivityIMP(self, methodSelector, application, userActivity,
                                              restorationHandler);
   } else {
-    returnedValue |= [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector
-                                                                          object:self]
-                 application:application
-        continueUserActivity:userActivity
-          restorationHandler:restorationHandler];
+    returnedValue |= [GULAppDelegateSwizzler
+        boolReturnValueOfInvocation:[GULAppDelegateSwizzler
+                                        forwardSelector:methodSelector
+                                             fromObject:self
+                                         argumentSetter:^(NSInvocation *invocation) {
+                                           [invocation setArgument:(void *)(&application)
+                                                           atIndex:2];
+                                           [invocation setArgument:(void *)(&userActivity)
+                                                           atIndex:3];
+                                           [invocation setArgument:(void *)(&restorationHandler)
+                                                           atIndex:4];
+                                         }]];
   }
   return returnedValue;
 }
@@ -870,9 +913,12 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (didRegisterForRemoteNotificationsIMP) {
     didRegisterForRemoteNotificationsIMP(self, methodSelector, application, deviceToken);
   } else {
-    [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self]
-                              application:application
-        didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+    [GULAppDelegateSwizzler forwardSelector:methodSelector
+                                 fromObject:self
+                             argumentSetter:^(NSInvocation *invocation) {
+                               [invocation setArgument:(void *)(&application) atIndex:2];
+                               [invocation setArgument:(void *)(&deviceToken) atIndex:3];
+                             }];
   }
 }
 
@@ -900,9 +946,12 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (didFailToRegisterForRemoteNotificationsIMP) {
     didFailToRegisterForRemoteNotificationsIMP(self, methodSelector, application, error);
   } else {
-    [[GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self]
-                              application:application
-        didFailToRegisterForRemoteNotificationsWithError:error];
+    [GULAppDelegateSwizzler forwardSelector:methodSelector
+                                 fromObject:self
+                             argumentSetter:^(NSInvocation *invocation) {
+                               [invocation setArgument:(void *)(&application) atIndex:2];
+                               [invocation setArgument:(void *)(&error) atIndex:3];
+                             }];
   }
 }
 
@@ -949,14 +998,17 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
     didReceiveRemoteNotificationWithCompletionIMP(self, methodSelector, application, userInfo,
                                                   localCompletionHandler);
   } else {
-    id<GULApplicationDelegate> forwardingTarget =
-        [GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self];
-    if (forwardingTarget) {
+    if ([GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self]) {
       dispatch_group_enter(callbackGroup);
 
-      [forwardingTarget application:application
-          didReceiveRemoteNotification:userInfo
-                fetchCompletionHandler:localCompletionHandler];
+      [GULAppDelegateSwizzler
+          forwardSelector:methodSelector
+               fromObject:self
+           argumentSetter:^(NSInvocation *invocation) {
+             [invocation setArgument:(void *)(&application) atIndex:2];
+             [invocation setArgument:(void *)(&userInfo) atIndex:3];
+             [invocation setArgument:(void *)(&localCompletionHandler) atIndex:4];
+           }];
     }
   }
 

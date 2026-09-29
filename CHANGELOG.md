@@ -1,3 +1,7 @@
+# Unreleased
+- [fixed] Deliver App Delegate callbacks to delegates that handle them by forwarding rather than by
+  implementing them, such as the one SwiftUI installs for `UIApplicationDelegateAdaptor`. (#247)
+
 # 8.1.3
 - [fixed] Fixed [GULSwizzler ivarObjectsForObject] to correctly query instance variables
   of an NSProxy and to exclude weak instances in the returned array. (#244)
