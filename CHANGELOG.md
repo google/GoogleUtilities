@@ -1,4 +1,4 @@
-# Unreleased
+# 8.1.4
 - [fixed] `GULMutableDictionary` now ignores a `nil` key (and a `nil` object in
   `setObject:forKey:`) instead of throwing on its internal queue, which crashed
   apps when Analytics received a malformed experiment response. A warning
