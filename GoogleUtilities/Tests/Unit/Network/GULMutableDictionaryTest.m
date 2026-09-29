@@ -84,4 +84,29 @@ const static NSString *const kValue2 = @"testValue2";
   XCTAssertEqual(dict[kKey2], kValue2);
 }
 
+- (void)testNilKeyIsIgnored {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
+  self.dictionary[nilKey] = kValue2;
+  [self.dictionary setObject:kValue2 forKey:nilKey];
+  [self.dictionary removeObjectForKey:nilKey];
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testNilObjectIsIgnored {
+  id nilObject = nil;
+  [self.dictionary setObject:nilObject forKey:kKey];
+  XCTAssertEqual([self.dictionary.dictionary count], 0);
+}
+
+- (void)testKeyedNilObjectRemovesKey {
+  id nilObject = nil;
+  self.dictionary[kKey] = kValue;
+  self.dictionary[kKey] = nilObject;
+  XCTAssertNil(self.dictionary[kKey]);
+}
+
 @end
