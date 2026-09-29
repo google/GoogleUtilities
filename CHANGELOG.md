@@ -23,6 +23,15 @@
   ignores values that are not property lists, such as a collection containing
   `NSNull`. Previously only the top-level class was checked, and
   `NSUserDefaults` aborted the app when given such values.
+- [fixed] `GULUserDefaults` typed getters (`integerForKey:`, `stringForKey:`,
+  `arrayForKey:`, etc.) now check the type of the stored value, like
+  `NSUserDefaults`, instead of crashing or returning an object of the wrong type.
+- [fixed] `GULNetworkURLSession` now reports a non-HTTP response as an error
+  instead of passing it to callers as an `NSHTTPURLResponse`.
+- [fixed] `GULNetworkURLSession` no longer throws when logging a server trust
+  evaluation error for a request with a `nil` URL.
+- [fixed] `GULLogger` now reuses cached `os_log` objects instead of creating
+  one for every log message.
 
 # 8.1.3
 - [fixed] Fixed [GULSwizzler ivarObjectsForObject] to correctly query instance variables
