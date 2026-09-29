@@ -2,7 +2,7 @@
 - [fixed] `GULMutableDictionary` now ignores a `nil` key (and a `nil` object in
   `setObject:forKey:`) instead of throwing on its internal queue, which crashed
   apps when Analytics received a malformed experiment response. A warning
-  (`I-NET902000`/`I-NET902001`) is logged when a write is ignored.
+  (`I-NET903000`/`I-NET903001`) is logged when a write is ignored.
   (firebase/firebase-ios-sdk#16728)
 
 # 8.1.3
