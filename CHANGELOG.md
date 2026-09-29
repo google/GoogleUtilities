@@ -15,6 +15,10 @@
   threw on an internal queue and crashed the app, and a `nil` key built a
   keychain query without an account, which could read or remove other items
   stored for the same service.
+- [fixed] `GULUserDefaults` now validates the entire value before saving it and
+  ignores values that are not property lists, such as a collection containing
+  `NSNull`. Previously only the top-level class was checked, and
+  `NSUserDefaults` aborted the app when given such values.
 
 # 8.1.3
 - [fixed] Fixed [GULSwizzler ivarObjectsForObject] to correctly query instance variables

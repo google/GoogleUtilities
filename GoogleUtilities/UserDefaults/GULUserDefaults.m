@@ -87,10 +87,12 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
     [self.userDefaults removeObjectForKey:key];
     return;
   }
+  // Validate the entire object graph rather than only the top-level class. NSUserDefaults aborts
+  // the process on non-property-list content nested inside a collection, e.g. an NSNull decoded
+  // from a JSON `null`, or a dictionary with non-string keys.
   BOOL isAcceptableValue =
-      [value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]] ||
-      [value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]] ||
-      [value isKindOfClass:[NSDate class]] || [value isKindOfClass:[NSData class]];
+      [NSPropertyListSerialization propertyList:value
+                               isValidForFormat:NSPropertyListBinaryFormat_v1_0];
   if (!isAcceptableValue) {
     GULOSLogWarning(
         kGULLogSubsystem, kGULLogUserDefaultsService, NO,
