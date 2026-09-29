@@ -39,33 +39,47 @@ static NSString *const kInvalidKeyReason = @"Key must be a non-empty string.";
   self.storage = nil;
 }
 
+// The completion blocks only record their results. Assertions run after the wait because
+// XCTAssert* macros reference `self`, and capturing `self` in a block retained by `self.storage`
+// triggers -Warc-retain-cycles.
+
 - (void)testSetNilObjectReturnsError {
   id nilObject = nil;
   XCTestExpectation *expectation = [self expectationWithDescription:NSStringFromSelector(_cmd)];
+  __block id<NSSecureCoding> resultObject;
+  __block NSError *resultError;
   [self.storage setObject:nilObject
                    forKey:@"key"
               accessGroup:nil
         completionHandler:^(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error) {
-          XCTAssertNil(obj);
-          [self assertError:error hasReason:@"Object must not be nil."];
+          resultObject = obj;
+          resultError = error;
           [expectation fulfill];
         }];
   [self waitForExpectations:@[ expectation ] timeout:5.0];
+
+  XCTAssertNil(resultObject);
+  [self assertError:resultError hasReason:@"Object must not be nil."];
 }
 
 - (void)testSetWithInvalidKeysReturnsError {
   for (id candidate in [self invalidKeys]) {
     id key = [self keyFromCandidate:candidate];
     XCTestExpectation *expectation = [self expectationWithDescription:[candidate description]];
+    __block id<NSSecureCoding> resultObject;
+    __block NSError *resultError;
     [self.storage setObject:@"value"
                      forKey:key
                 accessGroup:nil
           completionHandler:^(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error) {
-            XCTAssertNil(obj);
-            [self assertError:error hasReason:kInvalidKeyReason];
+            resultObject = obj;
+            resultError = error;
             [expectation fulfill];
           }];
     [self waitForExpectations:@[ expectation ] timeout:5.0];
+
+    XCTAssertNil(resultObject, @"%@", candidate);
+    [self assertError:resultError hasReason:kInvalidKeyReason];
   }
 }
 
@@ -73,15 +87,20 @@ static NSString *const kInvalidKeyReason = @"Key must be a non-empty string.";
   for (id candidate in [self invalidKeys]) {
     id key = [self keyFromCandidate:candidate];
     XCTestExpectation *expectation = [self expectationWithDescription:[candidate description]];
+    __block id<NSSecureCoding> resultObject;
+    __block NSError *resultError;
     [self.storage getObjectForKey:key
                       objectClass:[NSString class]
                       accessGroup:nil
                 completionHandler:^(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error) {
-                  XCTAssertNil(obj);
-                  [self assertError:error hasReason:kInvalidKeyReason];
+                  resultObject = obj;
+                  resultError = error;
                   [expectation fulfill];
                 }];
     [self waitForExpectations:@[ expectation ] timeout:5.0];
+
+    XCTAssertNil(resultObject, @"%@", candidate);
+    [self assertError:resultError hasReason:kInvalidKeyReason];
   }
 }
 
@@ -89,13 +108,16 @@ static NSString *const kInvalidKeyReason = @"Key must be a non-empty string.";
   for (id candidate in [self invalidKeys]) {
     id key = [self keyFromCandidate:candidate];
     XCTestExpectation *expectation = [self expectationWithDescription:[candidate description]];
+    __block NSError *resultError;
     [self.storage removeObjectForKey:key
                          accessGroup:nil
                    completionHandler:^(NSError *_Nullable error) {
-                     [self assertError:error hasReason:kInvalidKeyReason];
+                     resultError = error;
                      [expectation fulfill];
                    }];
     [self waitForExpectations:@[ expectation ] timeout:5.0];
+
+    [self assertError:resultError hasReason:kInvalidKeyReason];
   }
 }
 
