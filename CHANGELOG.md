@@ -4,6 +4,12 @@
   apps when Analytics received a malformed experiment response. A warning
   (`I-NET903000`/`I-NET903001`) is logged when a write is ignored.
   (firebase/firebase-ios-sdk#16728)
+- [fixed] `GULMutableDictionary` setters now copy the key before returning.
+  Previously the key was copied when the write ran on the internal queue, so a
+  mutable key changed right after the call was stored under the changed value.
+- [changed] `GULMutableDictionary` getters are now declared `nullable`, and the
+  subscript setter accepts a `nil` object. In Swift, `object(forKey:)` now
+  returns `Any?`, and `dict[key] = nil` removes the key.
 
 # 8.1.3
 - [fixed] Fixed [GULSwizzler ivarObjectsForObject] to correctly query instance variables
