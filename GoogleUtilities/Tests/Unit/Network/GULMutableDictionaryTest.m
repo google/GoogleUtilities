@@ -103,6 +103,7 @@ const static NSString *const kValue2 = @"testValue2";
 }
 
 - (void)testRemoveAllWhenEmpty {
+  XCTAssertEqual([self.dictionary count], 0);
   [self.dictionary removeAllObjects];
   XCTAssertEqual([self.dictionary count], 0);
 }
