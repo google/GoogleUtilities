@@ -58,6 +58,11 @@ static void GULMutableDictionaryLogIgnoredWrite(GULNetworkMessageCode messageCod
 }
 
 - (id)objectForKey:(id)key {
+  // NSDictionary returns nil for a nil key, but that is not documented. Return early so the
+  // behavior does not depend on Foundation.
+  if (key == nil) {
+    return nil;
+  }
   __block id object;
   dispatch_sync(_queue, ^{
     object = [self->_objects objectForKey:key];
@@ -110,6 +115,10 @@ static void GULMutableDictionaryLogIgnoredWrite(GULNetworkMessageCode messageCod
 }
 
 - (id)objectForKeyedSubscript:(id<NSCopying>)key {
+  // See -objectForKey:.
+  if (key == nil) {
+    return nil;
+  }
   __block id object;
   dispatch_sync(_queue, ^{
     object = self->_objects[key];

@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface GULMutableDictionary : NSObject
 
 /// Returns an object given a key in the dictionary or nil if not found.
+/// If `key` is `nil`, returns `nil`.
 - (id)objectForKey:(id)key;
 
 /// Updates the object given its key or adds it to the dictionary if it is not in the dictionary.
@@ -39,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSUInteger)count;
 
 /// Returns an object given a key in the dictionary or nil if not found.
+/// If `key` is `nil`, returns `nil`.
 - (id)objectForKeyedSubscript:(id<NSCopying>)key;
 
 /// Updates the object given its key or adds it to the dictionary if it is not in the dictionary.

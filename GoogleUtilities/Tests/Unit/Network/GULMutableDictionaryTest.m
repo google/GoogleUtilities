@@ -118,12 +118,14 @@ const static NSString *const kValue2 = @"testValue2";
 
 - (void)testObjectForNilKey {
   id nilKey = nil;
-  [self.dictionary objectForKey:nilKey];
+  self.dictionary[kKey] = kValue;
+  XCTAssertNil([self.dictionary objectForKey:nilKey]);
 }
 
 - (void)testObjectForNilKeyedSubscript {
   id nilKey = nil;
-  [self.dictionary objectForKeyedSubscript:nilKey];
+  self.dictionary[kKey] = kValue;
+  XCTAssertNil([self.dictionary objectForKeyedSubscript:nilKey]);
 }
 
 @end
