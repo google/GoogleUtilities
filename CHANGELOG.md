@@ -1,3 +1,8 @@
+# Unreleased
+- [fixed] `GULMutableDictionary` now ignores a `nil` key (and a `nil` object in
+  `setObject:forKey:`) instead of throwing on its internal queue, which crashed
+  apps when Analytics received a malformed experiment response. (firebase/firebase-ios-sdk#16728)
+
 # 8.1.3
 - [fixed] Fixed [GULSwizzler ivarObjectsForObject] to correctly query instance variables
   of an NSProxy and to exclude weak instances in the returned array. (#244)

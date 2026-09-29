@@ -51,12 +51,20 @@
 }
 
 - (void)setObject:(id)object forKey:(id<NSCopying>)key {
+  // NSMutableDictionary throws on a nil key or object. The write runs asynchronously, so the
+  // exception would surface on the internal queue and crash the app instead of the caller.
+  if (key == nil || object == nil) {
+    return;
+  }
   dispatch_async(_queue, ^{
     [self->_objects setObject:object forKey:key];
   });
 }
 
 - (void)removeObjectForKey:(id)key {
+  if (key == nil) {
+    return;
+  }
   dispatch_async(_queue, ^{
     [self->_objects removeObjectForKey:key];
   });
@@ -85,6 +93,10 @@
 }
 
 - (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key {
+  // A nil object removes the key, but a nil key throws on the internal queue.
+  if (key == nil) {
+    return;
+  }
   dispatch_async(_queue, ^{
     self->_objects[key] = obj;
   });
