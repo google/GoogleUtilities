@@ -115,6 +115,28 @@
   XCTAssertEqual(error.code, GULErrorCodeNetworkInvalidResponse);
 }
 
+- (void)testNonHTTPResponsePassesSystemError {
+  NSURL *URL = [NSURL URLWithString:@"https://google.com"];
+  NSURLResponse *nonHTTPResponse = [[NSURLResponse alloc] initWithURL:URL
+                                                             MIMEType:@"text/plain"
+                                                expectedContentLength:0
+                                                     textEncodingName:nil];
+  NSError *systemError = [NSError errorWithDomain:NSURLErrorDomain
+                                             code:NSURLErrorCannotParseResponse
+                                         userInfo:nil];
+
+  NSHTTPURLResponse *response;
+  NSError *error;
+  [self completeTask:[self taskWithResponse:nonHTTPResponse]
+           withError:systemError
+            response:&response
+               error:&error];
+
+  // The more specific system error is kept instead of being replaced.
+  XCTAssertNil(response);
+  XCTAssertEqualObjects(error, systemError);
+}
+
 - (void)testMissingResponseReturnsError {
   NSHTTPURLResponse *response;
   NSError *error;
