@@ -30,7 +30,7 @@ static BOOL GULKeychainStorageIsValidKey(id key) {
   return [key isKindOfClass:[NSString class]] && ((NSString *)key).length > 0;
 }
 
-static NSError *GULKeychainStorageInvalidArgumentError(NSString *reason) {
+static NSError *GULKeychainStorageErrorWithReason(NSString *reason) {
   return [NSError errorWithDomain:kGULKeychainUtilsErrorDomain
                              code:0
                          userInfo:@{NSLocalizedFailureReasonErrorKey : reason}];
@@ -67,8 +67,7 @@ static NSError *GULKeychainStorageInvalidArgumentError(NSString *reason) {
           (void (^)(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error))completionHandler {
   if (!GULKeychainStorageIsValidKey(key)) {
     dispatch_async(self.inMemoryCacheQueue, ^{
-      completionHandler(nil,
-                        GULKeychainStorageInvalidArgumentError(@"Key must be a non-empty string."));
+      completionHandler(nil, GULKeychainStorageErrorWithReason(@"Key must be a non-empty string."));
     });
     return;
   }
@@ -102,7 +101,7 @@ static NSError *GULKeychainStorageInvalidArgumentError(NSString *reason) {
   }
   if (invalidReason) {
     dispatch_async(self.inMemoryCacheQueue, ^{
-      completionHandler(nil, GULKeychainStorageInvalidArgumentError(invalidReason));
+      completionHandler(nil, GULKeychainStorageErrorWithReason(invalidReason));
     });
     return;
   }
@@ -139,7 +138,7 @@ static NSError *GULKeychainStorageInvalidArgumentError(NSString *reason) {
   // for the same service.
   if (!GULKeychainStorageIsValidKey(key)) {
     dispatch_async(self.inMemoryCacheQueue, ^{
-      completionHandler(GULKeychainStorageInvalidArgumentError(@"Key must be a non-empty string."));
+      completionHandler(GULKeychainStorageErrorWithReason(@"Key must be a non-empty string."));
     });
     return;
   }
@@ -179,9 +178,9 @@ static NSError *GULKeychainStorageInvalidArgumentError(NSString *reason) {
       completionHandler(nil, nil);
       return;
     }
-    id object = [NSKeyedUnarchiver unarchivedObjectOfClass:objectClass
-                                                  fromData:encodedObject
-                                                     error:&error];
+    id object = [[self class] unarchivedObjectOfClass:objectClass
+                                             fromData:encodedObject
+                                                error:&error];
     if (error) {
       completionHandler(nil, error);
       return;
@@ -196,6 +195,27 @@ static NSError *GULKeychainStorageInvalidArgumentError(NSString *reason) {
       completionHandler(object, nil);
     });
   });
+}
+
+/// Decodes an object read from the keychain, reporting any failure through `outError`.
+///
+/// `+[NSKeyedUnarchiver unarchivedObjectOfClass:fromData:error:]` returns an error for malformed
+/// archives, but an exception raised by the decoded class's `-initWithCoder:` (for example while
+/// decoding corrupted data), or by a `nil` `objectClass`, still propagates. This runs on
+/// `keychainQueue`, where the caller cannot catch the exception, so it would crash the app.
++ (nullable id)unarchivedObjectOfClass:(Class)objectClass
+                              fromData:(NSData *)data
+                                 error:(NSError **)outError {
+  @try {
+    return [NSKeyedUnarchiver unarchivedObjectOfClass:objectClass fromData:data error:outError];
+  } @catch (NSException *exception) {
+    if (outError) {
+      NSString *reason = [NSString stringWithFormat:@"Failed to decode keychain item: %@: %@",
+                                                    exception.name, exception.reason];
+      *outError = GULKeychainStorageErrorWithReason(reason);
+    }
+    return nil;
+  }
 }
 
 - (void)resetInMemoryCache {

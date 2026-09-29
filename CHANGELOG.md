@@ -15,6 +15,10 @@
   threw on an internal queue and crashed the app, and a `nil` key built a
   keychain query without an account, which could read or remove other items
   stored for the same service.
+- [fixed] `GULKeychainStorage` now reports an exception raised while decoding a
+  keychain item (for example, from a class's `-initWithCoder:` on corrupted
+  data) as an error through the completion handler, instead of crashing the app
+  on its internal queue.
 - [fixed] `GULUserDefaults` now validates the entire value before saving it and
   ignores values that are not property lists, such as a collection containing
   `NSNull`. Previously only the top-level class was checked, and
