@@ -26,6 +26,16 @@
 @property(nonatomic, readonly) NSCache<NSString *, id<NSSecureCoding>> *inMemoryCache;
 @end
 
+static BOOL GULKeychainStorageIsValidKey(id key) {
+  return [key isKindOfClass:[NSString class]] && ((NSString *)key).length > 0;
+}
+
+static NSError *GULKeychainStorageInvalidArgumentError(NSString *reason) {
+  return [NSError errorWithDomain:kGULKeychainUtilsErrorDomain
+                             code:0
+                         userInfo:@{NSLocalizedFailureReasonErrorKey : reason}];
+}
+
 @implementation GULKeychainStorage
 
 - (instancetype)initWithService:(NSString *)service {
@@ -55,6 +65,13 @@
             accessGroup:(nullable NSString *)accessGroup
       completionHandler:
           (void (^)(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error))completionHandler {
+  if (!GULKeychainStorageIsValidKey(key)) {
+    dispatch_async(self.inMemoryCacheQueue, ^{
+      completionHandler(nil,
+                        GULKeychainStorageInvalidArgumentError(@"Key must be a non-empty string."));
+    });
+    return;
+  }
   dispatch_async(self.inMemoryCacheQueue, ^{
     // Return cached object or fail otherwise.
     id object = [self.inMemoryCache objectForKey:key];
@@ -75,6 +92,20 @@
           accessGroup:(nullable NSString *)accessGroup
     completionHandler:
         (void (^)(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error))completionHandler {
+  // Validate before dispatching: NSCache throws on a nil object, and an exception raised on the
+  // internal queue cannot be caught by the caller and crashes the app.
+  NSString *invalidReason = nil;
+  if (!GULKeychainStorageIsValidKey(key)) {
+    invalidReason = @"Key must be a non-empty string.";
+  } else if (object == nil) {
+    invalidReason = @"Object must not be nil.";
+  }
+  if (invalidReason) {
+    dispatch_async(self.inMemoryCacheQueue, ^{
+      completionHandler(nil, GULKeychainStorageInvalidArgumentError(invalidReason));
+    });
+    return;
+  }
   dispatch_async(self.inMemoryCacheQueue, ^{
     // Save to the in-memory cache first.
     [self.inMemoryCache setObject:object forKey:[key copy]];
@@ -104,6 +135,14 @@
 - (void)removeObjectForKey:(NSString *)key
                accessGroup:(nullable NSString *)accessGroup
          completionHandler:(void (^)(NSError *_Nullable error))completionHandler {
+  // A nil key would drop kSecAttrAccount from the query, which could remove other items stored
+  // for the same service.
+  if (!GULKeychainStorageIsValidKey(key)) {
+    dispatch_async(self.inMemoryCacheQueue, ^{
+      completionHandler(GULKeychainStorageInvalidArgumentError(@"Key must be a non-empty string."));
+    });
+    return;
+  }
   dispatch_async(self.inMemoryCacheQueue, ^{
     [self.inMemoryCache removeObjectForKey:key];
     dispatch_async(self.keychainQueue, ^{
