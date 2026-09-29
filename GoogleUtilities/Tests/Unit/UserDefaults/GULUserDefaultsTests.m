@@ -420,6 +420,44 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
+- (void)testNestedInvalidObjectsAreRejected {
+  NSString *suiteName = @"test_suite_nested_invalid_obj";
+  GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
+  [newUserDefaults setObject:@"original" forKey:@"Key"];
+
+  // Each of these passed the previous top-level class check, and NSUserDefaults aborts the
+  // process when asked to store them.
+  NSArray *invalidValues = @[
+    @[ [NSNull null] ],                              // JSON `null` inside an array.
+    @{@"k" : [NSNull null]},                         // JSON `null` as a dictionary value.
+    @{@1 : @"v"},                                    // Non-string dictionary key.
+    @{@"outer" : @[ @{@"inner" : [NSNull null]} ]},  // Deeply nested invalid value.
+    @[ [NSURL URLWithString:@"https://example.com"] ],
+  ];
+  for (id value in invalidValues) {
+    [newUserDefaults setObject:value forKey:@"Key"];
+    XCTAssertEqualObjects([newUserDefaults objectForKey:@"Key"], @"original", @"%@", value);
+  }
+
+  [self removePreferenceFileWithSuiteName:suiteName];
+}
+
+- (void)testNestedValidObjectsAreStored {
+  NSString *suiteName = @"test_suite_nested_valid_obj";
+  GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
+
+  NSDictionary *value = @{
+    @"array" : @[ @1, @"two", @{@"three" : @3.0} ],
+    @"date" : [NSDate dateWithTimeIntervalSince1970:0],
+    @"data" : [@"data" dataUsingEncoding:NSUTF8StringEncoding],
+    @"bool" : @YES,
+  };
+  [newUserDefaults setObject:value forKey:@"Key"];
+  XCTAssertEqualObjects([newUserDefaults objectForKey:@"Key"], value);
+
+  [self removePreferenceFileWithSuiteName:suiteName];
+}
+
 - (void)testSetNilObject {
   NSString *suiteName = @"test_suite_set_nil";
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];

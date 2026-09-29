@@ -10,6 +10,19 @@
 - [changed] `GULMutableDictionary` getters are now declared `nullable`, and the
   subscript setter accepts a `nil` object. In Swift, `object(forKey:)` now
   returns `Any?`, and `dict[key] = nil` removes the key.
+- [fixed] `GULKeychainStorage` now reports an error through the completion
+  handler for a `nil` object or a `nil` or non-string key. Previously a `nil`
+  object threw on an internal queue and crashed the app, and a `nil` key built a
+  keychain query without an account, which could read or remove other items
+  stored for the same service.
+- [fixed] `GULKeychainStorage` now reports an exception raised while decoding a
+  keychain item (for example, from a class's `-initWithCoder:` on corrupted
+  data) as an error through the completion handler, instead of crashing the app
+  on its internal queue.
+- [fixed] `GULUserDefaults` now validates the entire value before saving it and
+  ignores values that are not property lists, such as a collection containing
+  `NSNull`. Previously only the top-level class was checked, and
+  `NSUserDefaults` aborted the app when given such values.
 
 # 8.1.3
 - [fixed] Fixed [GULSwizzler ivarObjectsForObject] to correctly query instance variables
