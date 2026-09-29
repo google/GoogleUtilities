@@ -337,12 +337,19 @@
   GULNetworkURLSessionCompletionHandler handler = _completionHandler;
   _completionHandler = nil;
 
-  if (task.response) {
-    // The following assertion should always be true for HTTP requests, see https://goo.gl/gVLxT7.
-    NSAssert([task.response isKindOfClass:[NSHTTPURLResponse class]], @"URL response must be HTTP");
-
+  NSHTTPURLResponse *HTTPResponse = nil;
+  if ([task.response isKindOfClass:[NSHTTPURLResponse class]]) {
+    HTTPResponse = (NSHTTPURLResponse *)task.response;
     // The server responded so ignore the error created by the system.
     error = nil;
+  } else if (task.response) {
+    // Responses to HTTP(S) requests should always be HTTP responses, but a non-HTTP response is
+    // possible, e.g. when a custom `NSURLProtocol` intercepts the request. Report it as an error
+    // instead of handing callers an object that doesn't respond to `NSHTTPURLResponse` methods.
+    error = [[NSError alloc]
+        initWithDomain:kGULNetworkErrorDomain
+                  code:GULErrorCodeNetworkInvalidResponse
+              userInfo:@{kGULNetworkErrorContext : @"Network Error: Response is not HTTP"}];
   } else if (!error) {
     error = [[NSError alloc]
         initWithDomain:kGULNetworkErrorDomain
@@ -350,10 +357,7 @@
               userInfo:@{kGULNetworkErrorContext : @"Network Error: Empty network response"}];
   }
 
-  [self callCompletionHandler:handler
-                 withResponse:(NSHTTPURLResponse *)task.response
-                         data:_downloadedData
-                        error:error];
+  [self callCompletionHandler:handler withResponse:HTTPResponse data:_downloadedData error:error];
 
   // Remove the temp file to avoid trashing devices with lots of temp files.
   [self removeTempItemAtURL:_uploadingFileURL];
@@ -438,11 +442,14 @@
       }
 
       if (errorRef) {
+        // `_request.URL` may be nil; inserting nil into an array literal would throw.
         [self->_loggerDelegate
             GULNetwork_logWithLevel:kGULNetworkLogLevelError
                         messageCode:kGULNetworkMessageCodeURLSession008
                             message:@"Cannot evaluate server trust. Error, host"
-                           contexts:@[ @((int)CFErrorGetCode(errorRef)), self->_request.URL ]];
+                           contexts:@[
+                             @((int)CFErrorGetCode(errorRef)), self->_request.URL ?: [NSNull null]
+                           ]];
         CFRelease(errorRef);
       }
 
