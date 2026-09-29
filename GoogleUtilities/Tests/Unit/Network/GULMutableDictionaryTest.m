@@ -97,6 +97,28 @@ const static NSString *const kValue2 = @"testValue2";
   XCTAssertEqual(snapshot[kKey], kValue);
 }
 
+- (void)testSetObjectForKeyCopiesKeyBeforeReturning {
+  NSMutableString *key = [NSMutableString stringWithString:@"key"];
+  [self.dictionary setObject:kValue forKey:key];
+
+  [key appendString:@"Mutated"];
+
+  XCTAssertEqual([self.dictionary count], 1);
+  XCTAssertEqual(self.dictionary[@"key"], kValue);
+  XCTAssertNil(self.dictionary[@"keyMutated"]);
+}
+
+- (void)testKeyedSetObjectCopiesKeyBeforeReturning {
+  NSMutableString *key = [NSMutableString stringWithString:@"key"];
+  self.dictionary[key] = kValue;
+
+  [key appendString:@"Mutated"];
+
+  XCTAssertEqual([self.dictionary count], 1);
+  XCTAssertEqual(self.dictionary[@"key"], kValue);
+  XCTAssertNil(self.dictionary[@"keyMutated"]);
+}
+
 - (void)testRemoveMissingKey {
   self.dictionary[kKey] = kValue;
   [self.dictionary removeObjectForKey:kKey2];
