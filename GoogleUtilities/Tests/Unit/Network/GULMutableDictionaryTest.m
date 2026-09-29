@@ -116,4 +116,14 @@ const static NSString *const kValue2 = @"testValue2";
   XCTAssertEqual([self.dictionary count], 0);
 }
 
+- (void)testObjectForNilKey {
+  id nilKey = nil;
+  [self.dictionary objectForKey:nilKey];
+}
+
+- (void)testObjectForNilKeyedSubscript {
+  id nilKey = nil;
+  [self.dictionary objectForKeyedSubscript:nilKey];
+}
+
 @end
