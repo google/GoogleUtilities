@@ -26,8 +26,10 @@
 @property(nonatomic, readonly) NSCache<NSString *, id<NSSecureCoding>> *inMemoryCache;
 @end
 
+// Only `nil` and non-string keys are rejected. An empty string is a valid, distinct keychain
+// account (not a wildcard), so rejecting it would strand items already stored under it.
 static BOOL GULKeychainStorageIsValidKey(id key) {
-  return [key isKindOfClass:[NSString class]] && ((NSString *)key).length > 0;
+  return [key isKindOfClass:[NSString class]];
 }
 
 static NSError *GULKeychainStorageErrorWithReason(NSString *reason) {
@@ -67,7 +69,7 @@ static NSError *GULKeychainStorageErrorWithReason(NSString *reason) {
           (void (^)(id<NSSecureCoding> _Nullable obj, NSError *_Nullable error))completionHandler {
   if (!GULKeychainStorageIsValidKey(key)) {
     dispatch_async(self.inMemoryCacheQueue, ^{
-      completionHandler(nil, GULKeychainStorageErrorWithReason(@"Key must be a non-empty string."));
+      completionHandler(nil, GULKeychainStorageErrorWithReason(@"Key must be a non-nil string."));
     });
     return;
   }
@@ -95,7 +97,7 @@ static NSError *GULKeychainStorageErrorWithReason(NSString *reason) {
   // internal queue cannot be caught by the caller and crashes the app.
   NSString *invalidReason = nil;
   if (!GULKeychainStorageIsValidKey(key)) {
-    invalidReason = @"Key must be a non-empty string.";
+    invalidReason = @"Key must be a non-nil string.";
   } else if (object == nil) {
     invalidReason = @"Object must not be nil.";
   }
@@ -138,7 +140,7 @@ static NSError *GULKeychainStorageErrorWithReason(NSString *reason) {
   // for the same service.
   if (!GULKeychainStorageIsValidKey(key)) {
     dispatch_async(self.inMemoryCacheQueue, ^{
-      completionHandler(GULKeychainStorageErrorWithReason(@"Key must be a non-empty string."));
+      completionHandler(GULKeychainStorageErrorWithReason(@"Key must be a non-nil string."));
     });
     return;
   }

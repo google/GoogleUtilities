@@ -22,7 +22,7 @@
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainStorage.h"
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULKeychainUtils.h"
 
-static NSString *const kInvalidKeyReason = @"Key must be a non-empty string.";
+static NSString *const kInvalidKeyReason = @"Key must be a non-nil string.";
 
 @interface GULKeychainStorage (Tests)
 + (nullable id)unarchivedObjectOfClass:(Class)objectClass
@@ -198,7 +198,7 @@ static NSString *const kInvalidKeyReason = @"Key must be a non-empty string.";
 
 /// Keys that must be rejected. `NSNull` stands in for a nil key, since arrays cannot hold nil.
 - (NSArray *)invalidKeys {
-  return @[ [NSNull null], @"", @123 ];
+  return @[ [NSNull null], @123 ];
 }
 
 - (id)keyFromCandidate:(id)candidate {
