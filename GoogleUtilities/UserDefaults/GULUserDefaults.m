@@ -112,36 +112,56 @@ typedef NS_ENUM(NSInteger, GULUDMessageCode) {
 
 #pragma mark - Getters
 
+// The typed getters below check the class of the stored value before using it, mirroring the type
+// checks of the corresponding `NSUserDefaults` getters. Stored values may come from persisted
+// (possibly server-derived) state, so a value of an unexpected type must not cause an
+// unrecognized selector crash or be returned as the wrong type.
+
+/// Returns the stored value if it responds to the numeric accessors (`NSNumber` or `NSString`),
+/// otherwise `nil`.
+- (nullable id)numericObjectForKey:(NSString *)defaultName {
+  id object = [self objectForKey:defaultName];
+  if ([object isKindOfClass:[NSNumber class]] || [object isKindOfClass:[NSString class]]) {
+    return object;
+  }
+  return nil;
+}
+
 - (NSInteger)integerForKey:(NSString *)defaultName {
-  NSNumber *object = [self objectForKey:defaultName];
-  return object.integerValue;
+  return [[self numericObjectForKey:defaultName] integerValue];
 }
 
 - (float)floatForKey:(NSString *)defaultName {
-  NSNumber *object = [self objectForKey:defaultName];
-  return object.floatValue;
+  return [[self numericObjectForKey:defaultName] floatValue];
 }
 
 - (double)doubleForKey:(NSString *)defaultName {
-  NSNumber *object = [self objectForKey:defaultName];
-  return object.doubleValue;
+  return [[self numericObjectForKey:defaultName] doubleValue];
 }
 
 - (BOOL)boolForKey:(NSString *)defaultName {
-  NSNumber *object = [self objectForKey:defaultName];
-  return object.boolValue;
+  return [[self numericObjectForKey:defaultName] boolValue];
 }
 
 - (nullable NSString *)stringForKey:(NSString *)defaultName {
-  return [self objectForKey:defaultName];
+  id object = [self objectForKey:defaultName];
+  if ([object isKindOfClass:[NSString class]]) {
+    return object;
+  }
+  if ([object isKindOfClass:[NSNumber class]]) {
+    return [object stringValue];
+  }
+  return nil;
 }
 
 - (nullable NSArray *)arrayForKey:(NSString *)defaultName {
-  return [self objectForKey:defaultName];
+  id object = [self objectForKey:defaultName];
+  return [object isKindOfClass:[NSArray class]] ? object : nil;
 }
 
 - (nullable NSDictionary<NSString *, id> *)dictionaryForKey:(NSString *)defaultName {
-  return [self objectForKey:defaultName];
+  id object = [self objectForKey:defaultName];
+  return [object isKindOfClass:[NSDictionary class]] ? object : nil;
 }
 
 #pragma mark - Setters
