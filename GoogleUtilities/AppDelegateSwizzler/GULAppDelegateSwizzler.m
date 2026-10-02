@@ -547,6 +547,48 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   return realImplementationBySelector[NSStringFromSelector(selector)];
 }
 
+// The App Delegate SwiftUI installs for UIApplicationDelegateAdaptor implements a handful of
+// selectors itself and forwards the rest to the app's own delegate. Such a delegate has no
+// implementation for the runtime to find, so the donor methods have nothing to call.
++ (nullable id<GULApplicationDelegate>)forwardingTargetForProxiedSelector:(SEL)selector
+                                                                   object:(id)object {
+  if (![object respondsToSelector:@selector(forwardingTargetForSelector:)]) {
+    return nil;
+  }
+  id target = [object forwardingTargetForSelector:selector];
+  if (target == nil || target == object || ![target respondsToSelector:selector]) {
+    return nil;
+  }
+  return target;
+}
+
++ (nullable NSInvocation *)forwardSelector:(SEL)selector
+                                fromObject:(id)object
+                            argumentSetter:(void (^)(NSInvocation *invocation))argumentSetter {
+  id target = [self forwardingTargetForProxiedSelector:selector object:object];
+  if (target == nil) {
+    return nil;
+  }
+  NSInvocation *invocation = [self appDelegateInvocationForSelector:selector];
+  if (invocation == nil) {
+    return nil;
+  }
+  [invocation setTarget:target];
+  [invocation setSelector:selector];
+  argumentSetter(invocation);
+  [invocation invoke];
+  return invocation;
+}
+
++ (BOOL)boolReturnValueOfInvocation:(nullable NSInvocation *)invocation {
+  if (invocation == nil) {
+    return NO;
+  }
+  BOOL returnValue = NO;
+  [invocation getReturnValue:&returnValue];
+  return returnValue;
+}
+
 + (void)proxyDestinationSelector:(SEL)destinationSelector
     implementationsFromSourceSelector:(SEL)sourceSelector
                             fromClass:(Class)sourceClass
@@ -696,6 +738,17 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 #pragma clang diagnostic pop
   if (openURLOptionsIMP) {
     returnedValue |= openURLOptionsIMP(self, methodSelector, application, url, options);
+  } else {
+    returnedValue |= [GULAppDelegateSwizzler
+        boolReturnValueOfInvocation:[GULAppDelegateSwizzler
+                                        forwardSelector:methodSelector
+                                             fromObject:self
+                                         argumentSetter:^(NSInvocation *invocation) {
+                                           [invocation setArgument:(void *)(&application)
+                                                           atIndex:2];
+                                           [invocation setArgument:(void *)(&url) atIndex:3];
+                                           [invocation setArgument:(void *)(&options) atIndex:4];
+                                         }]];
   }
   return returnedValue;
 }
@@ -731,6 +784,19 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (openURLSourceApplicationAnnotationIMP) {
     returnedValue |= openURLSourceApplicationAnnotationIMP(self, methodSelector, application, url,
                                                            sourceApplication, annotation);
+  } else {
+    returnedValue |= [GULAppDelegateSwizzler
+        boolReturnValueOfInvocation:[GULAppDelegateSwizzler
+                                        forwardSelector:methodSelector
+                                             fromObject:self
+                                         argumentSetter:^(NSInvocation *invocation) {
+                                           [invocation setArgument:(void *)(&application)
+                                                           atIndex:2];
+                                           [invocation setArgument:(void *)(&url) atIndex:3];
+                                           [invocation setArgument:(void *)(&sourceApplication)
+                                                           atIndex:4];
+                                           [invocation setArgument:(void *)(&annotation) atIndex:5];
+                                         }]];
   }
   return returnedValue;
 }
@@ -765,6 +831,14 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // Call the real implementation if the real App Delegate has any.
   if (handleBackgroundSessionIMP) {
     handleBackgroundSessionIMP(self, methodSelector, application, identifier, completionHandler);
+  } else {
+    [GULAppDelegateSwizzler forwardSelector:methodSelector
+                                 fromObject:self
+                             argumentSetter:^(NSInvocation *invocation) {
+                               [invocation setArgument:(void *)(&application) atIndex:2];
+                               [invocation setArgument:(void *)(&identifier) atIndex:3];
+                               [invocation setArgument:(void *)(&completionHandler) atIndex:4];
+                             }];
   }
 }
 
@@ -795,6 +869,19 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if (continueUserActivityIMP) {
     returnedValue |= continueUserActivityIMP(self, methodSelector, application, userActivity,
                                              restorationHandler);
+  } else {
+    returnedValue |= [GULAppDelegateSwizzler
+        boolReturnValueOfInvocation:[GULAppDelegateSwizzler
+                                        forwardSelector:methodSelector
+                                             fromObject:self
+                                         argumentSetter:^(NSInvocation *invocation) {
+                                           [invocation setArgument:(void *)(&application)
+                                                           atIndex:2];
+                                           [invocation setArgument:(void *)(&userActivity)
+                                                           atIndex:3];
+                                           [invocation setArgument:(void *)(&restorationHandler)
+                                                           atIndex:4];
+                                         }]];
   }
   return returnedValue;
 }
@@ -825,6 +912,13 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // Call the real implementation if the real App Delegate has any.
   if (didRegisterForRemoteNotificationsIMP) {
     didRegisterForRemoteNotificationsIMP(self, methodSelector, application, deviceToken);
+  } else {
+    [GULAppDelegateSwizzler forwardSelector:methodSelector
+                                 fromObject:self
+                             argumentSetter:^(NSInvocation *invocation) {
+                               [invocation setArgument:(void *)(&application) atIndex:2];
+                               [invocation setArgument:(void *)(&deviceToken) atIndex:3];
+                             }];
   }
 }
 
@@ -851,6 +945,13 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   // Call the real implementation if the real App Delegate has any.
   if (didFailToRegisterForRemoteNotificationsIMP) {
     didFailToRegisterForRemoteNotificationsIMP(self, methodSelector, application, error);
+  } else {
+    [GULAppDelegateSwizzler forwardSelector:methodSelector
+                                 fromObject:self
+                             argumentSetter:^(NSInvocation *invocation) {
+                               [invocation setArgument:(void *)(&application) atIndex:2];
+                               [invocation setArgument:(void *)(&error) atIndex:3];
+                             }];
   }
 }
 
@@ -896,6 +997,19 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 
     didReceiveRemoteNotificationWithCompletionIMP(self, methodSelector, application, userInfo,
                                                   localCompletionHandler);
+  } else {
+    if ([GULAppDelegateSwizzler forwardingTargetForProxiedSelector:methodSelector object:self]) {
+      dispatch_group_enter(callbackGroup);
+
+      [GULAppDelegateSwizzler
+          forwardSelector:methodSelector
+               fromObject:self
+           argumentSetter:^(NSInvocation *invocation) {
+             [invocation setArgument:(void *)(&application) atIndex:2];
+             [invocation setArgument:(void *)(&userInfo) atIndex:3];
+             [invocation setArgument:(void *)(&localCompletionHandler) atIndex:4];
+           }];
+    }
   }
 
   dispatch_group_notify(callbackGroup, dispatch_get_main_queue(), ^() {

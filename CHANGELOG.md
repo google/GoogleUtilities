@@ -1,3 +1,7 @@
+# Unreleased
+- [fixed] Deliver App Delegate callbacks to delegates that handle them by forwarding rather than by
+  implementing them, such as the one SwiftUI installs for `UIApplicationDelegateAdaptor`. (#247)
+
 # 8.1.4
 - [fixed] `GULMutableDictionary` now ignores a `nil` key (and a `nil` object in
   `setObject:forKey:`) instead of throwing on its internal queue, which crashed
