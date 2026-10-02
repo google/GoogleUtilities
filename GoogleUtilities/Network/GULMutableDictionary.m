@@ -14,6 +14,33 @@
 
 #import "GoogleUtilities/Network/Public/GoogleUtilities/GULMutableDictionary.h"
 
+#import "GoogleUtilities/Logger/Public/GoogleUtilities/GULLogger.h"
+#import "GoogleUtilities/Network/GULNetworkInternal.h"
+#import "GoogleUtilities/Network/Public/GoogleUtilities/GULNetworkMessageCode.h"
+
+/// Logs a write that was dropped because of a nil argument. Dropping the write avoids a crash, and
+/// the log keeps the caller's bug visible.
+static void GULMutableDictionaryLogIgnoredWrite(GULNetworkMessageCode messageCode,
+                                                SEL selector,
+                                                NSString *reason) {
+  GULOSLogWarning(kGULLogSubsystem, kGULLoggerNetwork, NO,
+                  [NSString stringWithFormat:@"I-NET%06ld", (long)messageCode],
+                  @"GULMutableDictionary ignored -%@ because %@.", NSStringFromSelector(selector),
+                  reason);
+}
+
+/// Copies `key` on the caller's thread. Writes run asynchronously, and NSMutableDictionary copies
+/// the key only when the write runs, so a caller that mutates the key after the call would
+/// otherwise change which entry is written. Returns nil, and logs, if the copy is nil.
+static id<NSCopying> GULMutableDictionaryCopyKey(id<NSCopying> key, SEL selector) {
+  id<NSCopying> keyCopy = [(id)key copy];
+  if (keyCopy == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary000, selector,
+                                        @"the key's copy is nil");
+  }
+  return keyCopy;
+}
+
 @implementation GULMutableDictionary {
   /// The mutable dictionary.
   NSMutableDictionary *_objects;
@@ -43,6 +70,11 @@
 }
 
 - (id)objectForKey:(id)key {
+  // NSDictionary returns nil for a nil key, but that is not documented. Return early so the
+  // behavior does not depend on Foundation.
+  if (key == nil) {
+    return nil;
+  }
   __block id object;
   dispatch_sync(_queue, ^{
     object = [self->_objects objectForKey:key];
@@ -51,12 +83,34 @@
 }
 
 - (void)setObject:(id)object forKey:(id<NSCopying>)key {
+  // NSMutableDictionary throws on a nil key or object. Because the write runs asynchronously, the
+  // exception would be raised on the internal queue, where the caller cannot catch it and the crash
+  // is attributed to GoogleUtilities.
+  if (key == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary000, _cmd,
+                                        @"the key is nil");
+    return;
+  }
+  if (object == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary001, _cmd,
+                                        @"the object is nil");
+    return;
+  }
+  id<NSCopying> keyCopy = GULMutableDictionaryCopyKey(key, _cmd);
+  if (keyCopy == nil) {
+    return;
+  }
   dispatch_async(_queue, ^{
-    [self->_objects setObject:object forKey:key];
+    [self->_objects setObject:object forKey:keyCopy];
   });
 }
 
 - (void)removeObjectForKey:(id)key {
+  if (key == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary000, _cmd,
+                                        @"the key is nil");
+    return;
+  }
   dispatch_async(_queue, ^{
     [self->_objects removeObjectForKey:key];
   });
@@ -77,6 +131,10 @@
 }
 
 - (id)objectForKeyedSubscript:(id<NSCopying>)key {
+  // See -objectForKey:.
+  if (key == nil) {
+    return nil;
+  }
   __block id object;
   dispatch_sync(_queue, ^{
     object = self->_objects[key];
@@ -85,8 +143,18 @@
 }
 
 - (void)setObject:(id)obj forKeyedSubscript:(id<NSCopying>)key {
+  // A nil object removes the key, but a nil key would throw on the internal queue.
+  if (key == nil) {
+    GULMutableDictionaryLogIgnoredWrite(kGULNetworkMessageCodeMutableDictionary000, _cmd,
+                                        @"the key is nil");
+    return;
+  }
+  id<NSCopying> keyCopy = GULMutableDictionaryCopyKey(key, _cmd);
+  if (keyCopy == nil) {
+    return;
+  }
   dispatch_async(_queue, ^{
-    self->_objects[key] = obj;
+    self->_objects[keyCopy] = obj;
   });
 }
 

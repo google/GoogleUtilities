@@ -84,4 +84,177 @@ const static NSString *const kValue2 = @"testValue2";
   XCTAssertEqual(dict[kKey2], kValue2);
 }
 
+- (void)testDictionaryReturnsSnapshot {
+  self.dictionary[kKey] = kValue;
+  NSDictionary *snapshot = self.dictionary.dictionary;
+
+  self.dictionary[kKey2] = kValue2;
+  [self.dictionary removeObjectForKey:kKey];
+  XCTAssertNil(self.dictionary[kKey]);
+  XCTAssertEqual(self.dictionary[kKey2], kValue2);
+
+  XCTAssertEqual([snapshot count], 1);
+  XCTAssertEqual(snapshot[kKey], kValue);
+}
+
+- (void)testSetObjectForKeyCopiesKeyBeforeReturning {
+  NSMutableString *key = [NSMutableString stringWithString:@"key"];
+  [self.dictionary setObject:kValue forKey:key];
+
+  [key appendString:@"Mutated"];
+
+  XCTAssertEqual([self.dictionary count], 1);
+  XCTAssertEqual(self.dictionary[@"key"], kValue);
+  XCTAssertNil(self.dictionary[@"keyMutated"]);
+}
+
+- (void)testKeyedSetObjectCopiesKeyBeforeReturning {
+  NSMutableString *key = [NSMutableString stringWithString:@"key"];
+  self.dictionary[key] = kValue;
+
+  [key appendString:@"Mutated"];
+
+  XCTAssertEqual([self.dictionary count], 1);
+  XCTAssertEqual(self.dictionary[@"key"], kValue);
+  XCTAssertNil(self.dictionary[@"keyMutated"]);
+}
+
+- (void)testRemoveMissingKey {
+  self.dictionary[kKey] = kValue;
+  [self.dictionary removeObjectForKey:kKey2];
+  XCTAssertEqual([self.dictionary count], 1);
+  XCTAssertEqual(self.dictionary[kKey], kValue);
+}
+
+- (void)testRemoveAllWhenEmpty {
+  XCTAssertEqual([self.dictionary count], 0);
+  [self.dictionary removeAllObjects];
+  XCTAssertEqual([self.dictionary count], 0);
+}
+
+- (void)testDescription {
+  self.dictionary[kKey] = kValue;
+  NSString *description = [self.dictionary description];
+  XCTAssertNotNil(description);
+  XCTAssertTrue([description containsString:(NSString *)kKey]);
+}
+
+- (void)testSetObjectForNilKeyIsIgnored {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
+  [self.dictionary setObject:kValue2 forKey:nilKey];
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testKeyedSetObjectForNilKeyIsIgnored {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
+  self.dictionary[nilKey] = kValue2;
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testKeyedSetNilObjectForNilKeyIsIgnored {
+  id nilKey = nil;
+  id nilObj = nil;
+  self.dictionary[kKey] = kValue;
+  self.dictionary[nilKey] = nilObj;
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testRemoveObjectForNilKeyIsIgnored {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
+  [self.dictionary removeObjectForKey:nilKey];
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testNilObjectIsIgnored {
+  id nilObject = nil;
+  self.dictionary[kKey] = kValue;
+
+  // Unlike keyed subscripting, -setObject:forKey: with a nil object leaves the existing entry.
+  [self.dictionary setObject:nilObject forKey:kKey];
+
+  NSDictionary *dict = self.dictionary.dictionary;
+  XCTAssertEqual([dict count], 1);
+  XCTAssertEqual(dict[kKey], kValue);
+}
+
+- (void)testKeyedNilObjectRemovesKey {
+  self.dictionary[kKey] = kValue;
+  XCTAssertEqual(self.dictionary[kKey], kValue);
+  // The object parameter is nullable, so no workaround is needed to pass nil.
+  id nilObj = nil;
+  self.dictionary[kKey] = nilObj;
+  XCTAssertNil(self.dictionary[kKey]);
+  XCTAssertEqual([self.dictionary count], 0);
+}
+
+- (void)testObjectForNilKey {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
+  XCTAssertEqual([self.dictionary count], 1);
+  XCTAssertNil([self.dictionary objectForKey:nilKey]);
+}
+
+- (void)testObjectForNilKeyedSubscript {
+  id nilKey = nil;
+  self.dictionary[kKey] = kValue;
+  XCTAssertEqual([self.dictionary count], 1);
+  XCTAssertNil([self.dictionary objectForKeyedSubscript:nilKey]);
+}
+
+- (void)testConcurrentAccess {
+  GULMutableDictionary *dictionary = self.dictionary;
+  id nilKey = nil;
+  const size_t keyCount = 10;
+
+  dispatch_apply(10000, DISPATCH_APPLY_AUTO, ^(size_t i) {
+    NSString *key = [NSString stringWithFormat:@"key%zu", i % keyCount];
+    NSNumber *value = @(i);
+
+    dictionary[key] = value;
+    [dictionary setObject:value forKey:key];
+    (void)dictionary[key];
+    (void)[dictionary objectForKey:key];
+
+    dictionary[nilKey] = value;
+    [dictionary setObject:value forKey:nilKey];
+    [dictionary removeObjectForKey:nilKey];
+    (void)dictionary[nilKey];
+    (void)[dictionary objectForKey:nilKey];
+
+    if (i % 7 == 0) {
+      [dictionary removeObjectForKey:key];
+    }
+    if (i % 997 == 0) {
+      [dictionary removeAllObjects];
+    }
+
+    (void)dictionary.count;
+    (void)dictionary.dictionary;
+    (void)dictionary.description;
+  });
+
+  NSDictionary *snapshot = dictionary.dictionary;
+  XCTAssertEqual([snapshot count], [dictionary count]);
+  XCTAssertLessThanOrEqual([snapshot count], keyCount);
+  for (NSString *key in snapshot) {
+    XCTAssertTrue([key hasPrefix:@"key"]);
+    XCTAssertTrue([snapshot[key] isKindOfClass:[NSNumber class]]);
+  }
+}
+
 @end

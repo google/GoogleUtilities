@@ -420,6 +420,125 @@ static const NSTimeInterval kGULTestCaseTimeoutInterval = 10;
   [self removePreferenceFileWithSuiteName:suiteName];
 }
 
+- (void)testNestedInvalidObjectsAreRejected {
+  NSString *suiteName = @"test_suite_nested_invalid_obj";
+  GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
+  [newUserDefaults setObject:@"original" forKey:@"Key"];
+
+  // Each of these passed the previous top-level class check, and NSUserDefaults aborts the
+  // process when asked to store them.
+  NSArray *invalidValues = @[
+    @[ [NSNull null] ],                              // JSON `null` inside an array.
+    @{@"k" : [NSNull null]},                         // JSON `null` as a dictionary value.
+    @{@1 : @"v"},                                    // Non-string dictionary key.
+    @{@"outer" : @[ @{@"inner" : [NSNull null]} ]},  // Deeply nested invalid value.
+    @[ [NSURL URLWithString:@"https://example.com"] ],
+  ];
+  for (id value in invalidValues) {
+    [newUserDefaults setObject:value forKey:@"Key"];
+    XCTAssertEqualObjects([newUserDefaults objectForKey:@"Key"], @"original", @"%@", value);
+  }
+
+  [self removePreferenceFileWithSuiteName:suiteName];
+}
+
+- (void)testNestedValidObjectsAreStored {
+  NSString *suiteName = @"test_suite_nested_valid_obj";
+  GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
+
+  NSDictionary *value = @{
+    @"array" : @[ @1, @"two", @{@"three" : @3.0} ],
+    @"date" : [NSDate dateWithTimeIntervalSince1970:0],
+    @"data" : [@"data" dataUsingEncoding:NSUTF8StringEncoding],
+    @"bool" : @YES,
+  };
+  [newUserDefaults setObject:value forKey:@"Key"];
+  XCTAssertEqualObjects([newUserDefaults objectForKey:@"Key"], value);
+
+  [self removePreferenceFileWithSuiteName:suiteName];
+}
+
+- (void)testTypedGettersWithMismatchedTypesMatchNSUserDefaults {
+  NSString *suiteName = @"test_suite_typed_getters_mismatched";
+  NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:suiteName];
+  GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
+
+  NSDictionary<NSString *, id> *values = @{
+    @"array" : @[ @1, @2 ],
+    @"dictionary" : @{@"key" : @1},
+    @"data" : [@"data" dataUsingEncoding:NSUTF8StringEncoding],
+    @"date" : [NSDate dateWithTimeIntervalSince1970:1000],
+  };
+  [values enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
+    [newUserDefaults setObject:value forKey:key];
+  }];
+
+  for (NSString *key in values) {
+    // None of these values are numbers or strings, so the numeric and string getters must return
+    // zero values instead of crashing with an unrecognized selector.
+    XCTAssertEqual([newUserDefaults integerForKey:key], 0, @"%@", key);
+    XCTAssertEqual([newUserDefaults floatForKey:key], 0, @"%@", key);
+    XCTAssertEqual([newUserDefaults doubleForKey:key], 0, @"%@", key);
+    XCTAssertFalse([newUserDefaults boolForKey:key], @"%@", key);
+    XCTAssertNil([newUserDefaults stringForKey:key], @"%@", key);
+
+    XCTAssertEqual([newUserDefaults integerForKey:key], [userDefaults integerForKey:key], @"%@",
+                   key);
+    XCTAssertEqual([newUserDefaults doubleForKey:key], [userDefaults doubleForKey:key], @"%@", key);
+    XCTAssertEqual([newUserDefaults boolForKey:key], [userDefaults boolForKey:key], @"%@", key);
+    XCTAssertEqualObjects([newUserDefaults stringForKey:key], [userDefaults stringForKey:key],
+                          @"%@", key);
+    XCTAssertEqualObjects([newUserDefaults arrayForKey:key], [userDefaults arrayForKey:key], @"%@",
+                          key);
+    XCTAssertEqualObjects([newUserDefaults dictionaryForKey:key],
+                          [userDefaults dictionaryForKey:key], @"%@", key);
+  }
+
+  XCTAssertNil([newUserDefaults arrayForKey:@"dictionary"]);
+  XCTAssertNil([newUserDefaults arrayForKey:@"data"]);
+  XCTAssertNil([newUserDefaults dictionaryForKey:@"array"]);
+  XCTAssertNil([newUserDefaults dictionaryForKey:@"date"]);
+  XCTAssertEqualObjects([newUserDefaults arrayForKey:@"array"], values[@"array"]);
+  XCTAssertEqualObjects([newUserDefaults dictionaryForKey:@"dictionary"], values[@"dictionary"]);
+
+  [userDefaults removePersistentDomainForName:suiteName];
+  [self removePreferenceFileWithSuiteName:suiteName];
+}
+
+- (void)testTypedGettersConvertNumbersAndStrings {
+  NSString *suiteName = @"test_suite_typed_getters_convert";
+  NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:suiteName];
+  GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];
+
+  [newUserDefaults setObject:@"42" forKey:@"string"];
+  [newUserDefaults setObject:@"YES" forKey:@"boolString"];
+  [newUserDefaults setObject:@42 forKey:@"number"];
+
+  XCTAssertEqual([newUserDefaults integerForKey:@"string"], 42);
+  XCTAssertEqual([newUserDefaults doubleForKey:@"string"], 42.0);
+  XCTAssertTrue([newUserDefaults boolForKey:@"boolString"]);
+  XCTAssertTrue([newUserDefaults boolForKey:@"number"]);
+  XCTAssertEqualObjects([newUserDefaults stringForKey:@"number"], @"42");
+  XCTAssertNil([newUserDefaults arrayForKey:@"string"]);
+  XCTAssertNil([newUserDefaults dictionaryForKey:@"number"]);
+
+  // Note: `boolForKey:` isn't compared for arbitrary strings; GULUserDefaults uses
+  // -[NSString boolValue], which differs from NSUserDefaults for strings like @"42".
+  for (NSString *key in @[ @"string", @"boolString", @"number" ]) {
+    XCTAssertEqual([newUserDefaults integerForKey:key], [userDefaults integerForKey:key], @"%@",
+                   key);
+    XCTAssertEqual([newUserDefaults doubleForKey:key], [userDefaults doubleForKey:key], @"%@", key);
+    XCTAssertEqualObjects([newUserDefaults stringForKey:key], [userDefaults stringForKey:key],
+                          @"%@", key);
+  }
+  XCTAssertEqual([newUserDefaults boolForKey:@"boolString"],
+                 [userDefaults boolForKey:@"boolString"]);
+  XCTAssertEqual([newUserDefaults boolForKey:@"number"], [userDefaults boolForKey:@"number"]);
+
+  [userDefaults removePersistentDomainForName:suiteName];
+  [self removePreferenceFileWithSuiteName:suiteName];
+}
+
 - (void)testSetNilObject {
   NSString *suiteName = @"test_suite_set_nil";
   GULUserDefaults *newUserDefaults = [[GULUserDefaults alloc] initWithSuiteName:suiteName];

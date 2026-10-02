@@ -163,7 +163,7 @@ void GULOSLogBasic(GULLoggerLevel level,
       sGULServiceLogs[subsystem] = subsystemLogs;
     }
 
-    os_log_t serviceLog = [subsystemLogs objectForKey:subsystem];
+    os_log_t serviceLog = [subsystemLogs objectForKey:category];
     if (!serviceLog) {
       serviceLog = os_log_create(subsystem.UTF8String, category.UTF8String);
       subsystemLogs[category] = serviceLog;
