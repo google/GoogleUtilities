@@ -7,6 +7,8 @@
   call read `-[NSBundle appStoreReceiptURL]`, which makes a synchronous XPC call
   to the LaunchServices daemon and could block the calling thread, often the
   main thread, for seconds. (firebase/firebase-ios-sdk#16726)
+- [fixed] Fix an ARC-related deadlock in `GULNetworkURLSession` under -O1
+  optimization. (#255)
 
 # 8.1.4
 - [fixed] `GULMutableDictionary` now ignores a `nil` key (and a `nil` object in

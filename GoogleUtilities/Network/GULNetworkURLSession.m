@@ -727,7 +727,9 @@ static const void *kGULSessionTrackerKey = &kGULSessionTrackerKey;
     return;
   }
 
-  GULSessionDeallocTracker *oldTrackerToReleaseOutsideLock = nil;
+  // Retain the old tracker until the lock is released. If it deallocates inside the lock,
+  // its -dealloc method will attempt to re-acquire the lock, resulting in a deadlock.
+  NS_VALID_UNTIL_END_OF_SCOPE GULSessionDeallocTracker *oldTrackerToReleaseOutsideLock = nil;
 
   [[self sessionIDToFetcherMapReadWriteLock] lock];
   GULNetworkURLSessionWeakHolder *holder =
@@ -759,10 +761,6 @@ static const void *kGULSessionTrackerKey = &kGULSessionTrackerKey;
     [[[self class] sessionIDToFetcherMap] removeObjectForKey:sessionID];
   }
   [[self sessionIDToFetcherMapReadWriteLock] unlock];
-
-  // Retain the old tracker until the lock is released. If it deallocates inside the lock,
-  // its -dealloc method will attempt to re-acquire the lock, resulting in a deadlock.
-  (void)oldTrackerToReleaseOutsideLock;
 }
 
 + (nullable GULNetworkURLSession *)sessionFromFetcherMapForSessionID:(NSString *)sessionID {
