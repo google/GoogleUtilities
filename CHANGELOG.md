@@ -1,3 +1,10 @@
+# Unreleased
+- [fixed] `GULAppEnvironmentUtil` now computes `isAppStoreReceiptSandbox` and
+  `isFromAppStore` once per process and caches the results. Previously every
+  call read `-[NSBundle appStoreReceiptURL]`, which makes a synchronous XPC call
+  to the LaunchServices daemon and could block the calling thread, often the
+  main thread, for seconds. (firebase/firebase-ios-sdk#16726)
+
 # 8.1.4
 - [fixed] `GULMutableDictionary` now ignores a `nil` key (and a `nil` object in
   `setObject:forKey:`) instead of throwing on its internal queue, which crashed
