@@ -68,6 +68,7 @@ static NSString *const kGULGoogleAppDelegateProxyEnabledPlistKey =
 @property(nonatomic, strong) NSData *remoteNotificationsDeviceToken;
 @property(nonatomic, strong) NSError *failToRegisterForRemoteNotificationsError;
 @property(nonatomic, strong) NSDictionary *remoteNotification;
+@property(nonatomic, copy) void (^backgroundSessionCompletionHandler)(void);
 
 #if TARGET_OS_IOS || TARGET_OS_TV
 @property(nonatomic, copy) void (^remoteNotificationCompletionHandler)(UIBackgroundFetchResult);
@@ -149,6 +150,7 @@ static BOOL gRespondsToHandleBackgroundSession;
                       completionHandler:(nonnull void (^)(void))completionHandler {
   self.application = application;
   _backgroundSessionID = identifier;
+  self.backgroundSessionCompletionHandler = completionHandler;
 }
 
 - (void)application:(GULApplication *)application
@@ -236,6 +238,67 @@ static BOOL gRespondsToHandleBackgroundSession;
 }
 
 #endif  // SDK_HAS_USERACTIVITY
+
+@end
+
+/** An App Delegate that returns YES from the selectors that have a return value. */
+@interface GULReturningTestAppDelegate : NSObject <GULApplicationDelegate>
+@end
+
+@implementation GULReturningTestAppDelegate
+
+- (BOOL)application:(GULApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<NSString *, id> *)options {
+  return YES;
+}
+
+- (BOOL)application:(GULApplication *)application
+    continueUserActivity:(NSUserActivity *)userActivity
+      restorationHandler:(void (^)(NSArray<id<GULUserActivityRestoring>> *__nullable
+                                       restorableObjects))restorationHandler {
+  return YES;
+}
+
+@end
+
+/** An App Delegate shaped like the one SwiftUI installs for UIApplicationDelegateAdaptor: it
+ *  implements a handful of selectors itself and forwards the rest to the app's own delegate.
+ */
+@interface GULForwardingTestAppDelegate : NSObject <GULApplicationDelegate>
+
+/** The delegate every non-implemented selector is forwarded to. */
+@property(nonatomic, strong) NSObject<GULApplicationDelegate> *forwardingTarget;
+
+- (instancetype)initWithForwardingTarget:(NSObject<GULApplicationDelegate> *)forwardingTarget;
+
+@end
+
+@implementation GULForwardingTestAppDelegate
+
+- (instancetype)init {
+  return [self initWithForwardingTarget:[[GULTestAppDelegate alloc] init]];
+}
+
+- (instancetype)initWithForwardingTarget:(NSObject<GULApplicationDelegate> *)forwardingTarget {
+  self = [super init];
+  if (self) {
+    _forwardingTarget = forwardingTarget;
+  }
+  return self;
+}
+
+- (BOOL)respondsToSelector:(SEL)aSelector {
+  return
+      [super respondsToSelector:aSelector] || [self.forwardingTarget respondsToSelector:aSelector];
+}
+
+- (id)forwardingTargetForSelector:(SEL)aSelector {
+  if ([self.forwardingTarget respondsToSelector:aSelector]) {
+    return self.forwardingTarget;
+  }
+  return [super forwardingTargetForSelector:aSelector];
+}
 
 @end
 
@@ -1249,6 +1312,228 @@ static NSDictionary *gAppFakeInfoDictionary;
 
   [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
   XCTAssertNotEqualObjects([originalAppDelegate class], originalAppDelegateClass);
+}
+
+#pragma mark - Fast forwarding App Delegates
+
+/** Tests that an App Delegate which forwards the remote notification selectors, rather than
+ *  implementing them, still receives them after proxying.
+ */
+- (void)testForwardingAppDelegateReceivesRemoteNotificationsCallbacks {
+  GULApplication *application = [GULApplication sharedApplication];
+  GULForwardingTestAppDelegate *forwardingDelegate = [[GULForwardingTestAppDelegate alloc] init];
+  GULTestAppDelegate *realDelegate = (GULTestAppDelegate *)forwardingDelegate.forwardingTarget;
+
+  [GULApplication sharedApplication].delegate = forwardingDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
+
+  id<GULApplicationDelegate> proxiedDelegate = (id<GULApplicationDelegate>)forwardingDelegate;
+
+  NSData *deviceToken = [NSData data];
+  [proxiedDelegate application:application
+      didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+  XCTAssertEqual(realDelegate.remoteNotificationsDeviceToken, deviceToken);
+
+  NSError *error = [NSError errorWithDomain:@"test" code:-1 userInfo:nil];
+  [proxiedDelegate application:application didFailToRegisterForRemoteNotificationsWithError:error];
+  XCTAssertEqual(realDelegate.failToRegisterForRemoteNotificationsError, error);
+}
+
+/** Same, for the user activity callback, which is proxied without the APNS methods. */
+- (void)testForwardingAppDelegateReceivesContinueUserActivity {
+  GULApplication *application = [GULApplication sharedApplication];
+  GULForwardingTestAppDelegate *forwardingDelegate = [[GULForwardingTestAppDelegate alloc] init];
+  GULTestAppDelegate *realDelegate = (GULTestAppDelegate *)forwardingDelegate.forwardingTarget;
+
+  [GULApplication sharedApplication].delegate = forwardingDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegate];
+
+  NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:@"test"];
+  id<GULApplicationDelegate> proxiedDelegate = (id<GULApplicationDelegate>)forwardingDelegate;
+  [proxiedDelegate application:application
+          continueUserActivity:userActivity
+            restorationHandler:^(NSArray *restorableObjects){
+            }];
+
+  XCTAssertEqual(realDelegate.userActivity, userActivity);
+}
+
+/** Interceptors must keep working for a forwarding App Delegate. */
+- (void)testForwardingAppDelegateStillNotifiesInterceptors {
+  GULApplication *application = [GULApplication sharedApplication];
+  GULForwardingTestAppDelegate *forwardingDelegate = [[GULForwardingTestAppDelegate alloc] init];
+  GULFakeAppDelegateInterceptor *interceptor = [[GULFakeAppDelegateInterceptor alloc] init];
+
+  [GULApplication sharedApplication].delegate = forwardingDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
+  [GULAppDelegateSwizzler registerAppDelegateInterceptor:interceptor];
+
+  id<GULApplicationDelegate> proxiedDelegate = (id<GULApplicationDelegate>)forwardingDelegate;
+  [proxiedDelegate application:application
+      didRegisterForRemoteNotificationsWithDeviceToken:[NSData data]];
+
+  __block BOOL isCalled = NO;
+  dispatch_sync(interceptor.syncQueue, ^{
+    isCalled = interceptor.isApplicationDidRegisterForRemoteNotificationsCalled;
+  });
+  XCTAssertTrue(isCalled);
+  XCTAssertNotNil(
+      ((GULTestAppDelegate *)forwardingDelegate.forwardingTarget).remoteNotificationsDeviceToken);
+}
+
+/** Tests that the value returned by the forwarded selector is propagated back to the caller. */
+- (void)testForwardingAppDelegatePropagatesReturnValue {
+  GULApplication *application = [GULApplication sharedApplication];
+#if TARGET_OS_IOS || TARGET_OS_TV
+  NSURL *url = [NSURL URLWithString:@"https://example.com"];
+#endif  // TARGET_OS_IOS || TARGET_OS_TV
+  NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:@"test"];
+
+  GULForwardingTestAppDelegate *returningDelegate = [[GULForwardingTestAppDelegate alloc]
+      initWithForwardingTarget:[[GULReturningTestAppDelegate alloc] init]];
+  [GULApplication sharedApplication].delegate = returningDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegate];
+
+  id<GULApplicationDelegate> proxiedReturningDelegate =
+      (id<GULApplicationDelegate>)returningDelegate;
+#if TARGET_OS_IOS || TARGET_OS_TV
+  XCTAssertTrue([proxiedReturningDelegate application:application openURL:url options:@{}]);
+#endif  // TARGET_OS_IOS || TARGET_OS_TV
+  XCTAssertTrue([proxiedReturningDelegate application:application
+                                 continueUserActivity:userActivity
+                                   restorationHandler:^(NSArray *restorableObjects){
+                                   }]);
+
+  [GULAppDelegateSwizzler resetProxyOriginalDelegateOnceToken];
+
+  // GULTestAppDelegate returns NO from both, which must be propagated just the same.
+  GULForwardingTestAppDelegate *forwardingDelegate = [[GULForwardingTestAppDelegate alloc] init];
+  [GULApplication sharedApplication].delegate = forwardingDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegate];
+
+  id<GULApplicationDelegate> proxiedDelegate = (id<GULApplicationDelegate>)forwardingDelegate;
+#if TARGET_OS_IOS || TARGET_OS_TV
+  XCTAssertFalse([proxiedDelegate application:application openURL:url options:@{}]);
+#endif  // TARGET_OS_IOS || TARGET_OS_TV
+  XCTAssertFalse([proxiedDelegate application:application
+                         continueUserActivity:userActivity
+                           restorationHandler:^(NSArray *restorableObjects){
+                           }]);
+}
+
+#if TARGET_OS_IOS || TARGET_OS_TV
+/** Tests that the completion handler of a forwarded selector reaches the delegate unchanged. */
+- (void)testForwardingAppDelegateForwardsCompletionHandlers {
+  GULApplication *application = [GULApplication sharedApplication];
+  GULForwardingTestAppDelegate *forwardingDelegate = [[GULForwardingTestAppDelegate alloc] init];
+  GULTestAppDelegate *realDelegate = (GULTestAppDelegate *)forwardingDelegate.forwardingTarget;
+
+  [GULApplication sharedApplication].delegate = forwardingDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
+
+  id<GULApplicationDelegate> proxiedDelegate = (id<GULApplicationDelegate>)forwardingDelegate;
+
+  XCTestExpectation *backgroundSessionCalled =
+      [self expectationWithDescription:@"background session completion handler"];
+  [proxiedDelegate application:application
+      handleEventsForBackgroundURLSession:@"session"
+                        completionHandler:^{
+                          [backgroundSessionCalled fulfill];
+                        }];
+  XCTAssertNotNil(realDelegate.backgroundSessionCompletionHandler);
+  if (realDelegate.backgroundSessionCompletionHandler) {
+    realDelegate.backgroundSessionCompletionHandler();
+  }
+
+  XCTestExpectation *remoteNotificationCalled =
+      [self expectationWithDescription:@"remote notification completion handler"];
+  [proxiedDelegate application:application
+      didReceiveRemoteNotification:@{@"test" : @"test"}
+            fetchCompletionHandler:^(UIBackgroundFetchResult result) {
+              XCTAssertEqual(result, UIBackgroundFetchResultNewData);
+              [remoteNotificationCalled fulfill];
+            }];
+  XCTAssertNotNil(realDelegate.remoteNotificationCompletionHandler);
+  if (realDelegate.remoteNotificationCompletionHandler) {
+    realDelegate.remoteNotificationCompletionHandler(UIBackgroundFetchResultNewData);
+  }
+
+  [self waitForExpectations:@[ backgroundSessionCalled, remoteNotificationCalled ] timeout:1];
+}
+#endif  // TARGET_OS_IOS || TARGET_OS_TV
+
+#if (TARGET_OS_IOS || TARGET_OS_TV) && !TARGET_OS_MACCATALYST
+/** Tests that the fetch results of interceptors and a forwarding App Delegate are merged into a
+ *  single call of the original completion handler.
+ */
+- (void)testForwardingAppDelegateMergesFetchResultWithInterceptors {
+  GULApplication *application = [GULApplication sharedApplication];
+  GULForwardingTestAppDelegate *forwardingDelegate = [[GULForwardingTestAppDelegate alloc] init];
+  GULTestAppDelegate *realDelegate = (GULTestAppDelegate *)forwardingDelegate.forwardingTarget;
+
+  GULFakeAppDelegateInterceptor *interceptor = [[GULFakeAppDelegateInterceptor alloc] init];
+  interceptor.onDidReceiveRemoteNotificationWithCompletion =
+      ^(NSDictionary *userInfo, void (^completionHandler)(UIBackgroundFetchResult)) {
+        completionHandler(UIBackgroundFetchResultNoData);
+      };
+
+  [GULApplication sharedApplication].delegate = forwardingDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
+  [GULAppDelegateSwizzler registerAppDelegateInterceptor:interceptor];
+
+  XCTestExpectation *completionCalled = [self expectationWithDescription:@"Completion called once"];
+  completionCalled.assertForOverFulfill = YES;
+
+  id<GULApplicationDelegate> proxiedDelegate = (id<GULApplicationDelegate>)forwardingDelegate;
+  [proxiedDelegate application:application
+      didReceiveRemoteNotification:@{@"test" : @"test"}
+            fetchCompletionHandler:^(UIBackgroundFetchResult result) {
+              XCTAssertEqual(result, UIBackgroundFetchResultNewData);
+              [completionCalled fulfill];
+            }];
+
+  XCTAssertNotNil(realDelegate.remoteNotificationCompletionHandler);
+  if (realDelegate.remoteNotificationCompletionHandler) {
+    realDelegate.remoteNotificationCompletionHandler(UIBackgroundFetchResultNewData);
+  }
+
+  [self waitForExpectations:@[ completionCalled ] timeout:1];
+}
+#endif  // (TARGET_OS_IOS || TARGET_OS_TV) && !TARGET_OS_MACCATALYST
+
+/** Tests that a forwarding App Delegate whose target does not implement a selector falls through
+ *  safely rather than raising.
+ */
+- (void)testForwardingAppDelegateWithoutImplementationDoesNotRaise {
+  GULApplication *application = [GULApplication sharedApplication];
+  GULForwardingTestAppDelegate *forwardingDelegate = [[GULForwardingTestAppDelegate alloc]
+      initWithForwardingTarget:[[GULEmptyTestAppDelegate alloc] init]];
+
+  [GULApplication sharedApplication].delegate = forwardingDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
+
+  id<GULApplicationDelegate> proxiedDelegate = (id<GULApplicationDelegate>)forwardingDelegate;
+
+  XCTAssertNoThrow([proxiedDelegate application:application
+      didRegisterForRemoteNotificationsWithDeviceToken:[NSData data]]);
+  XCTAssertNoThrow([proxiedDelegate application:application
+      didFailToRegisterForRemoteNotificationsWithError:[NSError errorWithDomain:@"test"
+                                                                           code:-1
+                                                                       userInfo:nil]]);
+#if TARGET_OS_IOS || TARGET_OS_TV
+  XCTAssertNoThrow([proxiedDelegate application:application
+                   didReceiveRemoteNotification:@{}
+                         fetchCompletionHandler:^(UIBackgroundFetchResult result){
+                         }]);
+#endif  // TARGET_OS_IOS || TARGET_OS_TV
+
+  __block BOOL continueUserActivityResult = YES;
+  XCTAssertNoThrow(continueUserActivityResult = [proxiedDelegate
+                                application:application
+                       continueUserActivity:[[NSUserActivity alloc] initWithActivityType:@"t"]
+                         restorationHandler:^(NSArray *restorableObjects){
+                         }]);
+  XCTAssertFalse(continueUserActivityResult);
 }
 
 @end

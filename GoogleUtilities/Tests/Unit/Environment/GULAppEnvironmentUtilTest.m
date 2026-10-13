@@ -20,6 +20,8 @@
 #endif
 
 #import "GoogleUtilities/Environment/Public/GoogleUtilities/GULAppEnvironmentUtil.h"
+#import "GoogleUtilities/MethodSwizzler/Public/GoogleUtilities/GULSwizzler.h"
+#import "GoogleUtilities/SwizzlerTestHelpers/Public/GoogleUtilities/GULSwizzler+Unswizzle.h"
 
 @interface GULAppEnvironmentUtil (Tests)
 + (void)setProcessInfoForTest:(NSProcessInfo *)processInfo;
@@ -157,6 +159,37 @@
 #endif  // TARGET_OS_VISION
 
   XCTAssertEqualObjects([GULAppEnvironmentUtil appleDevicePlatform], expectedPlatform);
+}
+
+- (void)testAppStoreReceiptURLIsReadOnlyOnce {
+  // Warm up the cached values.
+  BOOL isAppStoreReceiptSandbox = [GULAppEnvironmentUtil isAppStoreReceiptSandbox];
+  BOOL isFromAppStore = [GULAppEnvironmentUtil isFromAppStore];
+
+  __block NSInteger receiptURLReadCount = 0;
+  [GULSwizzler swizzleClass:[NSBundle class]
+                   selector:@selector(appStoreReceiptURL)
+            isClassSelector:NO
+                  withBlock:^NSURL *(id bundle) {
+                    receiptURLReadCount++;
+                    return nil;
+                  }];
+
+  // Sanity check that reads of the receipt URL are intercepted.
+  XCTAssertNil([NSBundle mainBundle].appStoreReceiptURL);
+  XCTAssertEqual(receiptURLReadCount, 1);
+  receiptURLReadCount = 0;
+
+  // `-[NSBundle appStoreReceiptURL]` makes a synchronous XPC call that can block for seconds, so
+  // later calls must return the cached values without reading it again.
+  XCTAssertEqual([GULAppEnvironmentUtil isAppStoreReceiptSandbox], isAppStoreReceiptSandbox);
+  XCTAssertEqual([GULAppEnvironmentUtil isFromAppStore], isFromAppStore);
+
+  [GULSwizzler unswizzleClass:[NSBundle class]
+                     selector:@selector(appStoreReceiptURL)
+              isClassSelector:NO];
+
+  XCTAssertEqual(receiptURLReadCount, 0);
 }
 
 @end
