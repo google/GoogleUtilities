@@ -1,4 +1,7 @@
 # Unreleased
+- [fixed] Deliver App Delegate callbacks to delegates that handle them by
+  forwarding rather than by implementing them, such as the one SwiftUI installs
+  for `UIApplicationDelegateAdaptor`. (#247)
 - [fixed] `GULAppEnvironmentUtil` now computes `isAppStoreReceiptSandbox` and
   `isFromAppStore` once per process and caches the results. Previously every
   call read `-[NSBundle appStoreReceiptURL]`, which makes a synchronous XPC call
