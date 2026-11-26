@@ -1,3 +1,10 @@
+# Unreleased
+- [fixed] The App Delegate proxy now works when it is requested before the app
+  has an App Delegate, such as when a SwiftUI app calls
+  `FirebaseApp.configure()` in its `App` initializer. Proxying now waits until
+  the app finishes launching. Previously, the App Delegate was never proxied.
+  (firebase/firebase-ios-sdk#10417)
+
 # 8.1.5
 - [fixed] Deliver App Delegate callbacks to delegates that handle them by
   forwarding rather than by implementing them, such as the one SwiftUI installs
