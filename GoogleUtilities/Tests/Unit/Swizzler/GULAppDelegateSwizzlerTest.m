@@ -666,6 +666,101 @@ static NSDictionary *gAppFakeInfoDictionary;
   XCTAssertNotEqualObjects([realAppDelegate class], realAppDelegateClassBefore);
 }
 
+#pragma mark - Proxying before the App Delegate exists
+
+#if !TARGET_OS_WATCH
+- (void)postAppDidFinishLaunchingNotification {
+#if TARGET_OS_OSX
+  NSNotificationName name = NSApplicationDidFinishLaunchingNotification;
+#else
+  NSNotificationName name = UIApplicationDidFinishLaunchingNotification;
+#endif  // TARGET_OS_OSX
+  [[NSNotificationCenter defaultCenter] postNotificationName:name object:nil];
+}
+
+/** A SwiftUI app can configure Firebase in its `App` initializer, before the App Delegate is set.
+ *  Proxying should wait for the app to finish launching instead of giving up.
+ */
+- (void)testProxyIsDeferredUntilAppDidFinishLaunching {
+  gFakeApplication.delegate = nil;
+  [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
+
+  GULEmptyTestAppDelegate *realAppDelegate = [[GULEmptyTestAppDelegate alloc] init];
+  gFakeApplication.delegate = realAppDelegate;
+  XCTAssertTrue([realAppDelegate isMemberOfClass:[GULEmptyTestAppDelegate class]]);
+
+  [self postAppDidFinishLaunchingNotification];
+
+  XCTAssertTrue([NSStringFromClass([realAppDelegate class]) hasPrefix:@"GUL_"]);
+  XCTAssertTrue([realAppDelegate
+      respondsToSelector:@selector(application:didRegisterForRemoteNotificationsWithDeviceToken:)]);
+  XCTAssertTrue([realAppDelegate
+      respondsToSelector:@selector(application:didFailToRegisterForRemoteNotificationsWithError:)]);
+}
+
+/** In a SwiftUI `App` initializer, the application object itself doesn't exist yet. */
+- (void)testProxyIsDeferredWhenThereIsNoApplication {
+  gFakeApplication = nil;
+  [GULAppDelegateSwizzler proxyOriginalDelegate];
+
+  GULEmptyTestAppDelegate *realAppDelegate = [[GULEmptyTestAppDelegate alloc] init];
+  gFakeApplication = [[GULFakeApplication alloc] init];
+  gFakeApplication.delegate = realAppDelegate;
+
+  [self postAppDidFinishLaunchingNotification];
+
+  XCTAssertTrue([NSStringFromClass([realAppDelegate class]) hasPrefix:@"GUL_"]);
+  // Only -proxyOriginalDelegateIncludingAPNSMethods adds the remote notification methods.
+  XCTAssertFalse([realAppDelegate
+      respondsToSelector:@selector(application:didRegisterForRemoteNotificationsWithDeviceToken:)]);
+}
+
+/** One SDK may request the remote notification methods and another may not. */
+- (void)testDeferredProxyRequestsAreCombined {
+  gFakeApplication.delegate = nil;
+  [GULAppDelegateSwizzler proxyOriginalDelegateIncludingAPNSMethods];
+  [GULAppDelegateSwizzler proxyOriginalDelegate];
+
+  GULEmptyTestAppDelegate *realAppDelegate = [[GULEmptyTestAppDelegate alloc] init];
+  gFakeApplication.delegate = realAppDelegate;
+
+  [self postAppDidFinishLaunchingNotification];
+
+  XCTAssertTrue([NSStringFromClass([realAppDelegate class]) hasPrefix:@"GUL_"]);
+  XCTAssertTrue([realAppDelegate
+      respondsToSelector:@selector(application:didRegisterForRemoteNotificationsWithDeviceToken:)]);
+}
+
+/** Once the app has launched without an App Delegate, proxying doesn't wait any longer. */
+- (void)testProxyIsNotDeferredAfterAppDidFinishLaunching {
+  gFakeApplication.delegate = nil;
+  [GULAppDelegateSwizzler proxyOriginalDelegate];
+  [self postAppDidFinishLaunchingNotification];
+
+  // The deferred request ran without a delegate, so a later delegate isn't proxied.
+  GULEmptyTestAppDelegate *realAppDelegate = [[GULEmptyTestAppDelegate alloc] init];
+  gFakeApplication.delegate = realAppDelegate;
+  [GULAppDelegateSwizzler proxyOriginalDelegate];
+  [self postAppDidFinishLaunchingNotification];
+
+  XCTAssertTrue([realAppDelegate isMemberOfClass:[GULEmptyTestAppDelegate class]]);
+}
+
+/** Apps that disable proxying keep the existing behavior. */
+- (void)testProxyIsNotDeferredWhenProxyIsDisabled {
+  gAppFakeInfoDictionary = @{kGULFirebaseAppDelegateProxyEnabledPlistKey : @NO};
+  gFakeApplication.delegate = nil;
+  [GULAppDelegateSwizzler proxyOriginalDelegate];
+
+  GULEmptyTestAppDelegate *realAppDelegate = [[GULEmptyTestAppDelegate alloc] init];
+  gFakeApplication.delegate = realAppDelegate;
+  gAppFakeInfoDictionary = nil;
+  [self postAppDidFinishLaunchingNotification];
+
+  XCTAssertTrue([realAppDelegate isMemberOfClass:[GULEmptyTestAppDelegate class]]);
+}
+#endif  // !TARGET_OS_WATCH
+
 #if SDK_HAS_USERACTIVITY
 - (void)testHandleBackgroundSessionMethod {
   GULTestAppDelegate *realAppDelegate = [[GULTestAppDelegate alloc] init];

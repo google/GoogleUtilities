@@ -183,6 +183,17 @@ static NSString *const kGULDidReceiveRemoteNotificationWithCompletionSEL =
 static dispatch_once_t sProxyAppDelegateOnceToken;
 static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 
+#if !TARGET_OS_WATCH
+/** YES once the app has posted its "did finish launching" notification while proxying waited. */
+static BOOL sAppDidFinishLaunching;
+/** YES if proxying was requested before the App Delegate existed. */
+static BOOL sDeferredProxyRequested;
+/** YES if the deferred request includes the remote notification methods. */
+static BOOL sDeferredProxyIncludesAPNSMethods;
+/** Observes the "did finish launching" notification while proxying is deferred. */
+static id<NSObject> sDidFinishLaunchingObserver;
+#endif  // !TARGET_OS_WATCH
+
 #pragma mark - Public methods
 
 + (BOOL)isAppDelegateProxyEnabled {
@@ -276,6 +287,9 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   if ([GULAppEnvironmentUtil isAppExtension]) {
     return;
   }
+  if ([self deferProxyUntilAppDidFinishLaunchingIncludingAPNSMethods:NO]) {
+    return;
+  }
 
   dispatch_once(&sProxyAppDelegateOnceToken, ^{
     id<GULApplicationDelegate> originalDelegate =
@@ -286,6 +300,9 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 
 + (void)proxyOriginalDelegateIncludingAPNSMethods {
   if ([GULAppEnvironmentUtil isAppExtension]) {
+    return;
+  }
+  if ([self deferProxyUntilAppDidFinishLaunchingIncludingAPNSMethods:YES]) {
     return;
   }
 
@@ -322,6 +339,91 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
   }
   return sharedApplication;
 }
+
+#pragma mark - Deferred proxy
+
+/** Defers proxying if the App Delegate doesn't exist yet, and retries when the app finishes
+ *  launching.
+ *
+ *  SDKs proxy the App Delegate when Firebase is configured. A SwiftUI app can configure Firebase in
+ *  its `App` initializer, which runs before the application object and its delegate are created.
+ *  Proxying then has no delegate to work with, and because it runs only once, later requests can't
+ *  proxy the delegate either.
+ *
+ *  @param includingAPNSMethods Whether the request also proxies the remote notification methods.
+ *  @return YES if proxying is deferred, NO if it should run now.
+ */
++ (BOOL)deferProxyUntilAppDidFinishLaunchingIncludingAPNSMethods:(BOOL)includingAPNSMethods {
+#if TARGET_OS_WATCH
+  return NO;
+#else
+  // Keep the existing behavior, including the log messages, when proxying is disabled.
+  if (![self isAppDelegateProxyEnabled]) {
+    return NO;
+  }
+  if ([self sharedApplication].delegate != nil) {
+    return NO;
+  }
+
+  @synchronized(self) {
+    // The app has launched and still has no delegate, so there is nothing to wait for.
+    if (sAppDidFinishLaunching) {
+      return NO;
+    }
+    sDeferredProxyRequested = YES;
+    sDeferredProxyIncludesAPNSMethods = sDeferredProxyIncludesAPNSMethods || includingAPNSMethods;
+    if (sDidFinishLaunchingObserver == nil) {
+#if TARGET_OS_OSX
+      NSNotificationName didFinishLaunchingNotification =
+          NSApplicationDidFinishLaunchingNotification;
+#else
+      NSNotificationName didFinishLaunchingNotification =
+          UIApplicationDidFinishLaunchingNotification;
+#endif  // TARGET_OS_OSX
+      sDidFinishLaunchingObserver = [[NSNotificationCenter defaultCenter]
+          addObserverForName:didFinishLaunchingNotification
+                      object:nil
+                       queue:nil
+                  usingBlock:^(NSNotification *notification) {
+                    [GULAppDelegateSwizzler proxyDeferredAppDelegate];
+                  }];
+      GULOSLogDebug(
+          kGULLogSubsystem, kGULLoggerSwizzler, NO,
+          [NSString stringWithFormat:@"I-SWZ%06ld",
+                                     (long)kGULSwizzlerMessageCodeAppDelegateSwizzlingDeferred],
+          @"The App Delegate doesn't exist yet. It will be proxied when the app finishes "
+          @"launching.");
+    }
+  }
+  return YES;
+#endif  // TARGET_OS_WATCH
+}
+
+#if !TARGET_OS_WATCH
+/** Runs the proxying that was deferred until the app finished launching. */
++ (void)proxyDeferredAppDelegate {
+  BOOL includingAPNSMethods;
+  @synchronized(self) {
+    sAppDidFinishLaunching = YES;
+    if (sDidFinishLaunchingObserver != nil) {
+      [[NSNotificationCenter defaultCenter] removeObserver:sDidFinishLaunchingObserver];
+      sDidFinishLaunchingObserver = nil;
+    }
+    if (!sDeferredProxyRequested) {
+      return;
+    }
+    includingAPNSMethods = sDeferredProxyIncludesAPNSMethods;
+    sDeferredProxyRequested = NO;
+    sDeferredProxyIncludesAPNSMethods = NO;
+  }
+
+  if (includingAPNSMethods) {
+    [self proxyOriginalDelegateIncludingAPNSMethods];
+  } else {
+    [self proxyOriginalDelegate];
+  }
+}
+#endif  // !TARGET_OS_WATCH
 
 #pragma mark - Override default methods
 
@@ -1130,6 +1232,17 @@ static dispatch_once_t sProxyAppDelegateRemoteNotificationOnceToken;
 + (void)resetProxyOriginalDelegateOnceToken {
   sProxyAppDelegateOnceToken = 0;
   sProxyAppDelegateRemoteNotificationOnceToken = 0;
+#if !TARGET_OS_WATCH
+  @synchronized(self) {
+    if (sDidFinishLaunchingObserver != nil) {
+      [[NSNotificationCenter defaultCenter] removeObserver:sDidFinishLaunchingObserver];
+      sDidFinishLaunchingObserver = nil;
+    }
+    sAppDidFinishLaunching = NO;
+    sDeferredProxyRequested = NO;
+    sDeferredProxyIncludesAPNSMethods = NO;
+  }
+#endif  // !TARGET_OS_WATCH
 }
 
 + (id<GULApplicationDelegate>)originalDelegate {
