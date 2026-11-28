@@ -192,4 +192,28 @@
   XCTAssertEqual(receiptURLReadCount, 0);
 }
 
+- (void)testIsAppExtension {
+  // The test runner isn't an app extension.
+  XCTAssertFalse([GULAppEnvironmentUtil isAppExtension]);
+}
+
+- (void)testIsAppExtensionInAppExtensionBundle {
+  [GULSwizzler swizzleClass:[NSBundle class]
+                   selector:@selector(bundlePath)
+            isClassSelector:NO
+                  withBlock:^NSString *(id bundle) {
+                    return @"/private/var/containers/Bundle/Application/App.app/PlugIns/"
+                           @"Extension.appex";
+                  }];
+  BOOL isAppExtension = [GULAppEnvironmentUtil isAppExtension];
+  [GULSwizzler unswizzleClass:[NSBundle class] selector:@selector(bundlePath) isClassSelector:NO];
+
+#if TARGET_OS_OSX
+  XCTAssertFalse(isAppExtension);
+#else
+  // This includes visionOS, where `isAppExtension` used to end without returning a value.
+  XCTAssertTrue(isAppExtension);
+#endif  // TARGET_OS_OSX
+}
+
 @end

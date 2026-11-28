@@ -47,20 +47,20 @@ static NSString *const kFIRAppStoreReceiptURLCheckEnabledKey =
 static NSString *const kFIRAIdentitySandboxReceiptFileName = @"sandboxReceipt";
 
 static BOOL HasSCInfoFolder(void) {
-#if TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH
+#if TARGET_OS_OSX
+  return NO;
+#else
   NSString *bundlePath = [NSBundle mainBundle].bundlePath;
   NSString *scInfoPath = [bundlePath stringByAppendingPathComponent:@"SC_Info"];
   return [[NSFileManager defaultManager] fileExistsAtPath:scInfoPath];
-#elif TARGET_OS_OSX
-  return NO;
 #endif
 }
 
 static BOOL HasEmbeddedMobileProvision(void) {
-#if TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH
-  return [[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"].length > 0;
-#elif TARGET_OS_OSX
+#if TARGET_OS_OSX
   return NO;
+#else
+  return [[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"].length > 0;
 #endif
 }
 
@@ -239,12 +239,12 @@ static BOOL IsAppStoreReceiptSandbox(void) {
 }
 
 + (BOOL)isAppExtension {
-#if TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_WATCH
+#if TARGET_OS_OSX
+  return NO;
+#else
   // Documented by <a href="https://goo.gl/RRB2Up">Apple</a>
   BOOL appExtension = [[[NSBundle mainBundle] bundlePath] hasSuffix:@".appex"];
   return appExtension;
-#elif TARGET_OS_OSX
-  return NO;
 #endif
 }
 

@@ -1,3 +1,11 @@
+# Unreleased
+- [fixed] On visionOS, `GULAppEnvironmentUtil`'s `isAppExtension` (and so
+  `supportsBackgroundURLSessionUploads`) and, on devices, `isFromAppStore`
+  could return wrong results. Their platform checks covered iOS, tvOS, watchOS
+  and macOS but not visionOS, so the code ended without returning a value. For
+  example, an app could be treated as an app extension, which skips App
+  Delegate swizzling. visionOS now uses the same checks as iOS.
+
 # 8.1.5
 - [fixed] Deliver App Delegate callbacks to delegates that handle them by
   forwarding rather than by implementing them, such as the one SwiftUI installs
